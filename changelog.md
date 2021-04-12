@@ -1,24 +1,22 @@
 # Version 2021.0:
     The Original Release of the Library.
-    It currently has:
-        Classes:
-            - Hashes
-            - Miscellaneous
-            - Stats
-            - Math
+    Includes:
+        - Hashes
+        - Interfaces:
+            - INegatives<T>
+        - Lists:
             - List<T>
             - Matrix<T>
-            
-        Structs:
-            - Optional<T>
+        - Mathematics:
             - Angle
             - Color
             - ColorByte
+            - Math
             - Percent
             - Vector
             - Vector2
             - Vector3
             - Vector4
-            
-        Interfaces:
-            - INegatives<T>
+        - Miscellaneous
+        - Optional<T>
+        - Stats
