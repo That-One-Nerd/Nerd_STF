@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Nerd_STF
 {
@@ -36,40 +37,14 @@ namespace Nerd_STF
         }
     }
 
-    public static class Miscellaneous
-    {
-        public static int SyllableCount(string input)
-        {
-            // Starter code by KeithS on StackExchange.
-
-            input = input.ToLower().Trim();
-            bool lastWasVowel = false;
-            char[] vowels = new[] { 'a', 'e', 'i', 'o', 'u', 'y' };
-            int count = 0;
-
-            foreach (var c in input)
-            {
-                if (vowels.Contains(c))
-                {
-                    if (!lastWasVowel) count++;
-                    lastWasVowel = true;
-                }
-                else lastWasVowel = false;
-            }
-
-            if ((input.EndsWith("e") || input.EndsWith("es") || input.EndsWith("ed")) && !input.EndsWith("le")) count--;
-
-            return count;
-        }
-    }
-
     public static class Stats
     {
-        public static readonly string Creator = "That_One_Nerd"; 
+        public static readonly string Creator = "That_One_Nerd";
         public static readonly string[] Links = new[]
-        {   "Discord: https://discord.gg/ySXMtWDTYY/",
+        {   
+            "Discord: https://discord.gg/ySXMtWDTYY/",
             "Github: https://https://github.com/that-one-nerd",
-            "Itch: https://that-one-nerd.itch.io/" 
+            "Itch: https://that-one-nerd.itch.io/"
         };
         public static readonly string Version = "2021.0";
     }
