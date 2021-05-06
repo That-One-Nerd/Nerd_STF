@@ -20,3 +20,16 @@
         - Miscellaneous
         - Optional<T>
         - Stats
+
+# Version 2021.1:
+    Mainly centered around files and filesaving.
+    Added:
+        + Filesaving.cs
+            + File<T>
+            + BinaryFile
+            + ByteFile
+            + TextFile
+    
+    Removed:
+        General.cs
+            - Miscellaneous
