@@ -21,3 +21,13 @@
             * public class Miscellaneous
             * public struct Optional<T>
             * public static class Stats
+            
+# Version 2021.1:
+    Mainly centered around files and filesaving.
+    * Nerd_STF
+        + Nerd_STF.Filesaving
+            + File<T>
+            + BinaryFile
+            + ByteFile
+            + TextFile
+        - public class Miscellaneous
