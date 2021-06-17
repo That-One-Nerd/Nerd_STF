@@ -1,541 +1,465 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Nerd_STF.Mathematics;
 
 namespace Nerd_STF.Lists
 {
-    public class Matrix<T>
+    [Serializable]
+    public class List<T> : IEnumerable, IEnumerable<T>
     {
-        internal List<List<T>> lists;
+        public static List<T> Empty => new();
 
-        public Vector2 Length
-        {
-            get
-            {
-                return new(lists.Get(0).Length, lists.Length);
-            }
-        }
-        public int LengthX
-        {
-            get
-            {
-                return lists.Get(0).Length;
-            }
-        }
-        public int LengthY
-        {
-            get
-            {
-                return lists.Length;
-            }
-        }
+        internal T[] array;
 
-        public static Matrix<T> Empty
+        public int this[T item]
         {
-            get
-            {
-                return new Matrix<T> { lists = List<List<T>>.Empty };
-            }
-        }
-
-        public Matrix()
-        {
-            lists = new List<List<T>>(1, new List<T>(1, default));
-        }
-        public Matrix(int lengthX, int lengthY)
-        {
-            if (lengthX < 1) throw new ArgumentOutOfRangeException(nameof(lengthX), "Do not include a length of less than 1");
-            if (lengthY < 1) throw new ArgumentOutOfRangeException(nameof(lengthY), "Do not include a width of less than 1");
-            lists = new List<List<T>>(lengthY, new List<T>(lengthX));
-        } 
-        public Matrix(int lengthX, int lengthY, T inputAll)
-        {
-            if (lengthX < 1) throw new ArgumentOutOfRangeException(nameof(lengthX), "Do not include a length of less than 1");
-            if (lengthY < 1) throw new ArgumentOutOfRangeException(nameof(lengthY), "Do not include a width of less than 1");
-            lists = new List<List<T>>(lengthY, new List<T>(lengthX, inputAll));
-        }
-        public T this[int indexX, int indexY]
-        {
-            get
-            {
-                return Get(indexX, indexY);
-            }
-
-            set
-            {
-                Set(indexX, indexY, value);
-            }
-        }
-
-        public void Add(Matrix<T> input, DirectionType addDir)
-        {
-            if (addDir == DirectionType.y)
-            {
-                foreach (List<T> list in input.lists)
-                {
-                    AddY(list);
-                }
-                return;
-            }
-
-            foreach (List<T> list in input.lists)
-            {
-                AddX(list);
-            }
-        }
-        public void AddX()
-        {
-            foreach (List<T> list in lists)
-            {
-                list.Add();
-            }
-        }
-        public void AddX(T input)
-        {
-            foreach (List<T> list in lists)
-            {
-                list.Add(input);
-            }
-        }
-        public void AddX(T[] input)
-        {
-            foreach (T t in input)
-            {
-                AddX(t);
-            }
-        }
-        public void AddX(List<T> input)
-        {
-            foreach (T t in input)
-            {
-                AddX(t);
-            }
-        }
-        public void AddY()
-        {
-            lists.Add(new List<T>(lists.Get(0).Length));
-        }
-        public void AddY(T input)
-        {
-            lists.Add(new List<T>(lists.Get(0).Length, input));
-        }
-        public void AddY(T[] input)
-        {
-            if (input.Length > lists.Get(0).Length) throw new OverflowException();
-            lists.Add(new List<T>(input));
-        }
-        public void AddY(List<T> input)
-        {
-            if (input.Length > lists.Get(0).Length) throw new OverflowException();
-            lists.Add(input);
-        }
-        public bool Check(int placeX, int placeY)
-        {
-            return lists.Get(placeY).Get(placeX) != null;
-        }
-        public bool Compare(T input)
-        {
-            foreach (List<T> list in lists)
-            {
-                if (list.Compare(input)) return true;
-            }
-
-            return false;
-        }
-        public void Convert(T input)
-        {
-            foreach (List<T> list in lists)
-            {
-                list.Convert(input);
-            }
-        }
-        public void Convert(T[] input)
-        {
-            foreach (List<T> list in lists)
-            {
-                list.Convert(input);
-            }
-        }
-        public void Convert(List<T> input)
-        {
-            foreach (List<T> list in lists)
-            {
-                list.Convert(input);
-            }
-        }
-        public void Convert(Matrix<T> input)
-        {
-            lists = input.lists;
-        }
-        public int Count()
-        {
-            int returned = 0;
-
-            foreach (List<T> list in lists)
-            {
-                returned += list.Count();
-            }
-
-            return returned;
-        }
-        public int Count(DirectionType type)
-        {
-            if (type == DirectionType.y) return LengthY;
-            return LengthX;
-        }
-        public Vector2 CountXY()
-        {
-            return Length;
-        }
-        public T Get(int placeX, int placeY)
-        {
-            return lists.Get(placeY).Get(placeX);
-        }
-        public void Get(int placeX, int placeY, out T output)
-        {
-            output = Get(placeX, placeY);
-        }
-        public List<T> GetAll()
-        {
-            List<T> returned = new();
-
-            foreach (List<T> list in lists)
-            {
-                returned.Add(list);
-            }
-
-            return returned;
-        }
-        public void GetAll(out List<T> output)
-        {
-            List<T> returned = new();
-
-            foreach (List<T> list in lists)
-            {
-                returned.Add(list);
-            }
-
-            output = returned;
-        }
-        public IEnumerator GetEnumerator()
-        {
-            foreach (List<T> list in lists)
-            {
-                foreach (T t in list)
-                {
-                    yield return t;
-                }
-            }
-        }
-        public void Remove(int placeX, int placeY)
-        {
-            lists.Get(placeY).Remove(placeX);
-        }
-        public void Set(int placeX, int placeY, T input)
-        {
-            lists.Get(placeY).Set(placeX, input);
-        }
-        public void SetAll(T input)
-        {
-            for (int i = 0; i < lists.Length; i++)
-            {
-                for (int j = 0; j < lists.Get(i).Length; j++)
-                {
-                    lists.Get(i).Set(j, input);
-                }
-            }
-        }
-
-        public static Matrix<T> AllDefault(int lengthX, int lengthY)
-        {
-            return new(lengthX, lengthY, default);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-        public bool Equals(Matrix<T> other)
-        {
-            return GetAll() == other.GetAll();
-        }
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-        public override string ToString()
-        {
-            return lists.ToString();
-        }
-        public string ToString(bool showAll)
-        {
-            if (showAll)
-            {
-                string r = "";
-                for (int i = 0; i < lists.Length; i++)
-                {
-                    for (int j = 0; j < lists.Get(i).Length; j++)
-                    {
-                        r += lists.Get(i).Get(j);
-                        if (j != lists.Get(i).Length - 1) r += ", ";
-                    }
-                    if (i != lists.Length - 1) r += "\n";
-                }
-                return r;
-            }
-            else
-            {
-                return ToString();
-            }
-        }
-
-        public static bool operator ==(Matrix<T> a, Matrix<T> b)
-        {
-            return a.Equals(b);
-        }
-        public static bool operator !=(Matrix<T> a, Matrix<T> b)
-        {
-            return !a.Equals(b);
-        }
-
-        public enum DirectionType
-        {
-            x,
-            y,
-        }
-    }
-
-    public class List<T>
-    {
-        internal T[] list;
-
-        public int Length
-        {
-            get
-            {
-                return list.Length;
-            }
+            get => FindIndex(item);
+            set => Insert(value, item);
         }
         public T this[int index]
         {
-            get
-            {
-                return Get(index);
-            }
-            set
-            {
-                Set(index, value);
-            }
+            get => array[index]; 
+            set => array[index] = value;
         }
 
-        public static List<T> Empty
-        {
-            get
-            {
-                return new List<T>(Array.Empty<T>());
-            }
-        }
+        public List<T> Duplicate => new(array);
+        public bool IsEmpty => array == Array.Empty<T>();
+        public bool IsNull => array == null;
+        public bool IsNullOrEmpty => IsNull || IsEmpty;
+        public int Length => array.Length;
 
-        public List()
+        public List() => array = Array.Empty<T>();
+        public List(params T[] items) => array = items;
+        public List(int length) => array = new T[length];
+        public List(int length, T itemAll)
         {
-            list = Array.Empty<T>();
+            array = new T[length];
+            for (int i = 0; i < array.Length; i++) array[i] = itemAll;
         }
-        public List(int length)
+        public List(IEnumerable items)
         {
-            list = new T[length];
-            for (int i = 0; i < length; i++)
-            {
-                list[i] = default;
-            }
-        }
-        public List(int length, T inputAll)
-        {
-            list = new T[length];
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = inputAll;
-            }
-        }
-        public List(T[] input)
-        {
-            list = Array.Empty<T>();
-            if (input != default) list = input;
-        }
-        public List(List<T> input)
-        {
-            list = Array.Empty<T>();
-            if (input.list != default) list = input.list;
-        }
+            int length = 0;
+            foreach (object _ in items) length++;
+            array = new T[length];
 
-        public void Add()
+            AddRange(items);
+        }
+        public List(IEnumerable<T> items)
         {
-            T[] before = list;
+            int length = 0;
+            foreach (object _ in items) length++;
+            if (length == 0) array = Array.Empty<T>();
 
-            if (before.Length == 0)
-            {
-                list = new T[1];
-                list[0] = default;
-            }
+            AddRange(items);
+        }
+        public List(List<T> list) => array = list.array;
+
+        public void Add() => Add(default);
+        public void Add(T item)
+        {
+            if (array == null || array == Array.Empty<T>()) array = new T[1] { item };
             else
             {
-                list = new T[before.Length + 1];
-                int place = 0;
-                while (place < before.Length)
-                {
-                    list[place] = before[place];
-                    place++;
-                }
-                list[place] = default;
+                T[] old = array;
+                array = new T[old.Length + 1];
+                for (int i = 0; i < old.Length; i++) array[i] = old[i];
+                array[old.Length] = item;
             }
         }
-        public void Add(T add)
+        public void AddRange(IEnumerable items) { foreach (T t in items) Add(t); }
+        public void AddRange(IEnumerable<T> items) { foreach (T t in items) Add(t); }
+        public void AddRange(List<T> items) { foreach (T t in items) Add(t); }
+        public void AddRange(params T[] items) { foreach (T t in items) Add(t); }
+        public bool Any(Predicate<T> predicate)
         {
-            T[] before = list;
-
-            if (before.Length == 0)
-            {
-                list = new T[1];
-                list[0] = add;
-            }
-            else
-            {
-                list = new T[before.Length + 1];
-                int place = 0;
-                while (place < before.Length)
-                {
-                    list[place] = before[place];
-                    place++;
-                }
-                list[place] = add;
-            }
-        }
-        public void Add(T[] add)
-        {
-            foreach (T input in add)
-            {
-                Add(input);
-            }
-        }
-        public void Add(List<T> add)
-        {
-            Add(add.list);
-        }
-        public bool Check(int place)
-        {
-            return list[place] != null;
-        }
-        public bool Compare(T input)
-        {
-            foreach (T place in list)
-            {
-                if (place == null) continue;
-                if (place.Equals(input)) return true;
-            }
-
+            foreach (T t in array) if (predicate.Invoke(t)) return true;
             return false;
         }
-        public void Convert(T input)
+        public bool Any(T match)
         {
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = input;
-            }
+            foreach (T t in array) if (t.Equals(match)) return true;
+            return false;
         }
-        public void Convert(T[] input)
+        public void Clear(bool resetSize = false)
         {
-            list = input;
+            if (resetSize) array = Array.Empty<T>();
+            else { for (int i = 0; i < array.Length; i++) array[i] = default; }
         }
-        public void Convert(List<T> input)
+        public bool Contains(Predicate<T> predicate)
         {
-            Convert(input.list);
+            foreach (T t in array) if (predicate.Invoke(t)) return true;
+            return false;
+        }
+        public bool Contains(T match)
+        {
+            foreach (T t in array) if (t.Equals(match)) return true;
+            return false;
         }
         public int Count()
         {
-            int returned = 0;
-            foreach (T _ in list)
-            {
-                returned++;
-            }
-            return returned;
+            int r = 0;
+            foreach (T _ in array) r++;
+            return r;
         }
-        public T Get(int place)
+        public int Count(Predicate<T> predicate)
         {
-            return list[place];
+            if (!Contains(predicate)) return 0;
+            int r = 0;
+            foreach (T t in array) if (predicate.Invoke(t)) r++;
+            return r;
         }
-        public void Get(int place, out T output)
+        public int Count(T match)
         {
-            output = Get(place);
+            if (!Contains(match)) return 0;
+            int r = 0;
+            foreach (T t in array) if (t.Equals(match)) r++;
+            return r;
         }
-        public T[] GetAll()
+        public void Fill(T item) { for (int i = 0; i < Length; i++) array[i] = item; }
+        public T Find(Predicate<T> predicate)
         {
-            return list;
+            foreach (T t in array) if (predicate.Invoke(t)) return t;
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
         }
-        public IEnumerator GetEnumerator()
+        public T Find(T match)
         {
-            return list.GetEnumerator();
+            foreach (T t in array) if (t.Equals(match)) return t;
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
         }
-        public void Remove(int place)
+        public T Find(Predicate<T> predicate, int start)
         {
-            list[place] = default;
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
         }
-        public void Remove(int place, bool shift)
+        public T Find(T match, int start)
         {
-            list[place] = default;
-            if (shift)
-            {
-                for (int i = place; i < list.Length - 1; i++)
-                {
-                    list[i] = list[i + 1];
-                }
-                T[] save = list;
-                list = new T[save.Length - 1];
-                for (int i = 0; i < save.Length - 1; i++)
-                {
-                    list[i] = save[i];
-                }
-            }
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
         }
-        public void Set(int place, T input)
+        public T Find(Predicate<T> predicate, int start, int max)
         {
-            list[place] = input;
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
         }
-        public void Set(T[] input)
+        public T Find(T match, int start, int max)
         {
-            list = input;
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
         }
-        public void Set(List<T> input)
+        public T FindOrDefault(Predicate<T> predicate)
         {
-            Set(input.list);
+            foreach (T t in array) if (predicate.Invoke(t)) return t;
+            return default;
         }
-        public void SetAll(T input)
+        public T FindOrDefault(T match)
         {
-            for (int i = 0; i < list.Length; i++)
-            {
-                list[i] = input;
-            }
+            foreach (T t in array) if (t.Equals(match)) return t;
+            return default;
         }
+        public T FindOrDefault(Predicate<T> predicate, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindOrDefault(T match, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public T FindOrDefault(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindOrDefault(T match, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public List<T> FindAll(Predicate<T> predicate)
+        {
+            List<T> r = new();
+            foreach (T t in array) if (predicate.Invoke(t)) r.Add(t);
+            return r;
+        }
+        public List<T> FindAll(T match)
+        {
+            List<T> r = new();
+            foreach (T t in array) if (t.Equals(match)) r.Add(t);
+            return r;
+        }
+        public List<T> FindAll(Predicate<T> predicate, int start)
+        {
+            List<T> r = new();
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) r.Add(array[i]);
+            return r;
+        }
+        public List<T> FindAll(T match, int start)
+        {
+            List<T> r = new();
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) r.Add(array[i]);
+            return r;
+        }
+        public List<T> FindAll(Predicate<T> predicate, int start, int max)
+        {
+            List<T> r = new();
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) r.Add(array[i]);
+            return r;
+        }
+        public List<T> FindAll(T match, int start, int max)
+        {
+            List<T> r = new();
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) r.Add(array[i]);
+            return r;
+        }
+        public T FindLast(Predicate<T> predicate)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T FindLast(T match)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindLast(Predicate<T> predicate, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T FindLast(T match, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindLast(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T FindLast(T match, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindLastOrDefault(Predicate<T> predicate)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(T match)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(Predicate<T> predicate, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(T match, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(T match, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public int FindIndex(Predicate<T> predicate)
+        {
+            for (int i = 0; i < array.Length; i++) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindIndex(T match)
+        {
+            for (int i = 0; i < array.Length; i++) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindIndex(Predicate<T> predicate, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindIndex(T match, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindIndex(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindIndex(T match, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public List<int> FindAllIndex()
+        {
+            List<int> ret = new();
+            for (int i = 0; i < array.Length; i++) ret.Add(i);
+            return ret;
+        }
+        public List<int> FindAllIndex(Predicate<T> predicate)
+        {
+            List<int> r = new();
+            for (int i = 0; i < array.Length; i++) if (predicate.Invoke(array[i])) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(T match)
+        {
+            List<int> r = new();
+            for (int i = 0; i < array.Length; i++) if (array[i].Equals(match)) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(int start)
+        {
+            List<int> ret = new();
+            for (int i = start; i < array.Length; i++) ret.Add(i);
+            return ret;
+        }
+        public List<int> FindAllIndex(Predicate<T> predicate, int start)
+        {
+            List<int> r = new();
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(T match, int start)
+        {
+            List<int> r = new();
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(int start, int max)
+        {
+            List<int> ret = new();
+            for (int i = start; i <= max; i++) ret.Add(i);
+            return ret;
+        }
+        public List<int> FindAllIndex(Predicate<T> predicate, int start, int max)
+        {
+            List<int> r = new();
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(T match, int start, int max)
+        {
+            List<int> r = new();
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) r.Add(i);
+            return r;
+        }
+        public int FindLastIndex(Predicate<T> predicate)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindLastIndex(T match)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindLastIndex(Predicate<T> predicate, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindLastIndex(T match, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindLastIndex(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindLastIndex(T match, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public IEnumerator GetEnumerator() => array.GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => (IEnumerator<T>)array.GetEnumerator();
+        public List<T> GetRange(int start, int max)
+        {
+            List<T> r = new();
+            for (int i = start; i <= max; i++) r.Add(array[i]);
+            return r;
+        }
+        public void Insert(int index, T item)
+        {
+            T[] old = array;
+            array = new T[old.Length + 1];
+            for (int i = 0; i < index; i++) array[i] = old[i];
+            array[index] = item;
+            for (int i = index + 1; i < array.Length; i++) array[i] = old[i - 1];
+        }
+        public void InsertRange(int index, IEnumerable<T> items)
+        {
+            List<T> list = new(items);
 
-        public static List<T> AllDefault(int length)
-        {
-            return new(length, default);
+            T[] old = array;
+            array = new T[old.Length + list.Length];
+            for (int i = 0; i < index; i++) array[i] = old[i];
+            for (int i = 0; i < list.Length; i++) array[index + i] = list[i];
+            for (int i = index + list.Length; i < array.Length; i++) array[i] = old[i - list.Length];
         }
-
-        public override bool Equals(object obj)
+        public bool MatchesAll(Predicate<T> predicate) => FindAll(predicate).array == array;
+        public bool MatchesAll(T match) => FindAll(match).array == array;
+        public void Randomize()
         {
-            return base.Equals(obj);
-        }
-        public bool Equals(List<T> other)
-        {
-            bool returned = true;
-            if (Length == other.Length)
+            List<T> newL = new();
+            List<int> possibleIndexes = FindAllIndex();
+            for (int i = 0; i < possibleIndexes.Length; i++)
             {
-                for (int i = 0; i < Length; i++)
-                {
-                    returned &= Get(i).Equals(other.Get(i));
-                }
+                int index = possibleIndexes[new Random().Next(0, possibleIndexes.Length)];
+                newL.Add(array[index]);
+                possibleIndexes.Remove(x => x == index);
             }
-            return returned;
+            array = newL.ToArray();
         }
+        public void Remove(Predicate<T> predicate) => Remove(FindIndex(predicate));
+        public void Remove(T item) => Remove(FindIndex(item));
+        public void Remove(int index)
+        {
+            List<T> newList = new();
+            for (int i = 0; i < array.Length; i++) if (i != index) newList.Add(array[i]);
+            array = newList.array;
+        }
+        public void RemoveAll(Predicate<T> predicate) { foreach (int i in FindAllIndex(predicate)) Remove(i); }
+        public void RemoveAll(T match) { foreach (int i in FindAllIndex(match)) Remove(i); }
+        public void RemoveLast(Predicate<T> predicate) => Remove(FindLastIndex(predicate));
+        public void RemoveLast(T item) => Remove(FindLastIndex(item));
+        public void RemoveRange(int index, int max)
+        {
+            List<T> newList = new();
+            for (int i = 0; i < array.Length; i++) if (i < index || i > max) newList.Add(array[i]);
+            array = newList.array;
+        }
+        public void Reverse()
+        {
+            T[] old = array;
+            array = new T[old.Length];
+
+            for (int i = old.Length - 1; i >= 0; i--) array[i] = old[i];
+        }
+        public void Shuffle() => Randomize();
+        public T[] ToArray() => array;
+        public ReadOnlyList<T> ToReadOnly() { return new ReadOnlyList<T>(array); }
+        public ReadOnlyCollection<T> ToSystemReadOnly() { return new ReadOnlyCollection<T>(array); }
+        public System.Collections.Generic.List<T> ToSystemList() { return new System.Collections.Generic.List<T>(array); }
+
+        public override bool Equals(object obj) => base.Equals(obj);
         public bool Equals(T[] other)
         {
             bool returned = true;
@@ -543,86 +467,54 @@ namespace Nerd_STF.Lists
             {
                 for (int i = 0; i < Length; i++)
                 {
-                    returned &= Get(i).Equals(other[i]);
+                    returned &= array[i].Equals(other[i]);
                 }
             }
             return returned;
         }
-        public override int GetHashCode()
+        public bool Equals(List<T> list)
         {
-            return base.GetHashCode();
+            if (Length != list.Length) return false;
+            bool equal = true;
+            for (int i = 0; i < Length; i++) equal &= array[i].Equals(list[i]);
+            return equal;
         }
-        public override string ToString()
+        public bool Equals(IEnumerable<T> list) => Equals(new List<T>(list));
+        public override int GetHashCode() => base.GetHashCode();
+        public override string ToString() => ToString(false);
+        public string ToString(bool showAll = false)
         {
-            return list.ToString();
-        }
-        public string ToString(bool showAll)
-        {
-            if (showAll)
-            {
-                string r = "";
-                for (int i = 0; i < list.Length; i++)
-                {
-                    r += list[i].ToString();
-                    if (i != list.Length - 1) r += "\n";
-                }
-                return r;
-            }
-            else
-            {
-                return ToString();
-            }
+            string ret = "List of " + Length + " Elements (" + typeof(T).ToString() + ")";
+            if (showAll) for (int i = 0; i < Length; i++) ret += "\n" + i + ": " + array[i];
+            return ret;
         }
 
-        public static List<T> operator +(List<T> a, List<T> b)
+        public static List<T> operator +(List<T> a, T b)
         {
             a.Add(b);
+            return a;
+        }
+        public static List<T> operator +(List<T> a, IEnumerable<T> b)
+        {
+            a.AddRange(b);
+            return a;
+        }
+        public static List<T> operator +(List<T> a, List<T> b)
+        {
+            a.AddRange(b);
             return a;
         }
         public static List<T> operator +(List<T> a, T[] b)
         {
-            a.Add(b);
+            a.AddRange(b);
             return a;
-        }
-        public static List<T> operator +(T[] a, List<T> b)
-        {
-            List<T> returned = new(a);
-            returned.Add(b);
-            return returned;
-        }
-        public static List<T> operator +(List<T> a, int add)
-        {
-            List<T> returned = new(a.Length + add);
-            int i = 0;
-            while (i < a.Length)
-            {
-                returned.Set(i, a.Get(i));
-                i++;
-            }
-            while (i < returned.Length)
-            {
-                returned.Set(i, default);
-            }
-            return returned;
-        }
-        public static List<T> operator +(List<T> a, T b)
-        {
-            a.Add(b);
-
-            return a;
-        }
-        public static List<T> operator +(T a, List<T> b)
-        {
-            b.Add(a);
-
-            return b;
         }
         public static List<T> operator -(List<T> a, int remove)
         {
             List<T> returned = new(a.Length - remove);
             for (int i = 0; i < returned.Length; i++)
             {
-                returned.Set(i, a.Get(i));
+                returned[i] = a[i];
             }
             return returned;
         }
@@ -642,25 +534,12 @@ namespace Nerd_STF.Lists
             }
             return a;
         }
-        public static List<T> operator *(List<T> a, int multiplier)
+        public static List<T> operator -(List<T> a, T b)
         {
-            List<T> returned = new(a.Length * multiplier);
-            int i = 0;
-            while (i < a.Length)
-            {
-                returned.Set(i, a.Get(i));
-                i++;
-            }
-            while (i < returned.Length)
-            {
-                returned.Set(i, default);
-            }
-            return returned;
+            a.Remove(b);
+            return a;
         }
-        public static bool operator ==(List<T> a, List<T> b)
-        {
-            return a.Equals(b);
-        }
+        public static bool operator ==(List<T> a, List<T> b) => a.Equals(b);
         public static bool operator ==(List<T> a, T[] b)
         {
             return a.Equals(b);
@@ -669,10 +548,7 @@ namespace Nerd_STF.Lists
         {
             return b.Equals(a);
         }
-        public static bool operator !=(List<T> a, List<T> b)
-        {
-            return !a.Equals(b);
-        }
+        public static bool operator !=(List<T> a, List<T> b) => !a.Equals(b);
         public static bool operator !=(List<T> a, T[] b)
         {
             return !a.Equals(b);
@@ -681,14 +557,539 @@ namespace Nerd_STF.Lists
         {
             return !b.Equals(a);
         }
+    }
 
-        public static explicit operator T[](List<T> list)
+    [Serializable]
+    [Obsolete("This class will be removed or heavily modified in a future release.")]
+    public class Matrix<T>
+    {
+        internal List<List<T>> lists;
+
+        public Vector2 Length => new(lists[0].Length, lists.Length); 
+        public int LengthX => lists[0].Length; 
+        public int LengthY => lists.Length; 
+
+        public static Matrix<T> Empty => new() { lists = List<List<T>>.Empty };
+
+        public Matrix() => lists = new List<List<T>>(1, new List<T>(1, default));
+        public Matrix(int lengthX, int lengthY)
         {
-            return list.list;
+            if (lengthX < 1) throw new ArgumentOutOfRangeException(nameof(lengthX), "Do not include a length of less than 1");
+            if (lengthY < 1) throw new ArgumentOutOfRangeException(nameof(lengthY), "Do not include a width of less than 1");
+            lists = new List<List<T>>(lengthY, new List<T>(lengthX));
         }
-        public static explicit operator List<T>(T[] list)
+        public Matrix(int lengthX, int lengthY, T inputAll)
         {
-            return new List<T>(list);
+            if (lengthX < 1) throw new ArgumentOutOfRangeException(nameof(lengthX), "Do not include a length of less than 1");
+            if (lengthY < 1) throw new ArgumentOutOfRangeException(nameof(lengthY), "Do not include a width of less than 1");
+            lists = new List<List<T>>(lengthY, new List<T>(lengthX, inputAll));
         }
+        public T this[int indexX, int indexY]
+        {
+            get => Get(indexX, indexY);
+            set => Set(indexX, indexY, value);
+        }
+
+        public void Add(Matrix<T> input, DirectionType addDir)
+        {
+            if (addDir == DirectionType.y)
+            {
+                foreach (List<T> list in input.lists) AddY(list);
+                return;
+            }
+
+            foreach (List<T> list in input.lists) AddX(list);
+        }
+        public void AddX() { foreach (List<T> list in lists) list.Add(); }
+        public void AddX(T input) { foreach (List<T> list in lists) list.Add(input); }
+        public void AddX(T[] input) { foreach (T t in input) AddX(t); }
+        public void AddX(List<T> input) { foreach (T t in input) AddX(t); }
+        public void AddY() => lists.Add(new List<T>(lists[0].Length));
+        public void AddY(T input) => lists.Add(new List<T>(lists[0].Length, input));
+        public void AddY(T[] input)
+        {
+            if (input.Length > lists[0].Length) throw new OverflowException();
+            lists.Add(new List<T>(input));
+        }
+        public void AddY(List<T> input)
+        {
+            if (input.Length > lists[0].Length) throw new OverflowException();
+            lists.Add(input);
+        }
+        public bool Check(int placeX, int placeY) => lists[placeY][placeX] != null;
+        public bool Compare(T input)
+        {
+            foreach (List<T> list in lists) if (list.Contains(input)) return true;
+
+            return false;
+        }
+        public void Convert(T input) { for (int i = 0; i < lists.Length; i++) lists[i] = new(input); }
+        public void Convert(T[] input) { for (int i = 0; i < lists.Length; i++) lists[i] = new(input); }
+        public void Convert(List<T> input) { for (int i = 0; i < lists.Length; i++) lists[i] = input; }
+        public void Convert(Matrix<T> input) => lists = input.lists;
+        public int Count()
+        {
+            int returned = 0;
+
+            foreach (List<T> list in lists) returned += list.Count();
+
+            return returned;
+        }
+        public int Count(DirectionType type)
+        {
+            if (type == DirectionType.y) return LengthY;
+            return LengthX;
+        }
+        public Vector2 CountXY() => Length;
+        public T Get(int placeX, int placeY) => lists[placeY][placeX];
+        public void Get(int placeX, int placeY, out T output) => output = Get(placeX, placeY);
+        public List<T> GetAll()
+        {
+            List<T> returned = new();
+
+            foreach (List<T> list in lists) returned.AddRange(list);
+
+            return returned;
+        }
+        public void GetAll(out List<T> output)
+        {
+            List<T> returned = new();
+
+            foreach (List<T> list in lists) returned.AddRange(list);
+
+            output = returned;
+        }
+        public IEnumerator GetEnumerator() { foreach (List<T> list in lists) foreach (T t in list) yield return t; }
+        public void Remove(int placeX, int placeY) => lists[placeY].Remove(placeX);
+        public void Set(int placeX, int placeY, T input) => lists[placeY][placeX] = input;
+        public void SetAll(T input) { for (int i = 0; i < lists.Length; i++) for (int j = 0; j < lists[i].Length; j++) lists[i][j] = input; }
+
+        public static Matrix<T> AllDefault(int lengthX, int lengthY) => new(lengthX, lengthY, default);
+
+        public override bool Equals(object obj) => base.Equals(obj);
+        public bool Equals(Matrix<T> other) => GetAll() == other.GetAll();
+        public override int GetHashCode() => base.GetHashCode();
+        public override string ToString() => lists.ToString();
+        public string ToString(bool showAll)
+        {
+            if (showAll)
+            {
+                string r = "";
+                for (int i = 0; i < lists.Length; i++)
+                {
+                    for (int j = 0; j < lists[i].Length; j++)
+                    {
+                        r += lists[i][j];
+                        if (j != lists[i].Length - 1) r += ", ";
+                    }
+                    if (i != lists.Length - 1) r += "\n";
+                }
+                return r;
+            }
+            else return ToString();
+        }
+
+        public static bool operator ==(Matrix<T> a, Matrix<T> b) => a.Equals(b);
+        public static bool operator !=(Matrix<T> a, Matrix<T> b) => !a.Equals(b);
+
+        public enum DirectionType
+        {
+            x,
+            y,
+        }
+    }
+
+    [Serializable]
+    public class ReadOnlyList<T> : IEnumerable, IEnumerable<T>
+    {
+        public static ReadOnlyList<T> Empty => new();
+
+        internal T[] array;
+
+        public T this[int index] => array[index];
+
+        public List<T> Duplicate => new(array);
+        public bool IsEmpty => array == Array.Empty<T>();
+        public bool IsNull => array == null;
+        public bool IsNullOrEmpty => IsNull || IsEmpty;
+        public int Length => array.Length;
+
+        public ReadOnlyList() => array = Array.Empty<T>();
+        public ReadOnlyList(params T[] items) => array = items;
+        public ReadOnlyList(int length) => array = new T[length];
+        public ReadOnlyList(int length, T itemAll)
+        {
+            array = new T[length];
+            for (int i = 0; i < array.Length; i++) array[i] = itemAll;
+        }
+        public ReadOnlyList(IEnumerable<T> items) => array = new List<T>(items).ToArray();
+        
+        public bool Contains(Predicate<T> predicate)
+        {
+            foreach (T t in array) if (predicate.Invoke(t)) return true;
+            return false;
+        }
+        public bool Contains(T match)
+        {
+            foreach (T t in array) if (t.Equals(match)) return true;
+            return false;
+        }
+        public int Count()
+        {
+            int r = 0;
+            foreach (T _ in array) r++;
+            return r;
+        }
+        public int Count(Predicate<T> predicate)
+        {
+            if (!Contains(predicate)) return 0;
+            int r = 0;
+            foreach (T t in array) if (predicate.Invoke(t)) r++;
+            return r;
+        }
+        public int Count(T match)
+        {
+            if (!Contains(match)) return 0;
+            int r = 0;
+            foreach (T t in array) if (t.Equals(match)) r++;
+            return r;
+        }
+        public T Find(Predicate<T> predicate)
+        {
+            foreach (T t in array) if (predicate.Invoke(t)) return t;
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T Find(T match)
+        {
+            foreach (T t in array) if (t.Equals(match)) return t;
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T Find(Predicate<T> predicate, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T Find(T match, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T Find(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T Find(T match, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindOrDefault(Predicate<T> predicate)
+        {
+            foreach (T t in array) if (predicate.Invoke(t)) return t;
+            return default;
+        }
+        public T FindOrDefault(T match)
+        {
+            foreach (T t in array) if (t.Equals(match)) return t;
+            return default;
+        }
+        public T FindOrDefault(Predicate<T> predicate, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindOrDefault(T match, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public T FindOrDefault(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindOrDefault(T match, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public List<T> FindAll(Predicate<T> predicate)
+        {
+            List<T> r = new();
+            foreach (T t in array) if (predicate.Invoke(t)) r.Add(t);
+            return r;
+        }
+        public List<T> FindAll(T match)
+        {
+            List<T> r = new();
+            foreach (T t in array) if (t.Equals(match)) r.Add(t);
+            return r;
+        }
+        public List<T> FindAll(Predicate<T> predicate, int start)
+        {
+            List<T> r = new();
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) r.Add(array[i]);
+            return r;
+        }
+        public List<T> FindAll(T match, int start)
+        {
+            List<T> r = new();
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) r.Add(array[i]);
+            return r;
+        }
+        public List<T> FindAll(Predicate<T> predicate, int start, int max)
+        {
+            List<T> r = new();
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) r.Add(array[i]);
+            return r;
+        }
+        public List<T> FindAll(T match, int start, int max)
+        {
+            List<T> r = new();
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) r.Add(array[i]);
+            return r;
+        }
+        public T FindLast(Predicate<T> predicate)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T FindLast(T match)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindLast(Predicate<T> predicate, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T FindLast(T match, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindLast(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            throw new Exception("Parameter " + nameof(predicate) + " does not exist in the list.");
+        }
+        public T FindLast(T match, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            throw new Exception("Parameter " + nameof(match) + " does not exist in the list.");
+        }
+        public T FindLastOrDefault(Predicate<T> predicate)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(T match)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(Predicate<T> predicate, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(T match, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (predicate.Invoke(array[i])) return array[i];
+            return default;
+        }
+        public T FindLastOrDefault(T match, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (array[i].Equals(match)) return array[i];
+            return default;
+        }
+        public int FindIndex(Predicate<T> predicate)
+        {
+            for (int i = 0; i < array.Length; i++) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindIndex(T match)
+        {
+            for (int i = 0; i < array.Length; i++) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindIndex(Predicate<T> predicate, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindIndex(T match, int start)
+        {
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindIndex(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindIndex(T match, int start, int max)
+        {
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public List<int> FindAllIndex()
+        {
+            List<int> ret = new();
+            for (int i = 0; i < array.Length; i++) ret.Add(i);
+            return ret;
+        }
+        public List<int> FindAllIndex(Predicate<T> predicate)
+        {
+            List<int> r = new();
+            for (int i = 0; i < array.Length; i++) if (predicate.Invoke(array[i])) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(T match)
+        {
+            List<int> r = new();
+            for (int i = 0; i < array.Length; i++) if (array[i].Equals(match)) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(int start)
+        {
+            List<int> ret = new();
+            for (int i = start; i < array.Length; i++) ret.Add(i);
+            return ret;
+        }
+        public List<int> FindAllIndex(Predicate<T> predicate, int start)
+        {
+            List<int> r = new();
+            for (int i = start; i < array.Length; i++) if (predicate.Invoke(array[i])) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(T match, int start)
+        {
+            List<int> r = new();
+            for (int i = start; i < array.Length; i++) if (array[i].Equals(match)) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(int start, int max)
+        {
+            List<int> ret = new();
+            for (int i = start; i <= max; i++) ret.Add(i);
+            return ret;
+        }
+        public List<int> FindAllIndex(Predicate<T> predicate, int start, int max)
+        {
+            List<int> r = new();
+            for (int i = start; i <= max; i++) if (predicate.Invoke(array[i])) r.Add(i);
+            return r;
+        }
+        public List<int> FindAllIndex(T match, int start, int max)
+        {
+            List<int> r = new();
+            for (int i = start; i <= max; i++) if (array[i].Equals(match)) r.Add(i);
+            return r;
+        }
+        public int FindLastIndex(Predicate<T> predicate)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindLastIndex(T match)
+        {
+            for (int i = array.Length - 1; i >= 0; i--) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindLastIndex(Predicate<T> predicate, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindLastIndex(T match, int start)
+        {
+            for (int i = array.Length - 1; i >= start; i--) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public int FindLastIndex(Predicate<T> predicate, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (predicate.Invoke(array[i])) return i;
+            return -1;
+        }
+        public int FindLastIndex(T match, int start, int max)
+        {
+            for (int i = max; i >= start; i--) if (array[i].Equals(match)) return i;
+            return -1;
+        }
+        public IEnumerator GetEnumerator() => array.GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => (IEnumerator<T>)array.GetEnumerator();
+        public List<T> GetRange(int start, int max)
+        {
+            List<T> r = new();
+            for (int i = start; i <= max; i++) r.Add(array[i]);
+            return r;
+        }
+        public bool MatchesAll(Predicate<T> predicate) => FindAll(predicate).array == array;
+        public bool MatchesAll(T match) => FindAll(match).array == array;
+        public T[] ToArray() => array;
+        public List<T> ToList() => new(array);
+        public System.Collections.Generic.List<T> ToSystemList() => new(array);
+        public ReadOnlyCollection<T> ToSystemReadOnly() => new(array);
+
+        public override bool Equals(object obj) => base.Equals(obj);
+        public bool Equals(T[] other)
+        {
+            bool returned = true;
+            if (Length == other.Length)
+            {
+                for (int i = 0; i < Length; i++)
+                {
+                    returned &= array[i].Equals(other[i]);
+                }
+            }
+            return returned;
+        }
+        public bool Equals(ReadOnlyList<T> list)
+        {
+            if (Length != list.Length) return false;
+            bool equal = true;
+            for (int i = 0; i < Length; i++) equal &= array[i].Equals(list[i]);
+            return equal;
+        }
+        public bool Equals(IEnumerable<T> list) => Equals(new ReadOnlyList<T>(list));
+        public override int GetHashCode() => base.GetHashCode();
+        public override string ToString() => ToString(false);
+        public string ToString(bool showAll = false)
+        {
+            string ret = "List of " + Length + " Elements (" + typeof(T).ToString() + ")";
+            if (showAll) for (int i = 0; i < Length; i++) ret += "\n" + i + ": " + array[i];
+            return ret;
+        }
+
+        public static bool operator ==(ReadOnlyList<T> a, ReadOnlyList<T> b) => a.Equals(b);
+        public static bool operator ==(ReadOnlyList<T> a, T[] b)
+        {
+            return a.Equals(b);
+        }
+        public static bool operator ==(T[] a, ReadOnlyList<T> b)
+        {
+            return b.Equals(a);
+        }
+        public static bool operator ==(IEnumerable<T> a, ReadOnlyList<T> b) => a.Equals(b);
+        public static bool operator ==(ReadOnlyList<T> a, IEnumerable<T> b) => a.Equals(b);
+        public static bool operator !=(ReadOnlyList<T> a, ReadOnlyList<T> b) => !a.Equals(b);
+        public static bool operator !=(ReadOnlyList<T> a, T[] b)
+        {
+            return !a.Equals(b);
+        }
+        public static bool operator !=(T[] a, ReadOnlyList<T> b)
+        {
+            return !b.Equals(a);
+        }
+        public static bool operator !=(IEnumerable<T> a, ReadOnlyList<T> b) => !a.Equals(b);
+        public static bool operator !=(ReadOnlyList<T> a, IEnumerable<T> b) => !a.Equals(b);
     }
 }
