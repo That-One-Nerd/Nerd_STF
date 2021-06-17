@@ -1,35 +1,23 @@
 # Version 2021.0:
     The Original Release of the Library.
     Includes:
-        - Hashes
-        - Interfaces:
-            - INegatives<T>
-        - Lists:
-            - List<T>
-            - Matrix<T>
-        - Mathematics:
-            - Angle
-            - Color
-            - ColorByte
-            - Math
-            - Percent
-            - Vector
-            - Vector2
-            - Vector3
-            - Vector4
-        - Miscellaneous
-        - Optional<T>
-        - Stats
-
-# Version 2021.1:
-    Mainly centered around files and filesaving.
-    Added:
-        + Filesaving.cs
-            + File<T>
-            + BinaryFile
-            + ByteFile
-            + TextFile
-    
-    Removed:
-        General.cs
-            - Miscellaneous
+        * Nerd_STF:
+            * public static class Hashes
+            * Nerd_STF.Interfaces:
+                * public interface INegatives<T>
+            * Nerd_STF.Lists:
+                * public class List<T>
+                * public class Matrix<T>
+            * Nerd_STF.Mathematics:
+                * public struct Angle
+                * public struct Color
+                * public struct ColorByte
+                * public static class Math
+                * public struct Percent
+                * public struct Vector
+                * public struct Vector2
+                * public struct Vector3
+                * public struct Vector4
+            * public class Miscellaneous
+            * public struct Optional<T>
+            * public static class Stats
