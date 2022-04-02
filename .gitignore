@@ -1,0 +1,10 @@
+# Visual Studio stuff
+*.sln
+*.csproj
+
+/Nerd_STF/.vs
+/Nerd_STF/Nerd_STF/obj
+/Nerd_STF/Nerd_STF/bin/Debug
+/Nerd_STF/Nerd_STF/bin/Release/net6.0/Nerd_STF.deps.json
+/Nerd_STF/Nerd_STF/bin/Release/net6.0/Nerd_STF.dll
+/Nerd_STF/Nerd_STF/bin/Release/net6.0/Nerd_STF.pdb
