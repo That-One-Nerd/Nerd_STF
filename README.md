@@ -13,7 +13,9 @@ Nerd_STF will include math structures as well as other computer science topics. 
 Nerd_STF `2021` used an different version scheme, based on the year, as you might have guessed (it is not the year `2` right now), and while I will be keeping the `2021` versions up, I wouldn't recommend using them, and the code is old code, written by a more naive me. Hell, I wrote an entire `List<T>` class there before I knew of the `System.Collections.Generic.List<T>` class that did literally everything for me already. Oh well. So, keep that in mind when you check out those versions of the library.
 
 ## How do I install it?
-Well, unfortunately I don't have a nuget package for this library yet (maybe in the future), so here, I'll walk you through installing it in Visual Studio.
+There is a nuget package for this ([here](https://www.nuget.org/packages/Nerd_STF/)), so you could install it that way.
+
+Alternatively, you can install it with a project reference in Visual Studio, and I'll walk you through doing that here.
 
 Step 1: Find the `.dll` for this library, found in `/Nerd_STF/Nerd_STF/bin/Release/net6.0/ref/Nerd_STF.dll`. You can either move it, or simply remember where it is.
 Step 2: Search for "Add Project Reference" in the Visual Studio 2019 or 2022 search bar.
