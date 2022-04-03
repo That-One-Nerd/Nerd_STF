@@ -220,6 +220,13 @@ namespace Nerd_STF.Mathematics.Geometry
         public Vert[] ToArray() => new Vert[] { A, B, C };
         public List<Vert> ToList() => new() { A, B, C };
 
+        public double[] ToDoubleArray() => new double[] { A.position.x, A.position.y, A.position.z,
+                                                          B.position.x, B.position.y, B.position.z,
+                                                          C.position.x, C.position.y, C.position.z };
+        public List<double> ToDoubleList() => new() { A.position.x, A.position.y, A.position.z,
+                                                      B.position.x, B.position.y, B.position.z,
+                                                      C.position.x, C.position.y, C.position.z };
+
         public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);
         public static Triangle operator +(Triangle a, Vert b) => new(a.A + b, a.B + b, a.C + b);
         public static Triangle operator -(Triangle a, Triangle b) => new(a.A - b.A, a.B - b.B, a.C - b.C);
