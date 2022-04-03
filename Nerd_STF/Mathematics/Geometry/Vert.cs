@@ -1,8 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Nerd_STF.Mathematics.Geometry
 {
-    public struct Vert : ICloneable, IEquatable<Vert>
+    public struct Vert : ICloneable, IEquatable<Vert>, IGroup<double>
     {
         public static Vert Back => new(0, 0, -1);
         public static Vert Down => new(0, -1, 0);
@@ -72,6 +73,12 @@ namespace Nerd_STF.Mathematics.Geometry
         public string ToString(IFormatProvider provider) => position.ToString(provider);
 
         public object Clone() => new Vert(position);
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public IEnumerator<double> GetEnumerator() => position.GetEnumerator();
+
+        public double[] ToArray() => position.ToArray();
+        public List<double> ToList() => position.ToList();
 
         public static Vert operator +(Vert a, Vert b) => new(a.position + b.position);
         public static Vert operator -(Vert d) => new(-d.position);

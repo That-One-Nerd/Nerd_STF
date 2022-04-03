@@ -127,6 +127,11 @@ namespace Nerd_STF.Mathematics.Geometry
         public Vert[] ToArray() => new Vert[] { start, end };
         public List<Vert> ToList() => new() { start, end };
 
+        public double[] ToDoubleArray() => new double[] { start.position.x, start.position.y, start.position.z,
+                                                          end.position.x, end.position.y, end.position.z };
+        public List<double> ToDoubleList() => new() { start.position.x, start.position.y, start.position.z,
+                                                      end.position.x, end.position.y, end.position.z };
+
         public static Line operator +(Line a, Line b) => new(a.start + b.start, a.end + b.end);
         public static Line operator +(Line a, Vert b) => new(a.start + b, a.end + b);
         public static Line operator -(Line a, Line b) => new(a.start - b.start, a.end - b.end);
