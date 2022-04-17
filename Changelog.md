@@ -2,8 +2,6 @@
 
 This update doesn't add any new features, simply a code simplification, using some of the .net 6 tools, such as global usings and file-scoped namespace declarations.
 
-This update adds some operations from calculus, as well as many new geometry structures.
-
 ```
 * Nerd_STF
     = Removed unused or unrequired usings in all files.
