@@ -129,11 +129,7 @@ namespace Nerd_STF.Mathematics
             return val;
         }
 
-        public int CompareTo(Int2 other)
-        {
-            double magA = Magnitude, magB = other.Magnitude;
-            return magA == magB ? 0 : magA > magB ? 1 : -1;
-        }
+        public int CompareTo(Int2 other) => Magnitude.CompareTo(other.Magnitude);
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (obj == null || obj.GetType() != typeof(Int2)) return false;
@@ -166,6 +162,9 @@ namespace Nerd_STF.Mathematics
         public static Int2 operator *(Int2 a, int b) => new(a.x * b, a.y * b);
         public static Int2 operator /(Int2 a, Int2 b) => new(a.x / b.x, a.y / b.y);
         public static Int2 operator /(Int2 a, int b) => new(a.x / b, a.y / b);
+        public static Int2 operator &(Int2 a, Int2 b) => new(a.x & b.x, a.y & b.y);
+        public static Int2 operator |(Int2 a, Int2 b) => new(a.x | b.x, a.y | b.y);
+        public static Int2 operator ^(Int2 a, Int2 b) => new(a.x ^ b.x, a.y ^ b.y);
         public static bool operator ==(Int2 a, Int2 b) => a.Equals(b);
         public static bool operator !=(Int2 a, Int2 b) => !a.Equals(b);
         public static bool operator >(Int2 a, Int2 b) => a.CompareTo(b) > 0;

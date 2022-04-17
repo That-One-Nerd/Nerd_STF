@@ -58,7 +58,7 @@ namespace Nerd_STF
                 LogSeverity.Warning => ConsoleColor.DarkYellow,
                 LogSeverity.Error => ConsoleColor.Red,
                 LogSeverity.Fatal => ConsoleColor.DarkRed,
-                _ => throw new Exception("Unknown log severity " + msg.Severity),
+                _ => throw new ArgumentException("Unknown log severity " + msg.Severity, nameof(msg)),
             };
 
             ConsoleColor originalCol = Console.ForegroundColor;

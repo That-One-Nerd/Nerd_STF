@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Nerd_STF.Exceptions;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Nerd_STF.Mathematics.Geometry
@@ -11,8 +12,8 @@ namespace Nerd_STF.Mathematics.Geometry
             set
             {
                 p_a = value;
-                p_l1 = new(value, p_b);
-                p_l3 = new(p_c, value);
+                p_ab.a = value;
+                p_ca.b = value;
             }
         }
         public Vert B
@@ -21,8 +22,8 @@ namespace Nerd_STF.Mathematics.Geometry
             set
             {
                 p_b = value;
-                p_l1 = new(p_a, value);
-                p_l2 = new(value, p_c);
+                p_ab.b = value;
+                p_bc.a = value;
             }
         }
         public Vert C
@@ -31,67 +32,74 @@ namespace Nerd_STF.Mathematics.Geometry
             set
             {
                 p_c = value;
-                p_l2 = new(p_b, value);
-                p_l3 = new(value, p_a);
+                p_bc.b = value;
+                p_ca.a = value;
             }
         }
-        public Line L1
+        public Line AB
         {
-            get => p_l1;
+            get => p_ab;
             set
             {
-                p_a = value.start;
-                p_b = value.end;
-                p_l2 = new(value.end, p_c);
-                p_l3 = new(p_c, value.start);
+                p_ab = value;
+                p_a = value.a;
+                p_b = value.b;
+                p_bc.a = value.b;
+                p_ca.b = value.a;
             }
         }
-        public Line L2
+        public Line BC
         {
-            get => p_l2;
+            get => p_bc;
             set
             {
-                p_b = value.start;
-                p_c = value.end;
-                p_l1 = new(p_a, value.start);
-                p_l3 = new(value.end, p_a);
+                p_bc = value;
+                p_b = value.a;
+                p_c = value.b;
+                p_ca.a = value.b;
+                p_ab.b = value.a;
             }
         }
-        public Line L3
+        public Line CA
         {
-            get => p_l3;
+            get => p_ca;
             set
             {
-                p_a = value.end;
-                p_c = value.start;
-                p_l1 = new(value.end, p_b);
-                p_l2 = new(p_b, value.start);
+                p_ca = value;
+                p_a = value.b;
+                p_c = value.a;
+                p_ab.a = value.b;
+                p_bc.b = value.a;
             }
         }
 
         private Vert p_a, p_b, p_c;
-        private Line p_l1, p_l2, p_l3;
+        private Line p_ab, p_bc, p_ca;
+
+        public double Area => Mathf.Absolute((A.position.x * B.position.y) + (B.position.x * C.position.y) + (C.position.x * A.position.y) -
+            ((B.position.x * A.position.y) + (C.position.x * B.position.y) + (A.position.x * C.position.y))) * 0.5;
+        public double Perimeter => AB.Length + BC.Length + CA.Length;
 
         public Triangle(Vert a, Vert b, Vert c)
         {
             p_a = a;
             p_b = b;
             p_c = c;
-            p_l1 = new(a, b);
-            p_l2 = new(b, c);
-            p_l3 = new(c, a);
+            p_ab = new(a, b);
+            p_bc = new(b, c);
+            p_ca = new(c, a);
         }
-        public Triangle(Line l1, Line l2, Line l3)
+        public Triangle(Line ab, Line bc, Line ca)
         {
-            if (l1.start != l3.end && l1.end != l2.start && l2.end != l3.start)
-                throw new ArgumentException("Lines are not connected.");
+            if (ab.a != ca.b || ab.b != bc.a || bc.b != ca.a)
+                throw new DisconnectedLinesException(ab, bc, ca);
 
-            p_a = l1.start;
-            p_b = l2.start;
-            p_c = l3.start;
-            p_l1 = l1;
-            p_l2 = l2;
-            p_l3 = l3;
+            p_a = ab.a;
+            p_b = bc.a;
+            p_c = ca.a;
+            p_ab = ab;
+            p_bc = bc;
+            p_ca = ca;
         }
         public Triangle(double x1, double y1, double x2, double y2, double x3, double y3)
             : this(new Vert(x1, y1), new Vert(x2, y2), new Vert(x3, y3)) { }
@@ -151,17 +159,17 @@ namespace Nerd_STF.Mathematics.Geometry
             new(Vert.Clamp(val.A, min.A, max.A), Vert.Clamp(val.B, min.B, max.B), Vert.Clamp(val.C, min.C, max.C));
         public static Triangle Floor(Triangle val) =>
             new(Vert.Floor(val.A), Vert.Floor(val.B), Vert.Floor(val.C));
-        public static Triangle Lerp(Triangle a, Triangle b, double t, bool clamp = false) =>
+        public static Triangle Lerp(Triangle a, Triangle b, double t, bool clamp = true) =>
             new(Vert.Lerp(a.A, b.A, t, clamp), Vert.Lerp(a.B, b.B, t, clamp), Vert.Lerp(a.C, b.C, t, clamp));
-        public static Triangle Median(params Triangle[] vals)
-        {
-            (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
-            return new(Vert.Median(As), Vert.Median(Bs), Vert.Median(Cs));
-        }
         public static Triangle Max(params Triangle[] vals)
         {
             (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
             return new(Vert.Max(As), Vert.Max(Bs), Vert.Max(Cs));
+        }
+        public static Triangle Median(params Triangle[] vals)
+        {
+            (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
+            return new(Vert.Median(As), Vert.Median(Bs), Vert.Median(Cs));
         }
         public static Triangle Min(params Triangle[] vals)
         {
@@ -181,18 +189,38 @@ namespace Nerd_STF.Mathematics.Geometry
 
             return (a, b, c);
         }
-        public static (Line[] L1s, Line[] L2s, Line[] L3s) SplitLineArray(params Triangle[] tris)
+        public static (Line[] ABs, Line[] BCs, Line[] CAs) SplitLineArray(params Triangle[] tris)
         {
-            Line[] l1 = new Line[tris.Length], l2 = new Line[tris.Length], l3 = new Line[tris.Length];
+            Line[] ab = new Line[tris.Length], bc = new Line[tris.Length], ca = new Line[tris.Length];
             for (int i = 0; i < tris.Length; i++)
             {
-                l1[i] = tris[i].L1;
-                l2[i] = tris[i].L2;
-                l3[i] = tris[i].L3;
+                ab[i] = tris[i].AB;
+                bc[i] = tris[i].BC;
+                ca[i] = tris[i].CA;
             }
 
-            return (l1, l2, l3);
+            return (ab, bc, ca);
         }
+
+        public static double[] ToDoubleArrayAll(params Triangle[] tris)
+        {
+            double[] vals = new double[tris.Length * 9];
+            for (int i = 0; i < tris.Length; i++)
+            {
+                int pos = i * 9;
+                vals[pos + 0] = tris[i].A.position.x;
+                vals[pos + 1] = tris[i].A.position.y;
+                vals[pos + 2] = tris[i].A.position.z;
+                vals[pos + 3] = tris[i].B.position.x;
+                vals[pos + 4] = tris[i].B.position.y;
+                vals[pos + 5] = tris[i].B.position.z;
+                vals[pos + 6] = tris[i].C.position.x;
+                vals[pos + 7] = tris[i].C.position.y;
+                vals[pos + 8] = tris[i].C.position.z;
+            }
+            return vals;
+        }
+        public static List<double> ToDoubleListAll(params Triangle[] tris) => new(ToDoubleArrayAll(tris));
 
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
@@ -229,6 +257,7 @@ namespace Nerd_STF.Mathematics.Geometry
 
         public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);
         public static Triangle operator +(Triangle a, Vert b) => new(a.A + b, a.B + b, a.C + b);
+        public static Triangle operator -(Triangle t) => new(-t.A, -t.B, -t.C);
         public static Triangle operator -(Triangle a, Triangle b) => new(a.A - b.A, a.B - b.B, a.C - b.C);
         public static Triangle operator -(Triangle a, Vert b) => new(a.A - b, a.B - b, a.C - b);
         public static Triangle operator *(Triangle a, Triangle b) => new(a.A * b.A, a.B * b.B, a.C * b.C);
@@ -246,5 +275,6 @@ namespace Nerd_STF.Mathematics.Geometry
         public static implicit operator Triangle(Fill<Line> fill) => new(fill);
         public static implicit operator Triangle(Fill<double> fill) => new(fill);
         public static implicit operator Triangle(Fill<int> fill) => new(fill);
+        public static explicit operator Triangle(Polygon poly) => new(poly.Lines[0], poly.Lines[1], poly.Lines[2]);
     }
 }

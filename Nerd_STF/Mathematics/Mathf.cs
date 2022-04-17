@@ -2,12 +2,12 @@
 {
     public static class Mathf
     {
-        public const double DegToRad = 0.0174532925199; // Pi / 180
+        public const double RadToDeg = 0.0174532925199; // Pi / 180
         public const double E = 2.71828182846;
         public const double GoldenRatio = 1.61803398875; // (1 + Sqrt(5)) / 2
         public const double HalfPi = 1.57079632679; // Pi / 2
         public const double Pi = 3.14159265359;
-        public const double RadToDeg = 57.2957795131; // 180 / Pi
+        public const double DegToRad = 57.2957795131; // 180 / Pi
         public const double Tau = 6.28318530718; // 2 * Pi
 
         public static double Absolute(double val) => val < 0 ? -val : val;
@@ -26,6 +26,12 @@
 
         public static double ArcTan(double value) => ArcSin(value / Sqrt(1 + value * value));
 
+        public static double Average(Equation equ, double min, double max, double step = Calculus.DefaultStep)
+        {
+            List<double> vals = new();
+            for (double x = min; x <= max; x += step) vals.Add(equ(x));
+            return Average(vals.ToArray());
+        }
         public static double Average(params double[] vals) => Sum(vals) / vals.Length;
         public static int Average(params int[] vals) => Sum(vals) / vals.Length;
 
@@ -75,6 +81,14 @@
 
         public static int Floor(double val) => (int)(val - (val % 1));
 
+        public static Dictionary<double, double> GetValues(Equation equ, double min, double max,
+            double step = Calculus.DefaultStep)
+        {
+            Dictionary<double, double> vals = new();
+            for (double x = min; x <= max; x += step) vals.Add(x, equ(x));
+            return vals;
+        }
+
         public static double Lerp(double a, double b, double t, bool clamp = true)
         {
             double v = a + t * (b - a);
@@ -83,6 +97,30 @@
         }
         public static int Lerp(int a, int b, double value, bool clamp = true) => Floor(Lerp(a, b, value, clamp));
 
+        public static Equation MakeEquation(Dictionary<double, double> vals) => (x) =>
+        {
+            double min = -1, max = -1;
+            foreach (KeyValuePair<double, double> val in vals)
+            {
+                if (val.Key <= x) min = val.Key;
+                if (val.Key >= x) max = val.Key;
+
+                if (min != -1 && max != -1) break;
+            }
+            double per = x % (max - min);
+            return Lerp(min, max, per);
+        };
+
+        public static double Max(Equation equ, double min, double max, double step = Calculus.DefaultStep)
+        {
+            double Y = equ(min);
+            for (double x = min; x <= max; x += step)
+            {
+                double val = equ(x);
+                Y = val > Y ? val : Y;
+            }
+            return Y;
+        }
         public static double Max(params double[] vals)
         {
             if (vals.Length < 1) return 0;
@@ -106,6 +144,16 @@
         }
         public static int Median(params int[] vals) => vals[Floor(Average(0, vals.Length - 1))];
 
+        public static double Min(Equation equ, double min, double max, double step = Calculus.DefaultStep)
+        {
+            double Y = equ(min);
+            for (double x = min; x <= max; x += step)
+            {
+                double val = equ(x);
+                Y = val < Y ? val : Y;
+            }
+            return Y;
+        }
         public static double Min(params double[] vals)
         {
             if (vals.Length < 1) return 0;

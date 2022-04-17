@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace Nerd_STF.Mathematics.Geometry
 {
-    public struct Line : ICloneable, IEquatable<Line>, IGroup<Vert>
+    public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<Vert>, IEquatable<Line>,
+        IGroup<Vert>, ISubdividable<Line[]>
     {
         public static Line Back => new(Vert.Zero, Vert.Back);
         public static Line Down => new(Vert.Zero, Vert.Down);
@@ -20,14 +21,14 @@ namespace Nerd_STF.Mathematics.Geometry
         public static Line One => new(Vert.Zero, Vert.One);
         public static Line Zero => new(Vert.Zero, Vert.Zero);
 
-        public double Length => (end - start).Magnitude;
+        public double Length => (b - a).Magnitude;
 
-        public Vert start, end;
+        public Vert a, b;
 
-        public Line(Vert start, Vert end)
+        public Line(Vert a, Vert b)
         {
-            this.start = start;
-            this.end = end;
+            this.a = a;
+            this.b = b;
         }
         public Line(double x1, double y1, double x2, double y2) : this(new(x1, y1), new(x2, y2)) { }
         public Line(double x1, double y1, double z1, double x2, double y2, double z2)
@@ -42,8 +43,8 @@ namespace Nerd_STF.Mathematics.Geometry
         {
             get => index switch
             {
-                0 => start,
-                1 => end,
+                0 => a,
+                1 => b,
                 _ => throw new IndexOutOfRangeException(nameof(index)),
             };
             set
@@ -51,11 +52,11 @@ namespace Nerd_STF.Mathematics.Geometry
                 switch (index)
                 {
                     case 0:
-                        start = value;
+                        a = value;
                         break;
 
                     case 1:
-                        end = value;
+                        b = value;
                         break;
 
                     default: throw new IndexOutOfRangeException(nameof(index));
@@ -63,18 +64,18 @@ namespace Nerd_STF.Mathematics.Geometry
             }
         }
 
-        public static Line Absolute(Line val) => new(Vert.Absolute(val.start), Vert.Absolute(val.end));
+        public static Line Absolute(Line val) => new(Vert.Absolute(val.a), Vert.Absolute(val.b));
         public static Line Average(params Line[] vals)
         {
             (Vert[] starts, Vert[] ends) = SplitArray(vals);
             return new(Vert.Average(starts), Vert.Average(ends));
         }
-        public static Line Ceiling(Line val) => new(Vert.Ceiling(val.start), Vert.Ceiling(val.end));
+        public static Line Ceiling(Line val) => new(Vert.Ceiling(val.a), Vert.Ceiling(val.b));
         public static Line Clamp(Line val, Line min, Line max) =>
-            new(Vert.Clamp(val.start, min.start, max.start), Vert.Clamp(val.end, min.end, max.end));
-        public static Line Floor(Line val) => new(Vert.Floor(val.start), Vert.Floor(val.end));
+            new(Vert.Clamp(val.a, min.a, max.a), Vert.Clamp(val.b, min.b, max.b));
+        public static Line Floor(Line val) => new(Vert.Floor(val.a), Vert.Floor(val.b));
         public static Line Lerp(Line a, Line b, double t, bool clamp = true) =>
-            new(Vert.Lerp(a.start, b.start, t, clamp), Vert.Lerp(a.end, b.end, t, clamp));
+            new(Vert.Lerp(a.a, b.a, t, clamp), Vert.Lerp(a.b, b.b, t, clamp));
         public static Line Median(params Line[] vals)
         {
             (Vert[] starts, Vert[] ends) = SplitArray(vals);
@@ -96,8 +97,8 @@ namespace Nerd_STF.Mathematics.Geometry
             Vert[] starts = new Vert[lines.Length], ends = new Vert[lines.Length];
             for (int i = 0; i < lines.Length; i++)
             {
-                starts[i] = lines[i].start;
-                ends[i] = lines[i].end;
+                starts[i] = lines[i].a;
+                ends[i] = lines[i].b;
             }
             return (starts, ends);
         }
@@ -107,43 +108,90 @@ namespace Nerd_STF.Mathematics.Geometry
             if (obj == null || obj.GetType() != typeof(Line)) return false;
             return Equals((Line)obj);
         }
-        public bool Equals(Line other) => start == other.start && end == other.end;
-        public override int GetHashCode() => start.GetHashCode() ^ end.GetHashCode();
+        public bool Equals(Line other) => a == other.a && b == other.b;
+        public override int GetHashCode() => a.GetHashCode() ^ b.GetHashCode();
         public override string ToString() => ToString((string?)null);
         public string ToString(string? provider) =>
-            "A: " + start.ToString(provider) + " B: " + end.ToString(provider);
+            "A: " + a.ToString(provider) + " B: " + b.ToString(provider);
         public string ToString(IFormatProvider provider) =>
-            "A: " + start.ToString(provider) + " B: " + end.ToString(provider);
+            "A: " + a.ToString(provider) + " B: " + b.ToString(provider);
 
-        public object Clone() => new Line(start, end);
+        public object Clone() => new Line(a, b);
+
+        public int CompareTo(Line line) => Length.CompareTo(line.Length);
+
+        public bool Contains(Vert vert)
+        {
+            Double3 diffA = a - vert, diffB = a - b;
+            double lerpVal = diffA.Magnitude / diffB.Magnitude;
+            return Vert.Lerp(a, b, lerpVal) == vert;
+        }
+
+        public Vert ClosestTo(Vert vert) => ClosestTo(vert, Calculus.DefaultStep);
+        public Vert ClosestTo(Vert vert, double step)
+        {
+            Vert closestA = a, closestB = b;
+            for (double t = 0; t <= 1; t += step)
+            {
+                Vert valA = Vert.Lerp(a, b, t);
+                Vert valB = Vert.Lerp(b, a, t);
+                closestA = (valA - vert).Magnitude < (closestA - vert).Magnitude ? valA : closestA;
+                closestB = (valB - vert).Magnitude < (closestB - vert).Magnitude ? valB : closestB;
+            }
+
+            return (closestA - vert).Magnitude >= (closestB - vert).Magnitude ? closestA : closestB;
+        }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public IEnumerator<Vert> GetEnumerator()
         {
-            yield return start;
-            yield return end;
+            yield return a;
+            yield return b;
         }
 
-        public Vert[] ToArray() => new Vert[] { start, end };
-        public List<Vert> ToList() => new() { start, end };
+        public Line[] Subdivide()
+        {
+            Vert middle = Vert.Lerp(a, b, 0.5);
+            return new Line[] { new(a, middle), new(middle, b) };
+        }
+        public Line[] Subdivide(int iterations)
+        {
+            if (iterations < 1) return Array.Empty<Line>();
+            List<Line> lines = new(Subdivide());
+            for (int i = 1; i < iterations; i++)
+            {
+                List<Line> add = new();
+                for (int j = 0; j < lines.Count; j++) add.AddRange(lines[j].Subdivide());
+                lines = add;
+            }
+            return lines.ToArray();
+        }
 
-        public double[] ToDoubleArray() => new double[] { start.position.x, start.position.y, start.position.z,
-                                                          end.position.x, end.position.y, end.position.z };
-        public List<double> ToDoubleList() => new() { start.position.x, start.position.y, start.position.z,
-                                                      end.position.x, end.position.y, end.position.z };
+        public Vert[] ToArray() => new Vert[] { a, b };
+        public List<Vert> ToList() => new() { a, b };
 
-        public static Line operator +(Line a, Line b) => new(a.start + b.start, a.end + b.end);
-        public static Line operator +(Line a, Vert b) => new(a.start + b, a.end + b);
-        public static Line operator -(Line a, Line b) => new(a.start - b.start, a.end - b.end);
-        public static Line operator -(Line a, Vert b) => new(a.start - b, a.end - b);
-        public static Line operator *(Line a, Line b) => new(a.start * b.start, a.end * b.end);
-        public static Line operator *(Line a, Vert b) => new(a.start * b, a.end * b);
-        public static Line operator *(Line a, double b) => new(a.start * b, a.end * b);
-        public static Line operator /(Line a, Line b) => new(a.start / b.start, a.end / b.end);
-        public static Line operator /(Line a, Vert b) => new(a.start / b, a.end / b);
-        public static Line operator /(Line a, double b) => new(a.start / b, a.end / b);
+        public double[] ToDoubleArray() => new double[] { a.position.x, a.position.y, a.position.z,
+                                                          b.position.x, b.position.y, b.position.z };
+        public List<double> ToDoubleList() => new() { a.position.x, a.position.y, a.position.z,
+                                                      b.position.x, b.position.y, b.position.z };
+
+        public static Line operator +(Line a, Line b) => new(a.a + b.a, a.b + b.b);
+        public static Line operator +(Line a, Vert b) => new(a.a + b, a.b + b);
+        public static Line operator -(Line l) => new(-l.a, -l.b);
+        public static Line operator -(Line a, Line b) => new(a.a - b.a, a.b - b.b);
+        public static Line operator -(Line a, Vert b) => new(a.a - b, a.b - b);
+        public static Line operator *(Line a, Line b) => new(a.a * b.a, a.b * b.b);
+        public static Line operator *(Line a, Vert b) => new(a.a * b, a.b * b);
+        public static Line operator *(Line a, double b) => new(a.a * b, a.b * b);
+        public static Line operator /(Line a, Line b) => new(a.a / b.a, a.b / b.b);
+        public static Line operator /(Line a, Vert b) => new(a.a / b, a.b / b);
+        public static Line operator /(Line a, double b) => new(a.a / b, a.b / b);
         public static bool operator ==(Line a, Line b) => a.Equals(b);
         public static bool operator !=(Line a, Line b) => !a.Equals(b);
+        public static bool operator >(Line a, Line b) => a.CompareTo(b) > 0;
+        public static bool operator <(Line a, Line b) => a.CompareTo(b) < 0;
+        public static bool operator >=(Line a, Line b) => a > b || a == b;
+        public static bool operator <=(Line a, Line b) => a < b || a == b;
 
         public static implicit operator Line(Fill<Vert> fill) => new(fill);
         public static implicit operator Line(Fill<Double3> fill) => new(fill);

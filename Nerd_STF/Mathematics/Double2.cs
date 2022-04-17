@@ -134,11 +134,7 @@ namespace Nerd_STF.Mathematics
             return val;
         }
 
-        public int CompareTo(Double2 other)
-        {
-            double magA = Magnitude, magB = other.Magnitude;
-            return magA == magB ? 0 : magA > magB ? 1 : -1;
-        }
+        public int CompareTo(Double2 other) => Magnitude.CompareTo(other.Magnitude);
         public override bool Equals([NotNullWhen(true)] object? obj)
         {
             if (obj == null || obj.GetType() != typeof(Double2)) return false;
