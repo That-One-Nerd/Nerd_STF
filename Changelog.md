@@ -1,5 +1,7 @@
 # Nerd_STF v2.1.0
 
+This update adds some operations from calculus, as well as many new geometry structures.
+
 ```
 * Nerd_STF
     + Exceptions
