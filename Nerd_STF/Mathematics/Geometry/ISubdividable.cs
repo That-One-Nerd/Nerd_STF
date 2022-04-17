@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Nerd_STF.Mathematics.Geometry;
 
-namespace Nerd_STF.Mathematics.Geometry
+public interface ISubdividable<T>
 {
-    public interface ISubdividable<T>
-    {
-        public T Subdivide();
-        public T Subdivide(int iterations);
-    }
+    public T Subdivide();
+    public T Subdivide(int iterations);
 }
