@@ -1,8 +1,7 @@
-﻿namespace Nerd_STF
+﻿namespace Nerd_STF;
+
+public interface IGroup<T> : IEnumerable<T>
 {
-    public interface IGroup<T> : IEnumerable<T>
-    {
-        public T[] ToArray();
-        public List<T> ToList();
-    }
+    public T[] ToArray();
+    public List<T> ToList();
 }
