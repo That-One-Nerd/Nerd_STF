@@ -14,8 +14,8 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static Int4 One => new(1, 1, 1, 1);
     public static Int4 Zero => new(0, 0, 0, 0);
 
-    public double Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
-    public Int4 Normalized => (Int4)((Double4)this / Magnitude);
+    public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
+    public Int4 Normalized => (Int4)((Float4)this / Magnitude);
 
     public Int2 XY => new(x, y);
     public Int2 XZ => new(x, z);
@@ -90,7 +90,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     {
         if (maxMag < minMag) throw new ArgumentOutOfRangeException(nameof(maxMag),
             nameof(maxMag) + " must be greater than or equal to " + nameof(minMag));
-        double mag = val.Magnitude;
+        float mag = val.Magnitude;
         if (mag >= minMag && mag <= maxMag) return val;
         val = val.Normalized;
         if (mag < minMag) val *= minMag;
@@ -116,7 +116,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
         }
         return x + y + z;
     }
-    public static Int4 Lerp(Int4 a, Int4 b, double t, bool clamp = true) =>
+    public static Int4 Lerp(Int4 a, Int4 b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp),
             Mathf.Lerp(a.w, b.w, t, clamp));
     public static Int4 Median(params Int4[] vals)
@@ -205,9 +205,9 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static bool operator >=(Int4 a, Int4 b) => a == b || a > b;
     public static bool operator <=(Int4 a, Int4 b) => a == b || a < b;
 
-    public static explicit operator Int4(Double2 val) => new((int)val.x, (int)val.y, 0, 0);
-    public static explicit operator Int4(Double3 val) => new((int)val.x, (int)val.y, (int)val.z, 0);
-    public static explicit operator Int4(Double4 val) => new((int)val.x, (int)val.y, (int)val.z, (int)val.w);
+    public static explicit operator Int4(Float2 val) => new((int)val.x, (int)val.y, 0, 0);
+    public static explicit operator Int4(Float3 val) => new((int)val.x, (int)val.y, (int)val.z, 0);
+    public static explicit operator Int4(Float4 val) => new((int)val.x, (int)val.y, (int)val.z, (int)val.w);
     public static implicit operator Int4(Int2 val) => new(val.x, val.y, 0, 0);
     public static implicit operator Int4(Int3 val) => new(val.x, val.y, val.z, 0);
     public static explicit operator Int4(Vert val) => new((int)val.position.x, (int)val.position.y,

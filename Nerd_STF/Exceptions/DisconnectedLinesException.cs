@@ -18,11 +18,12 @@ public class DisconnectedLinesException : Nerd_STFException
         {
             ParamName = paramName;
             Lines = lines;
-        }
+    }
     public DisconnectedLinesException(string paramName, Line[] lines, Exception inner) : this(inner)
         {
             ParamName = paramName;
             Lines = lines;
         }
+
     protected DisconnectedLinesException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 }

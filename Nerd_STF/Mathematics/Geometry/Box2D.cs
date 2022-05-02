@@ -2,7 +2,7 @@
 
 public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
 {
-    public static Box2D Unit => new(Vert.Zero, Double2.One);
+    public static Box2D Unit => new(Vert.Zero, Float2.One);
 
     public Vert MaxVert
     {
@@ -10,7 +10,7 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         set
         {
             Vert diff = center - value;
-            size = (Double2)diff.position * 2;
+            size = (Float2)diff.position * 2;
         }
     }
     public Vert MinVert
@@ -19,25 +19,25 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         set
         {
             Vert diff = center + value;
-            size = (Double2)diff.position * 2;
+            size = (Float2)diff.position * 2;
         }
     }
 
-    public double Area => size.x * size.y;
-    public double Perimeter => size.x * 2 + size.y * 2;
+    public float Area => size.x * size.y;
+    public float Perimeter => size.x * 2 + size.y * 2;
 
     public Vert center;
-    public Double2 size;
+    public Float2 size;
 
-    public Box2D(Vert min, Vert max) : this(Vert.Average(min, max), (Double2)(min - max)) { }
-    public Box2D(Vert center, Double2 size)
+    public Box2D(Vert min, Vert max) : this(Vert.Average(min, max), (Float2)(min - max)) { }
+    public Box2D(Vert center, Float2 size)
     {
         this.center = center;
         this.size = size;
     }
-    public Box2D(Fill<double> fill) : this(fill, new Double2(fill(3), fill(4))) { }
+    public Box2D(Fill<float> fill) : this(fill, new Float2(fill(3), fill(4))) { }
 
-    public double this[int index]
+    public float this[int index]
     {
         get => size[index];
         set => size[index] = value;
@@ -46,34 +46,34 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
     public static Box2D Absolute(Box2D val) => new(Vert.Absolute(val.MinVert), Vert.Absolute(val.MaxVert));
     public static Box2D Average(params Box2D[] vals)
     {
-        (Vert[] centers, Double2[] sizes) = SplitArray(vals);
-        return new(Vert.Average(centers), Double2.Average(sizes));
+        (Vert[] centers, Float2[] sizes) = SplitArray(vals);
+        return new(Vert.Average(centers), Float2.Average(sizes));
     }
-    public static Box2D Ceiling(Box2D val) => new(Vert.Ceiling(val.center), Double2.Ceiling(val.size));
+    public static Box2D Ceiling(Box2D val) => new(Vert.Ceiling(val.center), Float2.Ceiling(val.size));
     public static Box2D Clamp(Box2D val, Box2D min, Box2D max) =>
-        new(Vert.Clamp(val.center, min.center, max.center), Double2.Clamp(val.size, min.size, max.size));
-    public static Box2D Floor(Box2D val) => new(Vert.Floor(val.center), Double2.Floor(val.size));
+        new(Vert.Clamp(val.center, min.center, max.center), Float2.Clamp(val.size, min.size, max.size));
+    public static Box2D Floor(Box2D val) => new(Vert.Floor(val.center), Float2.Floor(val.size));
     public static Box2D Lerp(Box2D a, Box2D b, float t, bool clamp = true) =>
-        new(Vert.Lerp(a.center, b.center, t, clamp), Double2.Lerp(a.size, b.size, t, clamp));
+        new(Vert.Lerp(a.center, b.center, t, clamp), Float2.Lerp(a.size, b.size, t, clamp));
     public static Box2D Median(params Box2D[] vals)
     {
-        (Vert[] verts, Double2[] sizes) = SplitArray(vals);
-        return new(Vert.Median(verts), Double2.Median(sizes));
+        (Vert[] verts, Float2[] sizes) = SplitArray(vals);
+        return new(Vert.Median(verts), Float2.Median(sizes));
     }
     public static Box2D Max(params Box2D[] vals)
     {
-        (Vert[] verts, Double2[] sizes) = SplitArray(vals);
-        return new(Vert.Max(verts), Double2.Max(sizes));
+        (Vert[] verts, Float2[] sizes) = SplitArray(vals);
+        return new(Vert.Max(verts), Float2.Max(sizes));
     }
     public static Box2D Min(params Box2D[] vals)
     {
-        (Vert[] verts, Double2[] sizes) = SplitArray(vals);
-        return new(Vert.Min(verts), Double2.Min(sizes));
+        (Vert[] verts, Float2[] sizes) = SplitArray(vals);
+        return new(Vert.Min(verts), Float2.Min(sizes));
     }
-    public static (Vert[] centers, Double2[] sizes) SplitArray(params Box2D[] vals)
+    public static (Vert[] centers, Float2[] sizes) SplitArray(params Box2D[] vals)
     {
         Vert[] centers = new Vert[vals.Length];
-        Double2[] sizes = new Double2[vals.Length];
+        Float2[] sizes = new Float2[vals.Length];
 
         for (int i = 0; i < vals.Length; i++)
         {
@@ -99,24 +99,24 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
 
     public bool Contains(Vert vert)
     {
-        Double2 diff = Double2.Absolute((Double2)(center - vert));
+        Float2 diff = Float2.Absolute((Float2)(center - vert));
         return diff.x <= size.x && diff.y <= size.y;
     }
 
     public object Clone() => new Box2D(center, size);
 
     public static Box2D operator +(Box2D a, Vert b) => new(a.center + b, a.size);
-    public static Box2D operator +(Box2D a, Double2 b) => new(a.center, a.size + b);
+    public static Box2D operator +(Box2D a, Float2 b) => new(a.center, a.size + b);
     public static Box2D operator -(Box2D b) => new(-b.MaxVert, -b.MinVert);
     public static Box2D operator -(Box2D a, Vert b) => new(a.center - b, a.size);
-    public static Box2D operator -(Box2D a, Double2 b) => new(a.center, a.size - b);
-    public static Box2D operator *(Box2D a, double b) => new(a.center * b, a.size * b);
-    public static Box2D operator *(Box2D a, Double2 b) => new(a.center, a.size * b);
-    public static Box2D operator /(Box2D a, double b) => new(a.center / b, a.size / b);
-    public static Box2D operator /(Box2D a, Double2 b) => new(a.center, a.size / b);
+    public static Box2D operator -(Box2D a, Float2 b) => new(a.center, a.size - b);
+    public static Box2D operator *(Box2D a, float b) => new(a.center * b, a.size * b);
+    public static Box2D operator *(Box2D a, Float2 b) => new(a.center, a.size * b);
+    public static Box2D operator /(Box2D a, float b) => new(a.center / b, a.size / b);
+    public static Box2D operator /(Box2D a, Float2 b) => new(a.center, a.size / b);
     public static bool operator ==(Box2D a, Box2D b) => a.Equals(b);
     public static bool operator !=(Box2D a, Box2D b) => !a.Equals(b);
 
-    public static implicit operator Box2D(Fill<double> fill) => new(fill);
-    public static explicit operator Box2D(Box3D box) => new(box.center, (Double2)box.size);
+    public static implicit operator Box2D(Fill<float> fill) => new(fill);
+    public static explicit operator Box2D(Box3D box) => new(box.center, (Float2)box.size);
 }

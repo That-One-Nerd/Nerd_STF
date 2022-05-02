@@ -24,5 +24,6 @@ public class DifferingVertCountException : Nerd_STFException
         ParamName = paramName;
         Polygons = polys;
     }
+
     protected DifferingVertCountException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 }

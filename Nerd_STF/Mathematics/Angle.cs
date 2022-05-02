@@ -8,17 +8,17 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public static Angle Quarter => new(90);
     public static Angle Zero => new(0);
 
-    public double Degrees
+    public float Degrees
         {
             get => p_deg;
             set => p_deg = value;
         }
-    public double Gradians
+    public float Gradians
         {
-            get => p_deg * 1.11111111111; // Reciprocal of 9/10 as a constant (10/9)
-            set => p_deg = value * 0.9;
+            get => p_deg * 1.11111111111f; // Reciprocal of 9/10 as a constant (10/9)
+            set => p_deg = value * 0.9f;
         }
-    public double Radians
+    public float Radians
         {
             get => p_deg * Mathf.DegToRad;
             set => p_deg = value * Mathf.RadToDeg;
@@ -26,14 +26,14 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
 
     public Angle Bounded => new(p_deg % 360);
 
-    private double p_deg;
+    private float p_deg;
 
-    public Angle(double value, Type valueType = Type.Degrees)
+    public Angle(float value, Type valueType = Type.Degrees)
     {
         p_deg = valueType switch
         {
             Type.Degrees => value,
-            Type.Gradians => value * 0.9,
+            Type.Gradians => value * 0.9f,
             Type.Radians => value * Mathf.RadToDeg,
             _ => throw new ArgumentException("Unknown type.", nameof(valueType)),
         };
@@ -44,15 +44,15 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public static Angle Ceiling(Angle val) => new(Mathf.Ceiling(val.p_deg));
     public static Angle Clamp(Angle val, Angle min, Angle max) => new(Mathf.Clamp(val.p_deg, min.p_deg, max.p_deg));
     public static Angle Floor(Angle val) => new(Mathf.Ceiling(val.p_deg));
-    public static Angle Lerp(Angle a, Angle b, double t, bool clamp = true) =>
+    public static Angle Lerp(Angle a, Angle b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.p_deg, b.p_deg, t, clamp));
     public static Angle Max(params Angle[] vals) => new(Mathf.Max(ToDoubles(Type.Degrees, vals)));
     public static Angle Median(params Angle[] vals) => new(Mathf.Median(ToDoubles(Type.Degrees, vals)));
     public static Angle Min(params Angle[] vals) => new(Mathf.Min(ToDoubles(Type.Degrees, vals)));
 
-    public static double[] ToDoubles(Type outputType, params Angle[] vals)
+    public static float[] ToDoubles(Type outputType, params Angle[] vals)
     {
-        double[] res = new double[vals.Length];
+        float[] res = new float[vals.Length];
         for (int i = 0; i < vals.Length; i++)
         {
             res[i] = outputType switch
@@ -97,9 +97,9 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public static Angle operator -(Angle a) => new(-a.p_deg);
     public static Angle operator -(Angle a, Angle b) => new(a.p_deg - b.p_deg);
     public static Angle operator *(Angle a, Angle b) => new(a.p_deg * b.p_deg);
-    public static Angle operator *(Angle a, double b) => new(a.p_deg * b);
+    public static Angle operator *(Angle a, float b) => new(a.p_deg * b);
     public static Angle operator /(Angle a, Angle b) => new(a.p_deg / b.p_deg);
-    public static Angle operator /(Angle a, double b) => new(a.p_deg / b);
+    public static Angle operator /(Angle a, float b) => new(a.p_deg / b);
     public static bool operator ==(Angle a, Angle b) => a.Equals(b);
     public static bool operator !=(Angle a, Angle b) => !a.Equals(b);
     public static bool operator >(Angle a, Angle b) => a.CompareTo(b) > 0;

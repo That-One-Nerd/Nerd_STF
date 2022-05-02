@@ -12,8 +12,8 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static Int3 One => new(1, 1, 1);
     public static Int3 Zero => new(0, 0, 0);
 
-    public double Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
-    public Int3 Normalized => (Int3)((Double3)this / Magnitude);
+    public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
+    public Int3 Normalized => (Int3)((Float3)this / Magnitude);
 
     public Int2 XY => new(x, y);
     public Int2 XZ => new(x, z);
@@ -72,7 +72,7 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     {
         if (maxMag < minMag) throw new ArgumentOutOfRangeException(nameof(maxMag),
             nameof(maxMag) + " must be greater than or equal to " + nameof(minMag));
-        double mag = val.Magnitude;
+        float mag = val.Magnitude;
         if (mag >= minMag && mag <= maxMag) return val;
         val = val.Normalized;
         if (mag < minMag) val *= minMag;
@@ -104,7 +104,7 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
         }
         return x + y + z;
     }
-    public static Int3 Lerp(Int3 a, Int3 b, double t, bool clamp = true) =>
+    public static Int3 Lerp(Int3 a, Int3 b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp));
     public static Int3 Median(params Int3[] vals)
     {
@@ -186,9 +186,9 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static bool operator >=(Int3 a, Int3 b) => a == b || a > b;
     public static bool operator <=(Int3 a, Int3 b) => a == b || a < b;
 
-    public static explicit operator Int3(Double2 val) => new((int)val.x, (int)val.y, 0);
-    public static explicit operator Int3(Double3 val) => new((int)val.x, (int)val.y, (int)val.z);
-    public static explicit operator Int3(Double4 val) => new((int)val.x, (int)val.y, (int)val.z);
+    public static explicit operator Int3(Float2 val) => new((int)val.x, (int)val.y, 0);
+    public static explicit operator Int3(Float3 val) => new((int)val.x, (int)val.y, (int)val.z);
+    public static explicit operator Int3(Float4 val) => new((int)val.x, (int)val.y, (int)val.z);
     public static implicit operator Int3(Int2 val) => new(val.x, val.y, 0);
     public static explicit operator Int3(Int4 val) => new(val.x, val.y, val.z);
     public static explicit operator Int3(Vert val) => new((int)val.position.x, (int)val.position.y,

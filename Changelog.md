@@ -1,12 +1,14 @@
-# Nerd_STF v2.1.1
+# Nerd_STF v2.1.2
 
-This update doesn't add any new features, simply a code simplification, using some of the .net 6 tools, such as global usings and file-scoped namespace declarations.
+This update just replaces instances of `double` with `float` instead.
+
+I know, this isn't the update you wanted. More stuff coming soon.
 
 ```
 * Nerd_STF
-    = Removed unused or unrequired usings in all files.
-    = Replaced all namespace declarations with file-scoped declarations.
-    * Miscellaneous
-        * GlobalUsings
-            + global using System.Diagnostics.CodeAnalysis
+    = Replace all instances of `double` with `float`
+    * Mathematics
+        = Renamed `Double2` to `Float2`
+        = Renamed `Double3` to `Float3`
+        = Renamed `Double4` to `Float4`
 ```
