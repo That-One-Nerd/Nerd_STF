@@ -26,20 +26,20 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
 
     [Obsolete("This method uses the Polygon.Triangulate() function, which has issues. It will be fixed in a " +
         "future update.")]
-    public double Area
+    public float Area
     {
         get
         {
-            double val = 0;
+            float val = 0;
             foreach (Triangle t in Triangulate()) val += t.Area;
             return val;
         }
     }
-    public double Perimeter
+    public float Perimeter
         {
             get
             {
-                double val = 0;
+                float val = 0;
                 foreach (Line l in Lines) val += l.Length;
                 return val;
             }
@@ -62,7 +62,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             }
             this = new(verts.ToArray());
         }
-    public Polygon(Fill<Double3?> fill)
+    public Polygon(Fill<Float3?> fill)
         {
             List<Vert> verts = new();
             int i = 0;
@@ -92,7 +92,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             for (int i = 0; i < length; i++) verts.Add(fill(i));
             this = new(verts.ToArray());
         }
-    public Polygon(Fill<Double3> fill, int length)
+    public Polygon(Fill<Float3> fill, int length)
         {
             List<Vert> verts = new();
             for (int i = 0; i < length; i++) verts.Add(fill(i));
@@ -104,7 +104,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             for (int i = 0; i < length; i++) lines.Add(fill(i));
             this = new(lines.ToArray());
         }
-    public Polygon(params Double3[] verts)
+    public Polygon(params Float3[] verts)
         {
             p_verts = new Vert[verts.Length];
             for (int i = 0; i < verts.Length; i++) p_verts[i] = verts[i];
@@ -132,7 +132,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
         List<Vert> parts = new();
         for (int i = 0; i < vertCount; i++)
         {
-            double val = Mathf.Tau * i / vertCount;
+            float val = Mathf.Tau * i / vertCount;
             parts.Add(new(Mathf.Cos(val), Mathf.Sin(val)));
         }
         return new(parts.ToArray());
@@ -182,7 +182,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             for (int i = 0; i < v.Length; i++) v[i] = Vert.Floor(v[i]);
             return new(v);
         }
-    public static Polygon Lerp(Polygon a, Polygon b, double t, bool clamp = true)
+    public static Polygon Lerp(Polygon a, Polygon b, float t, bool clamp = true)
         {
             if (!CheckVerts(a, b)) throw new DifferingVertCountException(a, b);
             Line[][] lines = new Line[2][] { a.Lines, b.Lines };
@@ -245,10 +245,10 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             return new(res);
         }
 
-    public static double[] ToDoubleArrayAll(params Polygon[] polys) => ToDoubleListAll(polys).ToArray();
-    public static List<double> ToDoubleListAll(params Polygon[] polys)
+    public static float[] ToDoubleArrayAll(params Polygon[] polys) => ToDoubleListAll(polys).ToArray();
+    public static List<float> ToDoubleListAll(params Polygon[] polys)
         {
-            List<double> vals = new();
+            List<float> vals = new();
             foreach (Polygon poly in polys) vals.AddRange(poly.ToDoubleArray());
             return vals;
         }
@@ -286,9 +286,9 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
     public Vert[] ToArray() => Verts;
     public List<Vert> ToList() => new(Verts);
 
-    public double[] ToDoubleArray()
+    public float[] ToDoubleArray()
         {
-            double[] vals = new double[Verts.Length * 3];
+            float[] vals = new float[Verts.Length * 3];
             for (int i = 0; i < Verts.Length; i++)
             {
                 int pos = i * 3;
@@ -298,7 +298,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             }
             return vals;
         }
-    public List<double> ToDoubleList() => new(ToDoubleArray());
+    public List<float> ToDoubleList() => new(ToDoubleArray());
 
     public Polygon Subdivide()
     {
@@ -323,7 +323,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
         {
             for (int factor = 0; factor < segments; factor++)
             {
-                double unit = factor / (double)(segments * 2), unit2 = unit + 0.5, lastUnit = unit * 2;
+                float unit = factor / (float)(segments * 2), unit2 = unit + 0.5f, lastUnit = unit * 2;
                 Vert p1, p2;
                 if (i == Verts.Length - 1)
                 {
@@ -500,10 +500,10 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
     public static bool operator !=(Polygon a, Polygon b) => !a.Equals(b);
 
     public static implicit operator Polygon(Fill<Vert?> fill) => new(fill);
-    public static implicit operator Polygon(Fill<Double3?> fill) => new(fill);
+    public static implicit operator Polygon(Fill<Float3?> fill) => new(fill);
     public static implicit operator Polygon(Fill<Line?> fill) => new(fill);
     public static implicit operator Polygon(Vert[] verts) => new(verts);
-    public static implicit operator Polygon(Double3[] verts) => new(verts);
+    public static implicit operator Polygon(Float3[] verts) => new(verts);
     public static implicit operator Polygon(Line[] lines) => new(lines);
     public static implicit operator Polygon(Triangle tri) => new(tri.AB, tri.BC, tri.CA);
     public static implicit operator Polygon(Quadrilateral quad) => new(quad.AB, quad.BC, quad.CD, quad.DA);

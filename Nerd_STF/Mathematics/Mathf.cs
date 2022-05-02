@@ -2,42 +2,42 @@
 
 public static class Mathf
 {
-    public const double RadToDeg = 0.0174532925199; // Pi / 180
-    public const double E = 2.71828182846;
-    public const double GoldenRatio = 1.61803398875; // (1 + Sqrt(5)) / 2
-    public const double HalfPi = 1.57079632679; // Pi / 2
-    public const double Pi = 3.14159265359;
-    public const double DegToRad = 57.2957795131; // 180 / Pi
-    public const double Tau = 6.28318530718; // 2 * Pi
+    public const float RadToDeg = 0.0174532925199f; // Pi / 180
+    public const float E = 2.71828182846f;
+    public const float GoldenRatio = 1.61803398875f; // (1 + Sqrt(5)) / 2
+    public const float HalfPi = 1.57079632679f; // Pi / 2
+    public const float Pi = 3.14159265359f;
+    public const float DegToRad = 57.2957795131f; // 180 / Pi
+    public const float Tau = 6.28318530718f; // 2 * Pi
 
-    public static double Absolute(double val) => val < 0 ? -val : val;
+    public static float Absolute(float val) => val < 0 ? -val : val;
     public static int Absolute(int val) => val < 0 ? -val : val;
 
-    public static double ArcCos(double value) => -ArcSin(value) + HalfPi;
+    public static float ArcCos(float value) => -ArcSin(value) + HalfPi;
 
-    public static double ArcCot(double value) => ArcCos(value / Sqrt(1 + value * value));
+    public static float ArcCot(float value) => ArcCos(value / Sqrt(1 + value * value));
 
-    public static double ArcCsc(double value) => ArcSin(1 / value);
+    public static float ArcCsc(float value) => ArcSin(1 / value);
 
-    public static double ArcSec(double value) => ArcCos(1 / value);
+    public static float ArcSec(float value) => ArcCos(1 / value);
 
     // Maybe one day I'll have a polynomial for this, but the RMSE for an order 10 polynomial is only 0.00876.
-    public static double ArcSin(double value) => Math.Asin(value);
+    public static float ArcSin(float value) => (float)Math.Asin(value);
 
-    public static double ArcTan(double value) => ArcSin(value / Sqrt(1 + value * value));
+    public static float ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
 
-    public static double Average(Equation equ, double min, double max, double step = Calculus.DefaultStep)
+    public static float Average(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
-        List<double> vals = new();
-        for (double x = min; x <= max; x += step) vals.Add(equ(x));
+        List<float> vals = new();
+        for (float x = min; x <= max; x += step) vals.Add(equ(x));
         return Average(vals.ToArray());
     }
-    public static double Average(params double[] vals) => Sum(vals) / vals.Length;
+    public static float Average(params float[] vals) => Sum(vals) / vals.Length;
     public static int Average(params int[] vals) => Sum(vals) / vals.Length;
 
-    public static int Ceiling(double val) => (int)(val + (1 - (val % 1)));
+    public static int Ceiling(float val) => (int)(val + (1 - (val % 1)));
 
-    public static double Clamp(double val, double min, double max)
+    public static float Clamp(float val, float min, float max)
     {
         if (max < min) throw new ArgumentOutOfRangeException(nameof(max),
             nameof(max) + " must be greater than or equal to " + nameof(min));
@@ -54,15 +54,15 @@ public static class Mathf
         return val;
     }
 
-    public static double Cos(double radians) => Sin(radians + HalfPi);
+    public static float Cos(float radians) => Sin(radians + HalfPi);
 
-    public static double Cot(double radians) => Cos(radians) / Sin(radians);
+    public static float Cot(float radians) => Cos(radians) / Sin(radians);
 
-    public static double Csc(double radians) => 1 / Sin(radians);
+    public static float Csc(float radians) => 1 / Sin(radians);
 
-    public static double Divide(double val, params double[] dividends)
+    public static float Divide(float val, params float[] dividends)
     {
-        foreach (double d in dividends) val /= d;
+        foreach (float d in dividends) val /= d;
         return val;
     }
     public static int Divide(int val, params int[] dividends)
@@ -79,53 +79,53 @@ public static class Mathf
         return val;
     }
 
-    public static int Floor(double val) => (int)(val - (val % 1));
+    public static int Floor(float val) => (int)(val - (val % 1));
 
-    public static Dictionary<double, double> GetValues(Equation equ, double min, double max,
-        double step = Calculus.DefaultStep)
+    public static Dictionary<float, float> GetValues(Equation equ, float min, float max,
+        float step = Calculus.DefaultStep)
     {
-        Dictionary<double, double> vals = new();
-        for (double x = min; x <= max; x += step) vals.Add(x, equ(x));
+        Dictionary<float, float> vals = new();
+        for (float x = min; x <= max; x += step) vals.Add(x, equ(x));
         return vals;
     }
 
-    public static double Lerp(double a, double b, double t, bool clamp = true)
+    public static float Lerp(float a, float b, float t, bool clamp = true)
     {
-        double v = a + t * (b - a);
+        float v = a + t * (b - a);
         if (clamp) v = Clamp(v, a, b);
         return v;
     }
-    public static int Lerp(int a, int b, double value, bool clamp = true) => Floor(Lerp(a, b, value, clamp));
+    public static int Lerp(int a, int b, float value, bool clamp = true) => Floor(Lerp(a, b, value, clamp));
 
-    public static Equation MakeEquation(Dictionary<double, double> vals) => (x) =>
+    public static Equation MakeEquation(Dictionary<float, float> vals) => (x) =>
     {
-        double min = -1, max = -1;
-        foreach (KeyValuePair<double, double> val in vals)
+        float min = -1, max = -1;
+        foreach (KeyValuePair<float, float> val in vals)
         {
             if (val.Key <= x) min = val.Key;
             if (val.Key >= x) max = val.Key;
 
             if (min != -1 && max != -1) break;
         }
-        double per = x % (max - min);
+        float per = x % (max - min);
         return Lerp(min, max, per);
     };
 
-    public static double Max(Equation equ, double min, double max, double step = Calculus.DefaultStep)
+    public static float Max(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
-        double Y = equ(min);
-        for (double x = min; x <= max; x += step)
+        float Y = equ(min);
+        for (float x = min; x <= max; x += step)
         {
-            double val = equ(x);
+            float val = equ(x);
             Y = val > Y ? val : Y;
         }
         return Y;
     }
-    public static double Max(params double[] vals)
+    public static float Max(params float[] vals)
     {
         if (vals.Length < 1) return 0;
-        double val = vals[0];
-        foreach (double d in vals) val = d > val ? d : val;
+        float val = vals[0];
+        foreach (float d in vals) val = d > val ? d : val;
         return val;
     }
     public static int Max(params int[] vals)
@@ -136,29 +136,29 @@ public static class Mathf
         return val;
     }
 
-    public static double Median(params double[] vals)
+    public static float Median(params float[] vals)
     {
-        double index = Average(0, vals.Length - 1);
-        double valA = vals[Floor(index)], valB = vals[Ceiling(index)];
+        float index = Average(0, vals.Length - 1);
+        float valA = vals[Floor(index)], valB = vals[Ceiling(index)];
         return Average(valA, valB);
     }
     public static int Median(params int[] vals) => vals[Floor(Average(0, vals.Length - 1))];
 
-    public static double Min(Equation equ, double min, double max, double step = Calculus.DefaultStep)
+    public static float Min(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
-        double Y = equ(min);
-        for (double x = min; x <= max; x += step)
+        float Y = equ(min);
+        for (float x = min; x <= max; x += step)
         {
-            double val = equ(x);
+            float val = equ(x);
             Y = val < Y ? val : Y;
         }
         return Y;
     }
-    public static double Min(params double[] vals)
+    public static float Min(params float[] vals)
     {
         if (vals.Length < 1) return 0;
-        double val = vals[0];
-        foreach (double d in vals) val = d < val ? d : val;
+        float val = vals[0];
+        foreach (float d in vals) val = d < val ? d : val;
         return val;
     }
     public static int Min(params int[] vals)
@@ -169,11 +169,11 @@ public static class Mathf
         return val;
     }
 
-    public static double Multiply(params double[] vals)
+    public static float Multiply(params float[] vals)
     {
         if (vals.Length < 1) return 0;
-        double val = 1;
-        foreach (double d in vals) val *= d;
+        float val = 1;
+        foreach (float d in vals) val *= d;
         return val;
     }
     public static int Multiply(params int[] vals)
@@ -184,7 +184,7 @@ public static class Mathf
         return val;
     }
 
-    public static double Power(double num, double pow) => Math.Pow(num, pow);
+    public static float Power(float num, float pow) => (float)Math.Pow(num, pow);
     public static int Power(int num, int pow)
     {
         if (pow < 0) return 0;
@@ -193,28 +193,28 @@ public static class Mathf
         return val;
     }
 
-    public static double Root(double value, double index) => Math.Exp(index * Math.Log(value));
+    public static float Root(float value, float index) => (float)Math.Exp(index * Math.Log(value));
 
-    public static double Round(double num) => num % 1 >= 0.5 ? Ceiling(num) : Floor(num);
-    public static double Round(double num, double nearest) => nearest * Round(num / nearest);
-    public static int RoundInt(double num) => (int)Round(num);
+    public static float Round(float num) => num % 1 >= 0.5 ? Ceiling(num) : Floor(num);
+    public static float Round(float num, float nearest) => nearest * Round(num / nearest);
+    public static int RoundInt(float num) => (int)Round(num);
 
-    public static double Sec(double radians) => 1 / Cos(radians);
+    public static float Sec(float radians) => 1 / Cos(radians);
 
-    public static double Sin(double radians)
+    public static float Sin(float radians)
     {
         // Really close polynomial to sin(x) (when modded by 2pi). RMSE of 0.000003833
-        const double a =  0.000013028,
-                     b =  0.999677,
-                     c =  0.00174164,
-                     d = -0.170587,
-                     e =  0.0046494,
-                     f =  0.00508955,
-                     g =  0.00140205,
-                     h = -0.000577413,
-                     i =  0.0000613134,
-                     j = -0.00000216852;
-        double x = radians % Tau;
+        const float a =  0.000013028f,
+                     b =  0.999677f,
+                     c =  0.00174164f,
+                     d = -0.170587f,
+                     e =  0.0046494f,
+                     f =  0.00508955f,
+                     g =  0.00140205f,
+                     h = -0.000577413f,
+                     i =  0.0000613134f,
+                     j = -0.00000216852f;
+        float x = radians % Tau;
 
         return
             a + (b * x) + (c * x * x) + (d * x * x * x) + (e * x * x * x * x) + (f * x * x * x * x * x)
@@ -222,11 +222,11 @@ public static class Mathf
             + (j * x * x * x * x * x * x * x * x * x);
     }
 
-    public static double Sqrt(double value) => Root(value, 2);
+    public static float Sqrt(float value) => Root(value, 2);
 
-    public static double Subtract(double num, params double[] vals)
+    public static float Subtract(float num, params float[] vals)
     {
-        foreach (double d in vals) num -= d;
+        foreach (float d in vals) num -= d;
         return num;
     }
     public static int Subtract(int num, params int[] vals)
@@ -235,10 +235,10 @@ public static class Mathf
         return num;
     }
 
-    public static double Sum(params double[] vals)
+    public static float Sum(params float[] vals)
     {
-        double val = 0;
-        foreach (double d in vals) val += d;
+        float val = 0;
+        foreach (float d in vals) val += d;
         return val;
     }
     public static int Sum(params int[] vals)
@@ -248,5 +248,5 @@ public static class Mathf
         return val;
     }
 
-    public static double Tan(double radians) => Sin(radians) / Cos(radians);
+    public static float Tan(float radians) => Sin(radians) / Cos(radians);
 }

@@ -72,9 +72,10 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     private Vert p_a, p_b, p_c;
     private Line p_ab, p_bc, p_ca;
 
-    public double Area => Mathf.Absolute((A.position.x * B.position.y) + (B.position.x * C.position.y) + (C.position.x * A.position.y) -
-        ((B.position.x * A.position.y) + (C.position.x * B.position.y) + (A.position.x * C.position.y))) * 0.5;
-    public double Perimeter => AB.Length + BC.Length + CA.Length;
+    public float Area => (float)Mathf.Absolute((A.position.x * B.position.y) + (B.position.x * C.position.y) +
+        (C.position.x * A.position.y) - ((B.position.x * A.position.y) + (C.position.x * B.position.y) +
+        (A.position.x * C.position.y))) * 0.5f;
+    public float Perimeter => AB.Length + BC.Length + CA.Length;
 
     public Triangle(Vert a, Vert b, Vert c)
     {
@@ -97,15 +98,15 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
         p_bc = bc;
         p_ca = ca;
     }
-    public Triangle(double x1, double y1, double x2, double y2, double x3, double y3)
+    public Triangle(float x1, float y1, float x2, float y2, float x3, float y3)
         : this(new Vert(x1, y1), new Vert(x2, y2), new Vert(x3, y3)) { }
-    public Triangle(double x1, double y1, double z1, double x2, double y2, double z2, double x3, double y3,
-        double z3) : this(new Vert(x1, y1, z1), new Vert(x2, y2, z2), new Vert(x3, y3, z3)) { }
-    public Triangle(Fill<Double3> fill) : this(fill(0), fill(1), fill(2)) { }
+    public Triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3,
+        float z3) : this(new Vert(x1, y1, z1), new Vert(x2, y2, z2), new Vert(x3, y3, z3)) { }
+    public Triangle(Fill<Float3> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<Int3> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<Vert> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<Line> fill) : this(fill(0), fill(1), fill(2)) { }
-    public Triangle(Fill<double> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4), fill(5), fill(6),
+    public Triangle(Fill<float> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4), fill(5), fill(6),
         fill(7), fill(8)) { }
     public Triangle(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4), fill(5), fill(6),
         fill(7), fill(8)) { }
@@ -153,7 +154,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
         new(Vert.Clamp(val.A, min.A, max.A), Vert.Clamp(val.B, min.B, max.B), Vert.Clamp(val.C, min.C, max.C));
     public static Triangle Floor(Triangle val) =>
         new(Vert.Floor(val.A), Vert.Floor(val.B), Vert.Floor(val.C));
-    public static Triangle Lerp(Triangle a, Triangle b, double t, bool clamp = true) =>
+    public static Triangle Lerp(Triangle a, Triangle b, float t, bool clamp = true) =>
         new(Vert.Lerp(a.A, b.A, t, clamp), Vert.Lerp(a.B, b.B, t, clamp), Vert.Lerp(a.C, b.C, t, clamp));
     public static Triangle Max(params Triangle[] vals)
     {
@@ -194,9 +195,9 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
          return (ab, bc, ca);
     }
 
-    public static double[] ToDoubleArrayAll(params Triangle[] tris)
+    public static float[] ToDoubleArrayAll(params Triangle[] tris)
     {
-        double[] vals = new double[tris.Length * 9];
+        float[] vals = new float[tris.Length * 9];
         for (int i = 0; i < tris.Length; i++)
         {
             int pos = i * 9;
@@ -212,7 +213,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
         }
         return vals;
     }
-    public static List<double> ToDoubleListAll(params Triangle[] tris) => new(ToDoubleArrayAll(tris));
+    public static List<float> ToDoubleListAll(params Triangle[] tris) => new(ToDoubleArrayAll(tris));
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
@@ -240,10 +241,10 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public Vert[] ToArray() => new Vert[] { A, B, C };
     public List<Vert> ToList() => new() { A, B, C };
 
-    public double[] ToDoubleArray() => new double[] { A.position.x, A.position.y, A.position.z,
+    public float[] ToDoubleArray() => new float[] { A.position.x, A.position.y, A.position.z,
                                                       B.position.x, B.position.y, B.position.z,
                                                       C.position.x, C.position.y, C.position.z };
-    public List<double> ToDoubleList() => new() { A.position.x, A.position.y, A.position.z,
+    public List<float> ToDoubleList() => new() { A.position.x, A.position.y, A.position.z,
                                                   B.position.x, B.position.y, B.position.z,
                                                   C.position.x, C.position.y, C.position.z };
     public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);
@@ -253,18 +254,18 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public static Triangle operator -(Triangle a, Vert b) => new(a.A - b, a.B - b, a.C - b);
     public static Triangle operator *(Triangle a, Triangle b) => new(a.A * b.A, a.B * b.B, a.C * b.C);
     public static Triangle operator *(Triangle a, Vert b) => new(a.A * b, a.B * b, a.C * b);
-    public static Triangle operator *(Triangle a, double b) => new(a.A * b, a.B * b, a.C * b);
+    public static Triangle operator *(Triangle a, float b) => new(a.A * b, a.B * b, a.C * b);
     public static Triangle operator /(Triangle a, Triangle b) => new(a.A / b.A, a.B / b.B, a.C / b.C);
     public static Triangle operator /(Triangle a, Vert b) => new(a.A / b, a.B / b, a.C / b);
-    public static Triangle operator /(Triangle a, double b) => new(a.A / b, a.B / b, a.C / b);
+    public static Triangle operator /(Triangle a, float b) => new(a.A / b, a.B / b, a.C / b);
     public static bool operator ==(Triangle a, Triangle b) => a.Equals(b);
     public static bool operator !=(Triangle a, Triangle b) => !a.Equals(b);
 
     public static implicit operator Triangle(Fill<Vert> fill) => new(fill);
-    public static implicit operator Triangle(Fill<Double3> fill) => new(fill);
+    public static implicit operator Triangle(Fill<Float3> fill) => new(fill);
     public static implicit operator Triangle(Fill<Int3> fill) => new(fill);
     public static implicit operator Triangle(Fill<Line> fill) => new(fill);
-    public static implicit operator Triangle(Fill<double> fill) => new(fill);
+    public static implicit operator Triangle(Fill<float> fill) => new(fill);
     public static implicit operator Triangle(Fill<int> fill) => new(fill);
     public static explicit operator Triangle(Polygon poly) => new(poly.Lines[0], poly.Lines[1], poly.Lines[2]);
 }

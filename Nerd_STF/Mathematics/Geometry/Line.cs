@@ -13,7 +13,7 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static Line One => new(Vert.Zero, Vert.One);
     public static Line Zero => new(Vert.Zero, Vert.Zero);
 
-    public double Length => (b - a).Magnitude;
+    public float Length => (b - a).Magnitude;
 
     public Vert a, b;
 
@@ -22,13 +22,13 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
         this.a = a;
         this.b = b;
     }
-    public Line(double x1, double y1, double x2, double y2) : this(new(x1, y1), new(x2, y2)) { }
-    public Line(double x1, double y1, double z1, double x2, double y2, double z2)
+    public Line(float x1, float y1, float x2, float y2) : this(new(x1, y1), new(x2, y2)) { }
+    public Line(float x1, float y1, float z1, float x2, float y2, float z2)
         : this(new(x1, y1, z1), new(x2, y2, z2)) { }
     public Line(Fill<Vert> fill) : this(fill(0), fill(1)) { }
-    public Line(Fill<Double3> fill) : this(new(fill(0)), new(fill(1))) { }
+    public Line(Fill<Float3> fill) : this(new(fill(0)), new(fill(1))) { }
     public Line(Fill<Int3> fill) : this(new(fill(0)), new(fill(1))) { }
-    public Line(Fill<double> fill) : this(new(fill(0), fill(1), fill(2)), new(fill(3), fill(4), fill(5))) { }
+    public Line(Fill<float> fill) : this(new(fill(0), fill(1), fill(2)), new(fill(3), fill(4), fill(5))) { }
     public Line(Fill<int> fill) : this(new(fill(0), fill(1), fill(2)), new(fill(3), fill(4), fill(5))) { }
 
     public Vert this[int index]
@@ -66,7 +66,7 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static Line Clamp(Line val, Line min, Line max) =>
         new(Vert.Clamp(val.a, min.a, max.a), Vert.Clamp(val.b, min.b, max.b));
     public static Line Floor(Line val) => new(Vert.Floor(val.a), Vert.Floor(val.b));
-    public static Line Lerp(Line a, Line b, double t, bool clamp = true) =>
+    public static Line Lerp(Line a, Line b, float t, bool clamp = true) =>
         new(Vert.Lerp(a.a, b.a, t, clamp), Vert.Lerp(a.b, b.b, t, clamp));
     public static Line Median(params Line[] vals)
     {
@@ -114,16 +114,16 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
 
     public bool Contains(Vert vert)
     {
-        Double3 diffA = a - vert, diffB = a - b;
-        double lerpVal = diffA.Magnitude / diffB.Magnitude;
+        Float3 diffA = a - vert, diffB = a - b;
+        float lerpVal = diffA.Magnitude / diffB.Magnitude;
         return Vert.Lerp(a, b, lerpVal) == vert;
     }
 
     public Vert ClosestTo(Vert vert) => ClosestTo(vert, Calculus.DefaultStep);
-    public Vert ClosestTo(Vert vert, double step)
+    public Vert ClosestTo(Vert vert, float step)
     {
         Vert closestA = a, closestB = b;
-        for (double t = 0; t <= 1; t += step)
+        for (float t = 0; t <= 1; t += step)
         {
             Vert valA = Vert.Lerp(a, b, t);
             Vert valB = Vert.Lerp(b, a, t);
@@ -143,7 +143,7 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
 
     public Line[] Subdivide()
     {
-        Vert middle = Vert.Lerp(a, b, 0.5);
+        Vert middle = Vert.Lerp(a, b, 0.5f);
         return new Line[] { new(a, middle), new(middle, b) };
     }
     public Line[] Subdivide(int iterations)
@@ -162,9 +162,9 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public Vert[] ToArray() => new Vert[] { a, b };
     public List<Vert> ToList() => new() { a, b };
 
-    public double[] ToDoubleArray() => new double[] { a.position.x, a.position.y, a.position.z,
+    public float[] ToDoubleArray() => new float[] { a.position.x, a.position.y, a.position.z,
                                                       b.position.x, b.position.y, b.position.z };
-    public List<double> ToDoubleList() => new() { a.position.x, a.position.y, a.position.z,
+    public List<float> ToDoubleList() => new() { a.position.x, a.position.y, a.position.z,
                                                   b.position.x, b.position.y, b.position.z };
 
     public static Line operator +(Line a, Line b) => new(a.a + b.a, a.b + b.b);
@@ -174,10 +174,10 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static Line operator -(Line a, Vert b) => new(a.a - b, a.b - b);
     public static Line operator *(Line a, Line b) => new(a.a * b.a, a.b * b.b);
     public static Line operator *(Line a, Vert b) => new(a.a * b, a.b * b);
-    public static Line operator *(Line a, double b) => new(a.a * b, a.b * b);
+    public static Line operator *(Line a, float b) => new(a.a * b, a.b * b);
     public static Line operator /(Line a, Line b) => new(a.a / b.a, a.b / b.b);
     public static Line operator /(Line a, Vert b) => new(a.a / b, a.b / b);
-    public static Line operator /(Line a, double b) => new(a.a / b, a.b / b);
+    public static Line operator /(Line a, float b) => new(a.a / b, a.b / b);
     public static bool operator ==(Line a, Line b) => a.Equals(b);
     public static bool operator !=(Line a, Line b) => !a.Equals(b);
     public static bool operator >(Line a, Line b) => a.CompareTo(b) > 0;
@@ -186,8 +186,8 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static bool operator <=(Line a, Line b) => a < b || a == b;
 
     public static implicit operator Line(Fill<Vert> fill) => new(fill);
-    public static implicit operator Line(Fill<Double3> fill) => new(fill);
+    public static implicit operator Line(Fill<Float3> fill) => new(fill);
     public static implicit operator Line(Fill<Int3> fill) => new(fill);
-    public static implicit operator Line(Fill<double> fill) => new(fill);
+    public static implicit operator Line(Fill<float> fill) => new(fill);
     public static implicit operator Line(Fill<int> fill) => new(fill);
 }

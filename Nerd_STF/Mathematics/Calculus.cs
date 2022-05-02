@@ -2,32 +2,32 @@
 
 public static class Calculus
 {
-    public const double DefaultStep = 0.001;
+    public const float DefaultStep = 0.001f;
 
-    public static Equation GetDerivative(Equation equ, double min, double max, double step = DefaultStep)
+    public static Equation GetDerivative(Equation equ, float min, float max, float step = DefaultStep)
     {
-        Dictionary<double, double> vals = new();
-        for (double x = min; x <= max; x += step)
+        Dictionary<float, float> vals = new();
+        for (float x = min; x <= max; x += step)
         {
-            double val1 = equ(x), val2 = equ(x + step), change = (val2 - val1) / step;
+            float val1 = equ(x), val2 = equ(x + step), change = (val2 - val1) / step;
             vals.Add(x, change);
         }
         return Mathf.MakeEquation(vals);
     }
-    public static double GetDerivativeAtPoint(Equation equ, double x, double step = DefaultStep) =>
+    public static float GetDerivativeAtPoint(Equation equ, float x, float step = DefaultStep) =>
         (equ(x + DefaultStep) - equ(x)) / step;
 
-    public static double GetIntegral(Equation equ, double lowerBound, double upperBound, double step = DefaultStep)
+    public static float GetIntegral(Equation equ, float lowerBound, float upperBound, float step = DefaultStep)
         {
-            double val = 0;
-            for (double x = lowerBound; x <= upperBound; x += step) val += equ(x) * step;
+            float val = 0;
+            for (float x = lowerBound; x <= upperBound; x += step) val += equ(x) * step;
             return val;
         }
 
-    public static double GradientDescent(Equation equ, double initial, double rate, double stepCount = 1000,
-        double step = DefaultStep)
+    public static float GradientDescent(Equation equ, float initial, float rate, float stepCount = 1000,
+        float step = DefaultStep)
     {
-        double val = initial;
+        float val = initial;
         for (int i = 0; i < stepCount; i++) val -= GetDerivativeAtPoint(equ, val, step) * rate;
         return val;
     }
