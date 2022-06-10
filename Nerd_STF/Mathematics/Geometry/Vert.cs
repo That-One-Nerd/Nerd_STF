@@ -31,7 +31,7 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
     }
 
     public static Vert Absolute(Vert val) => new(Float3.Absolute(val.position));
-    public static Vert Average(params Vert[] vals) => Float3.Average(ToDouble3Array(vals));
+    public static Vert Average(params Vert[] vals) => Float3.Average(ToFloat3Array(vals));
     public static Vert Ceiling(Vert val) => new(Float3.Ceiling(val.position));
     public static Vert Clamp(Vert val, Vert min, Vert max) =>
         new(Float3.Clamp(val.position, min.position, max.position));
@@ -40,23 +40,24 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
     public static Vert Cross(Vert a, Vert b, bool normalized = false) =>
         new(Float3.Cross(a.position, b.position, normalized));
     public static float Dot(Vert a, Vert b) => Float3.Dot(a.position, b.position);
-    public static float Dot(params Vert[] vals) => Float3.Dot(ToDouble3Array(vals));
+    public static float Dot(params Vert[] vals) => Float3.Dot(ToFloat3Array(vals));
     public static Vert Floor(Vert val) => new(Float3.Floor(val.position));
     public static Vert Lerp(Vert a, Vert b, float t, bool clamp = true) =>
         new(Float3.Lerp(a.position, b.position, t, clamp));
     public static Vert Median(params Vert[] vals) =>
-        Float3.Median(ToDouble3Array(vals));
+        Float3.Median(ToFloat3Array(vals));
     public static Vert Max(params Vert[] vals) =>
-        Float3.Max(ToDouble3Array(vals));
+        Float3.Max(ToFloat3Array(vals));
     public static Vert Min(params Vert[] vals) =>
-        Float3.Min(ToDouble3Array(vals));
-    public static Float3[] ToDouble3Array(params Vert[] vals)
+        Float3.Min(ToFloat3Array(vals));
+
+    public static Float3[] ToFloat3Array(params Vert[] vals)
     {
-        Float3[] doubles = new Float3[vals.Length];
-        for (int i = 0; i < vals.Length; i++) doubles[i] = vals[i].position;
-        return doubles;
+        Float3[] floats = new Float3[vals.Length];
+        for (int i = 0; i < vals.Length; i++) floats[i] = vals[i].position;
+        return floats;
     }
-    public static List<Float3> ToDouble3List(params Vert[] vals) => ToDouble3Array(vals).ToList();
+    public static List<Float3> ToFloat3List(params Vert[] vals) => ToFloat3Array(vals).ToList();
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {

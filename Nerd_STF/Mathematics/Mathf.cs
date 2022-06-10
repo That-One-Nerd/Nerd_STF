@@ -2,18 +2,10 @@
 
 public static class Mathf
 {
-    public const float RadToDeg = 0.0174532925199f; // Pi / 180
-    public const float E = 2.71828182846f;
-    public const float GoldenRatio = 1.61803398875f; // (1 + Sqrt(5)) / 2
-    public const float HalfPi = 1.57079632679f; // Pi / 2
-    public const float Pi = 3.14159265359f;
-    public const float DegToRad = 57.2957795131f; // 180 / Pi
-    public const float Tau = 6.28318530718f; // 2 * Pi
-
     public static float Absolute(float val) => val < 0 ? -val : val;
     public static int Absolute(int val) => val < 0 ? -val : val;
 
-    public static float ArcCos(float value) => -ArcSin(value) + HalfPi;
+    public static float ArcCos(float value) => -ArcSin(value) + Constants.HalfPi;
 
     public static float ArcCot(float value) => ArcCos(value / Sqrt(1 + value * value));
 
@@ -33,14 +25,14 @@ public static class Mathf
         return Average(vals.ToArray());
     }
     public static float Average(params float[] vals) => Sum(vals) / vals.Length;
-    public static int Average(params int[] vals) => Sum(vals) / vals.Length;
+    public static float Average(params int[] vals) => Sum(vals) / (float)vals.Length;
 
     public static int Ceiling(float val) => (int)(val + (1 - (val % 1)));
 
     public static float Clamp(float val, float min, float max)
     {
         if (max < min) throw new ArgumentOutOfRangeException(nameof(max),
-            nameof(max) + " must be greater than or equal to " + nameof(min));
+            nameof(max) + " must be greater than or equal to " + nameof(min) + ".");
         val = val < min ? min : val;
         val = val > max ? max : val;
         return val;
@@ -54,7 +46,11 @@ public static class Mathf
         return val;
     }
 
-    public static float Cos(float radians) => Sin(radians + HalfPi);
+    // nCr (n = total, r = size)
+    public static int Combinations(int total, int size) => Factorial(total) /
+        (Factorial(size) * Factorial(total - size));
+
+    public static float Cos(float radians) => Sin(radians + Constants.HalfPi);
 
     public static float Cot(float radians) => Cos(radians) / Sin(radians);
 
@@ -88,6 +84,22 @@ public static class Mathf
         for (float x = min; x <= max; x += step) vals.Add(x, equ(x));
         return vals;
     }
+
+    public static int GreatestCommonFactor(params int[] vals)
+    {
+        int loops = Min(vals);
+        for (int i = loops; i > 0; i--)
+        {
+            bool fit = true;
+            foreach (int v in vals) fit &= v % i == 0;
+            if (fit) return i;
+        }
+        return -1;
+    }
+
+    public static float InverseSqrt(float val) => 1 / Sqrt(val);
+
+    public static int LeastCommonMultiple(params int[] vals) => Product(vals) / GreatestCommonFactor(vals);
 
     public static float Lerp(float a, float b, float t, bool clamp = true)
     {
@@ -169,27 +181,61 @@ public static class Mathf
         return val;
     }
 
-    public static float Multiply(params float[] vals)
+    public static (T value, int occurences) Mode<T>(params T[] vals) where T : IEquatable<T>
+    {
+        if (vals.Length < 1) throw new ArgumentException("List must contain at least 1 element.", nameof(vals));
+        (T value, int occurences) = (vals[0], -1);
+        for (int i = 0; i < vals.Length; i++)
+        {
+            int count = vals.Count(x => x.Equals(vals[i]));
+            if (count > occurences)
+            {
+                value = vals[i];
+                occurences = count;
+            }
+        }
+        return (value, occurences);
+    }
+
+    // nPr (n = total, r = size)
+    public static int Permutations(int total, int size) => Factorial(total) / Factorial(total - size);
+
+    public static float Product(params float[] vals)
     {
         if (vals.Length < 1) return 0;
         float val = 1;
         foreach (float d in vals) val *= d;
         return val;
     }
-    public static int Multiply(params int[] vals)
+    public static int Product(params int[] vals)
     {
         if (vals.Length < 1) return 0;
         int val = 1;
         foreach (int i in vals) val *= i;
         return val;
     }
+    public static float Product(Equation equ, float min, float max, float step = 1)
+    {
+        float total = 1;
+        for (float f = min; f <= max; f += step) total *= equ(f);
+        return total;
+    }
 
     public static float Power(float num, float pow) => (float)Math.Pow(num, pow);
+    public static float Power(float num, int pow)
+    {
+        if (pow < 0) return 0;
+        float val = 1;
+        for (int i = 0; i < Absolute(pow); i++) val *= num;
+        if (pow < 1) val = 1 / val;
+        return val;
+    }
     public static int Power(int num, int pow)
     {
         if (pow < 0) return 0;
         int val = 1;
         for (int i = 0; i < Absolute(pow); i++) val *= num;
+        if (pow < 1) val = 1 / val;
         return val;
     }
 
@@ -205,16 +251,16 @@ public static class Mathf
     {
         // Really close polynomial to sin(x) (when modded by 2pi). RMSE of 0.000003833
         const float a =  0.000013028f,
-                     b =  0.999677f,
-                     c =  0.00174164f,
-                     d = -0.170587f,
-                     e =  0.0046494f,
-                     f =  0.00508955f,
-                     g =  0.00140205f,
-                     h = -0.000577413f,
-                     i =  0.0000613134f,
-                     j = -0.00000216852f;
-        float x = radians % Tau;
+                    b =  0.999677f,
+                    c =  0.00174164f,
+                    d = -0.170587f,
+                    e =  0.0046494f,
+                    f =  0.00508955f,
+                    g =  0.00140205f,
+                    h = -0.000577413f,
+                    i =  0.0000613134f,
+                    j = -0.00000216852f;
+        float x = radians % Constants.Tau;
 
         return
             a + (b * x) + (c * x * x) + (d * x * x * x) + (e * x * x * x * x) + (f * x * x * x * x * x)
@@ -247,6 +293,36 @@ public static class Mathf
         foreach (int i in vals) val += i;
         return val;
     }
+    public static float Sum(Equation equ, float min, float max, float step = 1)
+    {
+        float total = 0;
+        for (float f = min; f <= max; f += step) total += equ(f);
+        return total;
+    }
+
+    // Known as stdev
+    public static float StandardDeviation(params float[] vals) => Sqrt(Variance(vals));
 
     public static float Tan(float radians) => Sin(radians) / Cos(radians);
+
+    public static T[] UniqueItems<T>(params T[] vals) where T : IEquatable<T>
+    {
+        List<T> unique = new();
+        foreach (T item in vals) if (!unique.Any(x => x.Equals(item))) unique.Add(item);
+        return unique.ToArray();
+    }
+
+    public static float Variance(params float[] vals)
+    {
+        float mean = Average(vals), sum = 0;
+        for (int i = 0; i < vals.Length; i++)
+        {
+            float val = vals[i] - mean;
+            sum += val * val;
+        }
+        return sum / vals.Length;
+    }
+
+    public static float ZScore(float val, params float[] vals) => ZScore(val, Average(vals), StandardDeviation(vals));
+    public static float ZScore(float val, float mean, float stdev) => (val - mean) / stdev;
 }

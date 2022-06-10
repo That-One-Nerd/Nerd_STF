@@ -108,7 +108,7 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp));
     public static Int3 Median(params Int3[] vals)
     {
-        int index = Mathf.Average(0, vals.Length - 1);
+        float index = Mathf.Average(0, vals.Length - 1);
         Int3 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
@@ -126,7 +126,7 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
         foreach (Int3 d in vals) val = d < val ? d : val;
         return val;
     }
-    public static Int3 Multiply(params Int3[] vals)
+    public static Int3 Product(params Int3[] vals)
     {
         if (vals.Length < 1) return Zero;
         Int3 val = One;
@@ -143,6 +143,18 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
         Int3 val = Zero;
         foreach (Int3 d in vals) val += d;
         return val;
+    }
+
+    public static (int[] Xs, int[] Ys, int[] Zs) SplitArray(params Int3[] vals)
+    {
+        int[] Xs = new int[vals.Length], Ys = new int[vals.Length], Zs = new int[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            Xs[i] = vals[i].x;
+            Ys[i] = vals[i].y;
+            Zs[i] = vals[i].z;
+        }
+        return (Xs, Ys, Zs);
     }
     public int CompareTo(Int3 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
@@ -193,5 +205,9 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static explicit operator Int3(Int4 val) => new(val.x, val.y, val.z);
     public static explicit operator Int3(Vert val) => new((int)val.position.x, (int)val.position.y,
                                                           (int)val.position.z);
+    public static explicit operator Int3(RGBA val) => (Int3)val.ToRGBAByte();
+    public static explicit operator Int3(HSVA val) => (Int3)val.ToHSVAByte();
+    public static explicit operator Int3(RGBAByte val) => new(val.R, val.G, val.B);
+    public static explicit operator Int3(HSVAByte val) => new(val.H, val.S, val.V);
     public static implicit operator Int3(Fill<int> fill) => new(fill);
 }

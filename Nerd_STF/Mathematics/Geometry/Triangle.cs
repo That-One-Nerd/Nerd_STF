@@ -3,71 +3,71 @@
 public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
 {
     public Vert A
+    {
+        get => p_a;
+        set
         {
-            get => p_a;
-            set
-            {
-                p_a = value;
-                p_ab.a = value;
-                p_ca.b = value;
-            }
+            p_a = value;
+            p_ab.a = value;
+            p_ca.b = value;
         }
+    }
     public Vert B
+    {
+        get => p_b;
+        set
         {
-            get => p_b;
-            set
-            {
-                p_b = value;
-                p_ab.b = value;
-                p_bc.a = value;
-            }
+            p_b = value;
+            p_ab.b = value;
+            p_bc.a = value;
         }
+    }
     public Vert C
+    {
+        get => p_c;
+        set
         {
-            get => p_c;
-            set
-            {
-                p_c = value;
-                p_bc.b = value;
-                p_ca.a = value;
-            }
+            p_c = value;
+            p_bc.b = value;
+            p_ca.a = value;
         }
+    }
     public Line AB
+    {
+        get => p_ab;
+        set
         {
-            get => p_ab;
-            set
-            {
-                p_ab = value;
-                p_a = value.a;
-                p_b = value.b;
-                p_bc.a = value.b;
-                p_ca.b = value.a;
-            }
+            p_ab = value;
+            p_a = value.a;
+            p_b = value.b;
+            p_bc.a = value.b;
+            p_ca.b = value.a;
         }
+    }
     public Line BC
+    {
+        get => p_bc;
+        set
         {
-            get => p_bc;
-            set
-            {
-                p_bc = value;
-                p_b = value.a;
-                p_c = value.b;
-                p_ca.a = value.b;
-                p_ab.b = value.a;
-            }
+            p_bc = value;
+            p_b = value.a;
+            p_c = value.b;
+            p_ca.a = value.b;
+            p_ab.b = value.a;
         }
+    }
     public Line CA
+    {
+        get => p_ca;
+        set
         {
-            get => p_ca;
-            set
-            {
-                p_ca = value;
-                p_a = value.b;
-                p_c = value.a;
-                p_ab.a = value.b;
-                p_bc.b = value.a;
-            }
+            p_ca = value;
+            p_a = value.b;
+            p_c = value.a;
+            p_ab.a = value.b;
+            p_bc.b = value.a;
         }
+    }
 
     private Vert p_a, p_b, p_c;
     private Line p_ab, p_bc, p_ca;
@@ -75,6 +75,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public float Area => (float)Mathf.Absolute((A.position.x * B.position.y) + (B.position.x * C.position.y) +
         (C.position.x * A.position.y) - ((B.position.x * A.position.y) + (C.position.x * B.position.y) +
         (A.position.x * C.position.y))) * 0.5f;
+    public Vert Midpoint => Vert.Average(A, B, C);
     public float Perimeter => AB.Length + BC.Length + CA.Length;
 
     public Triangle(Vert a, Vert b, Vert c)
@@ -195,7 +196,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
          return (ab, bc, ca);
     }
 
-    public static float[] ToDoubleArrayAll(params Triangle[] tris)
+    public static float[] ToFloatArrayAll(params Triangle[] tris)
     {
         float[] vals = new float[tris.Length * 9];
         for (int i = 0; i < tris.Length; i++)
@@ -213,7 +214,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
         }
         return vals;
     }
-    public static List<float> ToDoubleListAll(params Triangle[] tris) => new(ToDoubleArrayAll(tris));
+    public static List<float> ToFloatListAll(params Triangle[] tris) => new(ToFloatArrayAll(tris));
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
@@ -241,10 +242,10 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public Vert[] ToArray() => new Vert[] { A, B, C };
     public List<Vert> ToList() => new() { A, B, C };
 
-    public float[] ToDoubleArray() => new float[] { A.position.x, A.position.y, A.position.z,
+    public float[] ToFloatArray() => new float[] { A.position.x, A.position.y, A.position.z,
                                                       B.position.x, B.position.y, B.position.z,
                                                       C.position.x, C.position.y, C.position.z };
-    public List<float> ToDoubleList() => new() { A.position.x, A.position.y, A.position.z,
+    public List<float> ToFloatList() => new() { A.position.x, A.position.y, A.position.z,
                                                   B.position.x, B.position.y, B.position.z,
                                                   C.position.x, C.position.y, C.position.z };
     public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);

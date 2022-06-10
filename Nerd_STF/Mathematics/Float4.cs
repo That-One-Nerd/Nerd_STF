@@ -144,7 +144,7 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         foreach (Float4 d in vals) val = d < val ? d : val;
         return val;
     }
-    public static Float4 Multiply(params Float4[] vals)
+    public static Float4 Product(params Float4[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float4 val = One;
@@ -161,6 +161,20 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         Float4 val = Zero;
         foreach (Float4 d in vals) val += d;
         return val;
+    }
+
+    public static (float[] Xs, float[] Ys, float[] Zs, float[] Ws) SplitArray(params Float4[] vals)
+    {
+        float[] Xs = new float[vals.Length], Ys = new float[vals.Length], Zs = new float[vals.Length],
+                Ws = new float[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            Xs[i] = vals[i].x;
+            Ys[i] = vals[i].y;
+            Zs[i] = vals[i].z;
+            Ws[i] = vals[i].w;
+        }
+        return (Xs, Ys, Zs, Ws);
     }
 
     public int CompareTo(Float4 other) => Magnitude.CompareTo(other.Magnitude);
@@ -213,6 +227,12 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static implicit operator Float4(Int3 val) => new(val.x, val.y, val.z, 0);
     public static implicit operator Float4(Int4 val) => new(val.x, val.y, val.z, val.w);
     public static implicit operator Float4(Vert val) => new(val.position.x, val.position.y, val.position.z, 0);
+    public static implicit operator Float4(RGBA val) => new(val.R, val.G, val.B, val.A);
+    public static explicit operator Float4(CMYKA val) => new(val.C, val.M, val.Y, val.K);
+    public static explicit operator Float4(HSVA val) => new(val.H.Normalized, val.S, val.V, val.A);
+    public static implicit operator Float4(RGBAByte val) => val.ToRGBA();
+    public static explicit operator Float4(CMYKAByte val) => (Float4)val.ToCMYKA();
+    public static implicit operator Float4(HSVAByte val) => (Float4)val.ToHSVA();
     public static implicit operator Float4(Fill<float> fill) => new(fill);
     public static implicit operator Float4(Fill<int> fill) => new(fill);
 }

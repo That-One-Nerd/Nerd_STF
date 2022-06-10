@@ -7,7 +7,7 @@ Nerd_STF is a C# library that runs on .Net 6.0, and contains added structures an
 Nerd_STF has recently been remade, completely rebuilding many of its topics.
 
 ## What does it include?
-Nerd_STF will include math structures as well as other computer science topics. Right now, it is mainly focused on mathematics, but will branch out in the future. It currently contains things like lists of 3 doubles or ints, or `Vert`, `Line`, and `Triangle` classes, that are rich in implementation.
+Nerd_STF will include math structures as well as other computer science topics. Right now, it is mainly focused on mathematics, but will branch out in the future. It currently contains things like lists of 3 floats or ints, or `Vert`, `Line`, and `Triangle` classes, that are rich in implementation.
 
 ## What about Nerd_STF Versions `2021`?
 Nerd_STF `2021` used an different version scheme, based on the year, as you might have guessed (it is not the year `2` right now), and while I will be keeping the `2021` versions up, I wouldn't recommend using them, and the code is old code, written by a more naive me. Hell, I wrote an entire `List<T>` class there before I knew of the `System.Collections.Generic.List<T>` class that did literally everything for me already. Oh well. So, keep that in mind when you check out those versions of the library.

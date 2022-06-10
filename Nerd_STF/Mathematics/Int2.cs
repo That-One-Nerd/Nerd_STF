@@ -88,7 +88,7 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp));
     public static Int2 Median(params Int2[] vals)
     {
-        int index = Mathf.Average(0, vals.Length - 1);
+        float index = Mathf.Average(0, vals.Length - 1);
         Int2 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
@@ -106,7 +106,7 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
         foreach (Int2 d in vals) val = d < val ? d : val;
         return val;
     }
-    public static Int2 Multiply(params Int2[] vals)
+    public static Int2 Product(params Int2[] vals)
     {
         if (vals.Length < 1) return Zero;
         Int2 val = One;
@@ -123,6 +123,17 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
         Int2 val = Zero;
         foreach (Int2 d in vals) val += d;
         return val;
+    }
+
+    public static (int[] Xs, int[] Ys) SplitArray(params Int2[] vals)
+    {
+        int[] Xs = new int[vals.Length], Ys = new int[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            Xs[i] = vals[i].x;
+            Ys[i] = vals[i].y;
+        }
+        return (Xs, Ys);
     }
 
     public int CompareTo(Int2 other) => Magnitude.CompareTo(other.Magnitude);

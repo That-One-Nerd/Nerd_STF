@@ -121,7 +121,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
             Mathf.Lerp(a.w, b.w, t, clamp));
     public static Int4 Median(params Int4[] vals)
     {
-        int index = Mathf.Average(0, vals.Length - 1);
+        float index = Mathf.Average(0, vals.Length - 1);
         Int4 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
@@ -139,7 +139,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
         foreach (Int4 d in vals) val = d < val ? d : val;
         return val;
     }
-    public static Int4 Multiply(params Int4[] vals)
+    public static Int4 Product(params Int4[] vals)
     {
         if (vals.Length < 1) return Zero;
         Int4 val = One;
@@ -156,6 +156,20 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
         Int4 val = Zero;
         foreach (Int4 d in vals) val += d;
         return val;
+    }
+
+    public static (int[] Xs, int[] Ys, int[] Zs, int[] Ws) SplitArray(params Int4[] vals)
+    {
+        int[] Xs = new int[vals.Length], Ys = new int[vals.Length], Zs = new int[vals.Length],
+              Ws = new int[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            Xs[i] = vals[i].x;
+            Ys[i] = vals[i].y;
+            Zs[i] = vals[i].z;
+            Ws[i] = vals[i].w;
+        }
+        return (Xs, Ys, Zs, Ws);
     }
 
     public int CompareTo(Int4 other) => Magnitude.CompareTo(other.Magnitude);
@@ -212,5 +226,11 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static implicit operator Int4(Int3 val) => new(val.x, val.y, val.z, 0);
     public static explicit operator Int4(Vert val) => new((int)val.position.x, (int)val.position.y,
                                                           (int)val.position.z, 0);
+    public static explicit operator Int4(RGBA val) => val.ToRGBAByte();
+    public static explicit operator Int4(CMYKA val) => (Int4)val.ToCMYKAByte();
+    public static explicit operator Int4(HSVA val) => val.ToHSVAByte();
+    public static implicit operator Int4(RGBAByte val) => new(val.R, val.G, val.B, val.A);
+    public static explicit operator Int4(CMYKAByte val) => new(val.C, val.M, val.Y, val.K);
+    public static implicit operator Int4(HSVAByte val) => new(val.H, val.S, val.V, val.A);
     public static implicit operator Int4(Fill<int> fill) => new(fill);
 }

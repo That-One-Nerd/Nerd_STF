@@ -3,93 +3,93 @@
 public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert>, ITriangulatable
 {
     public Vert A
+    {
+        get => p_a;
+        set
         {
-            get => p_a;
-            set
-            {
-                p_a = value;
-                p_ab.a = value;
-                p_da.b = value;
-            }
+            p_a = value;
+            p_ab.a = value;
+            p_da.b = value;
         }
+    }
     public Vert B
+    {
+        get => p_b;
+        set
         {
-            get => p_b;
-            set
-            {
-                p_b = value;
-                p_ab.b = value;
-                p_bc.a = value;
-            }
+            p_b = value;
+            p_ab.b = value;
+            p_bc.a = value;
         }
+    }
     public Vert C
+    {
+        get => p_c;
+        set
         {
-            get => p_c;
-            set
-            {
-                p_c = value;
-                p_bc.b = value;
-                p_cd.a = value;
-            }
+            p_c = value;
+            p_bc.b = value;
+            p_cd.a = value;
         }
+    }
     public Vert D
+    {
+        get => p_d;
+        set
         {
-            get => p_d;
-            set
-            {
-                p_d = value;
-                p_cd.b = value;
-                p_da.a = value;
-            }
+            p_d = value;
+            p_cd.b = value;
+            p_da.a = value;
         }
+    }
     public Line AB
+    {
+        get => p_ab;
+        set
         {
-            get => p_ab;
-            set
-            {
-                p_ab = value;
-                p_a = value.a;
-                p_b = value.b;
-                p_bc.a = value.b;
-                p_da.b = value.a;
-            }
+            p_ab = value;
+            p_a = value.a;
+            p_b = value.b;
+            p_bc.a = value.b;
+            p_da.b = value.a;
         }
+    }
     public Line BC
+    {
+        get => p_bc;
+        set
         {
-            get => p_bc;
-            set
-            {
-                p_bc = value;
-                p_b = value.a;
-                p_c = value.b;
-                p_cd.a = value.b;
-                p_ab.b = value.a;
-            }
+            p_bc = value;
+            p_b = value.a;
+            p_c = value.b;
+            p_cd.a = value.b;
+            p_ab.b = value.a;
         }
+    }
     public Line CD
+    {
+        get => p_cd;
+        set
         {
-            get => p_cd;
-            set
-            {
-                p_cd = value;
-                p_c = value.a;
-                p_d = value.b;
-                p_da.a = value.b;
-                p_bc.b = value.a;
-            }
+            p_cd = value;
+            p_c = value.a;
+            p_d = value.b;
+            p_da.a = value.b;
+            p_bc.b = value.a;
         }
+    }
     public Line DA
+    {
+        get => p_da;
+        set
         {
-            get => p_da;
-            set
-            {
-                p_da = value;
-                p_d = value.a;
-                p_a = value.b;
-                p_ab.a = value.b;
-                p_cd.b = value.a;
-            }
+            p_da = value;
+            p_d = value.a;
+            p_a = value.b;
+            p_ab.a = value.b;
+            p_cd.b = value.a;
         }
+    }
 
     private Vert p_a, p_b, p_c, p_d;
     private Line p_ab, p_bc, p_cd, p_da;
@@ -103,33 +103,33 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
             return val;
         }
     }
+    public Vert Midpoint => Vert.Average(A, B, C, D);
     public float Perimeter => AB.Length + BC.Length + CD.Length + DA.Length;
 
     public Quadrilateral(Vert a, Vert b, Vert c, Vert d)
-        {
-            p_a = a;
-            p_b = b;
-            p_c = c;
-            p_d = d;
-            p_ab = new(a, b);
-            p_bc = new(b, c);
-            p_cd = new(c, d);
-            p_da = new(d, a);
-        }
+    {
+        p_a = a;
+        p_b = b;
+        p_c = c;
+        p_d = d;
+        p_ab = new(a, b);
+        p_bc = new(b, c);
+        p_cd = new(c, d);
+        p_da = new(d, a);
+    }
     public Quadrilateral(Line ab, Line bc, Line cd, Line da)
-        {
-            if (ab.a != da.b || ab.b != bc.a || bc.b != cd.a || cd.b != da.a)
-                throw new DisconnectedLinesException(ab, bc, cd, da);
-
-            p_a = ab.a;
-            p_b = bc.a;
-            p_c = cd.a;
-            p_d = da.a;
-            p_ab = ab;
-            p_bc = bc;
-            p_cd = cd;
-            p_da = da;
-        }
+    {
+        if (ab.a != da.b || ab.b != bc.a || bc.b != cd.a || cd.b != da.a)
+            throw new DisconnectedLinesException(ab, bc, cd, da);
+                 p_a = ab.a;
+        p_b = bc.a;
+        p_c = cd.a;
+        p_d = da.a;
+        p_ab = ab;
+        p_bc = bc;
+        p_cd = cd;
+        p_da = da;
+    }
     public Quadrilateral(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4)
         : this(new Vert(x1, y1), new(x2, y2), new(x3, y3), new(x4, y4)) { }
     public Quadrilateral(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3,
@@ -145,39 +145,39 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
         fill(7), fill(8), fill(9), fill(10), fill(11)) { }
 
     public Vert this[int index]
+    {
+        get => index switch
         {
-            get => index switch
+            0 => A,
+            1 => B,
+            2 => C,
+            3 => D,
+            _ => throw new IndexOutOfRangeException(nameof(index)),
+        };
+        set
+        {
+            switch (index)
             {
-                0 => A,
-                1 => B,
-                2 => C,
-                3 => D,
-                _ => throw new IndexOutOfRangeException(nameof(index)),
-            };
-            set
-            {
-                switch (index)
-                {
-                    case 0:
-                        A = value;
-                        break;
+                case 0:
+                    A = value;
+                    break;
 
-                    case 1:
-                        B = value;
-                        break;
+                case 1:
+                    B = value;
+                    break;
 
-                    case 2:
-                        C = value;
-                        break;
+                case 2:
+                    C = value;
+                    break;
 
-                    case 3:
-                        D = value;
-                        break;
+                case 3:
+                    D = value;
+                    break;
 
-                    default: throw new IndexOutOfRangeException(nameof(index));
-                }
+                default: throw new IndexOutOfRangeException(nameof(index));
             }
         }
+    }
 
     public static Quadrilateral Absolute(Quadrilateral val) =>
         new(Vert.Absolute(val.A), Vert.Absolute(val.B), Vert.Absolute(val.C), Vert.Absolute(val.D));
@@ -213,56 +213,56 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     }
 
     public static (Vert[] As, Vert[] Bs, Vert[] Cs, Vert[] Ds) SplitVertArray(params Quadrilateral[] quads)
+    {
+        Vert[] a = new Vert[quads.Length], b = new Vert[quads.Length],
+               c = new Vert[quads.Length], d = new Vert[quads.Length];
+        for (int i = 0; i < quads.Length; i++)
         {
-            Vert[] a = new Vert[quads.Length], b = new Vert[quads.Length],
-                   c = new Vert[quads.Length], d = new Vert[quads.Length];
-            for (int i = 0; i < quads.Length; i++)
-            {
-                a[i] = quads[i].A;
-                b[i] = quads[i].B;
-                c[i] = quads[i].C;
-                d[i] = quads[i].D;
-            }
-
-            return (a, b, c, d);
+            a[i] = quads[i].A;
+            b[i] = quads[i].B;
+            c[i] = quads[i].C;
+            d[i] = quads[i].D;
         }
+
+        return (a, b, c, d);
+    }
     public static (Line[] ABs, Line[] BCs, Line[] CDs, Line[] DAs) SplitLineArray(params Quadrilateral[] quads)
+    {
+        Line[] ab = new Line[quads.Length], bc = new Line[quads.Length],
+               cd = new Line[quads.Length], da = new Line[quads.Length];
+        for (int i = 0; i < quads.Length; i++)
         {
-            Line[] ab = new Line[quads.Length], bc = new Line[quads.Length],
-                   cd = new Line[quads.Length], da = new Line[quads.Length];
-            for (int i = 0; i < quads.Length; i++)
-            {
-                ab[i] = quads[i].AB;
-                bc[i] = quads[i].BC;
-                cd[i] = quads[i].CD;
-                da[i] = quads[i].DA;
-            }
-
-            return (ab, bc, cd, da);
+            ab[i] = quads[i].AB;
+            bc[i] = quads[i].BC;
+            cd[i] = quads[i].CD;
+            da[i] = quads[i].DA;
         }
 
-    public static float[] ToDoubleArrayAll(params Quadrilateral[] quads)
+        return (ab, bc, cd, da);
+    }
+
+    public static float[] ToFloatArrayAll(params Quadrilateral[] quads)
+    {
+        float[] vals = new float[quads.Length * 12];
+        for (int i = 0; i < quads.Length; i++)
         {
-            float[] vals = new float[quads.Length * 12];
-            for (int i = 0; i < quads.Length; i++)
-            {
-                int pos = i * 12;
-                vals[pos + 0] = quads[i].A.position.x;
-                vals[pos + 1] = quads[i].A.position.y;
-                vals[pos + 2] = quads[i].A.position.z;
-                vals[pos + 3] = quads[i].B.position.x;
-                vals[pos + 4] = quads[i].B.position.y;
-                vals[pos + 5] = quads[i].B.position.z;
-                vals[pos + 6] = quads[i].C.position.x;
-                vals[pos + 7] = quads[i].C.position.y;
-                vals[pos + 8] = quads[i].C.position.z;
-                vals[pos + 9] = quads[i].D.position.x;
-                vals[pos + 10] = quads[i].D.position.y;
-                vals[pos + 11] = quads[i].D.position.z;
-            }
-            return vals;
+            int pos = i * 12;
+            vals[pos + 0] = quads[i].A.position.x;
+            vals[pos + 1] = quads[i].A.position.y;
+            vals[pos + 2] = quads[i].A.position.z;
+            vals[pos + 3] = quads[i].B.position.x;
+            vals[pos + 4] = quads[i].B.position.y;
+            vals[pos + 5] = quads[i].B.position.z;
+            vals[pos + 6] = quads[i].C.position.x;
+            vals[pos + 7] = quads[i].C.position.y;
+            vals[pos + 8] = quads[i].C.position.z;
+            vals[pos + 9] = quads[i].D.position.x;
+            vals[pos + 10] = quads[i].D.position.y;
+            vals[pos + 11] = quads[i].D.position.z;
         }
-    public static List<float> ToDoubleListAll(params Quadrilateral[] quads) => new(ToDoubleArrayAll(quads));
+        return vals;
+    }
+    public static List<float> ToFloatListAll(params Quadrilateral[] quads) => new(ToFloatArrayAll(quads));
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
@@ -291,14 +291,14 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     public Vert[] ToArray() => new Vert[] { A, B, C, D };
     public List<Vert> ToList() => new() { A, B, C, D };
 
-    public float[] ToDoubleArray() => new float[] { A.position.x, A.position.y, A.position.z,
-                                                      B.position.x, B.position.y, B.position.z,
-                                                      C.position.x, C.position.y, C.position.z,
-                                                      D.position.x, D.position.y, D.position.z };
-    public List<float> ToDoubleList() => new() { A.position.x, A.position.y, A.position.z,
-                                                  B.position.x, B.position.y, B.position.z,
-                                                  C.position.x, C.position.y, C.position.z,
-                                                  D.position.x, D.position.y, D.position.z };
+    public float[] ToFloatArray() => new float[] { A.position.x, A.position.y, A.position.z,
+                                                   B.position.x, B.position.y, B.position.z,
+                                                   C.position.x, C.position.y, C.position.z,
+                                                   D.position.x, D.position.y, D.position.z };
+    public List<float> ToFloatList() => new() { A.position.x, A.position.y, A.position.z,
+                                                B.position.x, B.position.y, B.position.z,
+                                                C.position.x, C.position.y, C.position.z,
+                                                D.position.x, D.position.y, D.position.z };
 
     public Triangle[] Triangulate() => new Line(A, C).Length > new Line(B, D).Length ?
         new Triangle[] { new(A, B, C), new(C, D, A) } : new Triangle[] { new(B, C, D), new(D, A, B) };
