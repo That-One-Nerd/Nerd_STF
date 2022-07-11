@@ -131,7 +131,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
         foreach (Float3 d in vals) val = d < val ? d : val;
         return val;
     }
-    public static Float3 Multiply(params Float3[] vals)
+    public static Float3 Product(params Float3[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float3 val = One;
@@ -148,6 +148,18 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
         Float3 val = Zero;
         foreach (Float3 d in vals) val += d;
         return val;
+    }
+
+    public static (float[] Xs, float[] Ys, float[] Zs) SplitArray(params Float3[] vals)
+    {
+        float[] Xs = new float[vals.Length], Ys = new float[vals.Length], Zs = new float[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            Xs[i] = vals[i].x;
+            Ys[i] = vals[i].y;
+            Zs[i] = vals[i].z;
+        }
+        return (Xs, Ys, Zs);
     }
 
     public int CompareTo(Float3 other) => Magnitude.CompareTo(other.Magnitude);
@@ -197,6 +209,10 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public static implicit operator Float3(Int3 val) => new(val.x, val.y, val.z);
     public static explicit operator Float3(Int4 val) => new(val.x, val.y, val.z);
     public static implicit operator Float3(Vert val) => new(val.position.x, val.position.y, val.position.z);
+    public static explicit operator Float3(RGBA val) => new(val.R, val.G, val.B);
+    public static explicit operator Float3(HSVA val) => new(val.H.Normalized, val.S, val.V);
+    public static explicit operator Float3(RGBAByte val) => (Float3)val.ToRGBA();
+    public static explicit operator Float3(HSVAByte val) => (Float3)val.ToHSVA();
     public static implicit operator Float3(Fill<float> fill) => new(fill);
     public static implicit operator Float3(Fill<int> fill) => new(fill);
 }

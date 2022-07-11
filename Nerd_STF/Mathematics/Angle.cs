@@ -9,20 +9,25 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public static Angle Zero => new(0);
 
     public float Degrees
-        {
-            get => p_deg;
-            set => p_deg = value;
-        }
+    {
+        get => p_deg;
+        set => p_deg = value;
+    }
     public float Gradians
-        {
-            get => p_deg * 1.11111111111f; // Reciprocal of 9/10 as a constant (10/9)
-            set => p_deg = value * 0.9f;
-        }
+    {
+        get => p_deg * 1.11111111111f; // Reciprocal of 9/10 as a constant (10/9)
+        set => p_deg = value * 0.9f;
+    }
+    public float Normalized
+    {
+        get => p_deg / 360;
+        set => p_deg = value * 360;
+    }
     public float Radians
-        {
-            get => p_deg * Mathf.DegToRad;
-            set => p_deg = value * Mathf.RadToDeg;
-        }
+    {
+        get => p_deg * Constants.DegToRad;
+        set => p_deg = value * Constants.RadToDeg;
+    }
 
     public Angle Bounded => new(p_deg % 360);
 
@@ -34,23 +39,24 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
         {
             Type.Degrees => value,
             Type.Gradians => value * 0.9f,
-            Type.Radians => value * Mathf.RadToDeg,
+            Type.Normalized => value * 360,
+            Type.Radians => value * Constants.RadToDeg,
             _ => throw new ArgumentException("Unknown type.", nameof(valueType)),
         };
     }
 
     public static Angle Absolute(Angle val) => new(Mathf.Absolute(val.p_deg));
-    public static Angle Average(params Angle[] vals) => new(Mathf.Average(ToDoubles(Type.Degrees, vals)));
-    public static Angle Ceiling(Angle val) => new(Mathf.Ceiling(val.p_deg));
+    public static Angle Average(params Angle[] vals) => new(Mathf.Average(SplitArray(Type.Degrees, vals)));
+    public static Angle Ceiling(Angle val, Type type = Type.Degrees) => new(Mathf.Ceiling(val.ValueFromType(type)));
     public static Angle Clamp(Angle val, Angle min, Angle max) => new(Mathf.Clamp(val.p_deg, min.p_deg, max.p_deg));
-    public static Angle Floor(Angle val) => new(Mathf.Ceiling(val.p_deg));
+    public static Angle Floor(Angle val, Type type = Type.Degrees) => new(Mathf.Floor(val.ValueFromType(type)));
     public static Angle Lerp(Angle a, Angle b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.p_deg, b.p_deg, t, clamp));
-    public static Angle Max(params Angle[] vals) => new(Mathf.Max(ToDoubles(Type.Degrees, vals)));
-    public static Angle Median(params Angle[] vals) => new(Mathf.Median(ToDoubles(Type.Degrees, vals)));
-    public static Angle Min(params Angle[] vals) => new(Mathf.Min(ToDoubles(Type.Degrees, vals)));
+    public static Angle Max(params Angle[] vals) => new(Mathf.Max(SplitArray(Type.Degrees, vals)));
+    public static Angle Median(params Angle[] vals) => new(Mathf.Median(SplitArray(Type.Degrees, vals)));
+    public static Angle Min(params Angle[] vals) => new(Mathf.Min(SplitArray(Type.Degrees, vals)));
 
-    public static float[] ToDoubles(Type outputType, params Angle[] vals)
+    public static float[] SplitArray(Type outputType, params Angle[] vals)
     {
         float[] res = new float[vals.Length];
         for (int i = 0; i < vals.Length; i++)
@@ -59,6 +65,7 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
             {
                 Type.Degrees => vals[i].Degrees,
                 Type.Gradians => vals[i].Gradians,
+                Type.Normalized => vals[i].Normalized,
                 Type.Radians => vals[i].Radians,
                 _ => throw new ArgumentException("Unknown type.", nameof(outputType)),
             };
@@ -78,20 +85,31 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public string ToString(Type outputType) => ToString((string?)null, outputType);
     public string ToString(string? provider, Type outputType = Type.Degrees) => outputType switch
     {
-        Type.Degrees => p_deg.ToString(provider),
-        Type.Gradians => Gradians.ToString(provider),
-        Type.Radians => Radians.ToString(provider),
+        Type.Degrees => p_deg.ToString(provider) + "°",
+        Type.Gradians => Gradians.ToString(provider) + "grad",
+        Type.Normalized => Normalized.ToString(provider) + "%",
+        Type.Radians => Radians.ToString(provider) + "rad",
         _ => throw new ArgumentException("Unknown type.", nameof(outputType)),
     };
     public string ToString(IFormatProvider provider, Type outputType = Type.Degrees) => outputType switch
     {
-        Type.Degrees => p_deg.ToString(provider),
-        Type.Gradians => Gradians.ToString(provider),
-        Type.Radians => Radians.ToString(provider),
+        Type.Degrees => p_deg.ToString(provider) + "°",
+        Type.Gradians => Gradians.ToString(provider) + "grad",
+        Type.Normalized => Normalized.ToString(provider) + "%",
+        Type.Radians => Radians.ToString(provider) + "rad",
         _ => throw new ArgumentException("Unknown type.", nameof(outputType)),
     };
 
     public object Clone() => new Angle(p_deg);
+
+    public float ValueFromType(Type type) => type switch
+    {
+        Type.Degrees => Degrees,
+        Type.Gradians => Gradians,
+        Type.Normalized => Normalized,
+        Type.Radians => Radians,
+        _ => throw new ArgumentException("Unknown type.", nameof(type)),
+    };
 
     public static Angle operator +(Angle a, Angle b) => new(a.p_deg + b.p_deg);
     public static Angle operator -(Angle a) => new(-a.p_deg);
@@ -111,6 +129,7 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     {
         Degrees,
         Gradians,
+        Normalized,
         Radians,
     }
 }

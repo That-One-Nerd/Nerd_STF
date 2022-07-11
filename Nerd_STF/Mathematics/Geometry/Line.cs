@@ -14,6 +14,7 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static Line Zero => new(Vert.Zero, Vert.Zero);
 
     public float Length => (b - a).Magnitude;
+    public Vert Midpoint => Vert.Average(a, b);
 
     public Vert a, b;
 
@@ -162,9 +163,9 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public Vert[] ToArray() => new Vert[] { a, b };
     public List<Vert> ToList() => new() { a, b };
 
-    public float[] ToDoubleArray() => new float[] { a.position.x, a.position.y, a.position.z,
+    public float[] ToFloatArray() => new float[] { a.position.x, a.position.y, a.position.z,
                                                       b.position.x, b.position.y, b.position.z };
-    public List<float> ToDoubleList() => new() { a.position.x, a.position.y, a.position.z,
+    public List<float> ToFloatList() => new() { a.position.x, a.position.y, a.position.z,
                                                   b.position.x, b.position.y, b.position.z };
 
     public static Line operator +(Line a, Line b) => new(a.a + b.a, a.b + b.b);

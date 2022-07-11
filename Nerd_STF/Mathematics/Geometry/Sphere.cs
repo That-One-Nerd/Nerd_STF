@@ -8,8 +8,8 @@ public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, ICompara
     public Vert center;
     public float radius;
 
-    public float SurfaceArea => 4 * Mathf.Pi * radius * radius;
-    public float Volume => 4 / 3 * (Mathf.Pi * radius * radius * radius);
+    public float SurfaceArea => 4 * Constants.Pi * radius * radius;
+    public float Volume => 4 / 3 * (Constants.Pi * radius * radius * radius);
 
     public static Sphere FromDiameter(Vert a, Vert b) => new(Vert.Average(a, b), (a - b).Magnitude / 2);
     public static Sphere FromRadius(Vert center, Vert radius) => new(center, (center - radius).Magnitude);

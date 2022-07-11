@@ -3,23 +3,24 @@
 public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdividable<Polygon>, ITriangulatable
 {
     public Line[] Lines
+    {
+        get => p_lines;
+        set
         {
-            get => p_lines;
-            set
-            {
-                p_lines = value;
-                p_verts = GenerateVerts(value);
-            }
+            p_lines = value;
+            p_verts = GenerateVerts(value);
         }
+    }
+    public Vert Midpoint => Vert.Average(Verts);
     public Vert[] Verts
+    {
+        get => p_verts;
+        set
         {
-            get => p_verts;
-            set
-            {
-                p_verts = value;
-                p_lines = GenerateLines(value);
-            }
+            p_verts = value;
+            p_lines = GenerateLines(value);
         }
+    }
 
     private Line[] p_lines;
     private Vert[] p_verts;
@@ -132,7 +133,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
         List<Vert> parts = new();
         for (int i = 0; i < vertCount; i++)
         {
-            float val = Mathf.Tau * i / vertCount;
+            float val = Constants.Tau * i / vertCount;
             parts.Add(new(Mathf.Cos(val), Mathf.Sin(val)));
         }
         return new(parts.ToArray());
@@ -245,11 +246,11 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             return new(res);
         }
 
-    public static float[] ToDoubleArrayAll(params Polygon[] polys) => ToDoubleListAll(polys).ToArray();
-    public static List<float> ToDoubleListAll(params Polygon[] polys)
+    public static float[] ToFloatArrayAll(params Polygon[] polys) => ToFloatListAll(polys).ToArray();
+    public static List<float> ToFloatListAll(params Polygon[] polys)
         {
             List<float> vals = new();
-            foreach (Polygon poly in polys) vals.AddRange(poly.ToDoubleArray());
+            foreach (Polygon poly in polys) vals.AddRange(poly.ToFloatArray());
             return vals;
         }
 
@@ -286,7 +287,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
     public Vert[] ToArray() => Verts;
     public List<Vert> ToList() => new(Verts);
 
-    public float[] ToDoubleArray()
+    public float[] ToFloatArray()
         {
             float[] vals = new float[Verts.Length * 3];
             for (int i = 0; i < Verts.Length; i++)
@@ -298,7 +299,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             }
             return vals;
         }
-    public List<float> ToDoubleList() => new(ToDoubleArray());
+    public List<float> ToFloatList() => new(ToFloatArray());
 
     public Polygon Subdivide()
     {

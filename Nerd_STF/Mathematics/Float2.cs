@@ -111,7 +111,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         foreach (Float2 d in vals) val = d < val ? d : val;
         return val;
     }
-    public static Float2 Multiply(params Float2[] vals)
+    public static Float2 Product(params Float2[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float2 val = One;
@@ -128,6 +128,17 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         Float2 val = Zero;
         foreach (Float2 d in vals) val += d;
         return val;
+    }
+
+    public static (float[] Xs, float[] Ys) SplitArray(params Float2[] vals)
+    {
+        float[] Xs = new float[vals.Length], Ys = new float[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            Xs[i] = vals[i].x;
+            Ys[i] = vals[i].y;
+        }
+        return (Xs, Ys);
     }
 
     public int CompareTo(Float2 other) => Magnitude.CompareTo(other.Magnitude);
