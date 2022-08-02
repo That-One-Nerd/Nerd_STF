@@ -3,11 +3,11 @@
 public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGroup<float>
 {
     public static Float4 Back => new(0, 0, -1, 0);
-    public static Float4 Deep => new(0, 0, 0, -1);
     public static Float4 Down => new(0, -1, 0, 0);
     public static Float4 Far => new(0, 0, 0, 1);
     public static Float4 Forward => new(0, 0, 1, 0);
     public static Float4 Left => new(-1, 0, 0, 0);
+    public static Float4 Near => new(0, 0, 0, -1);
     public static Float4 Right => new(1, 0, 0, 0);
     public static Float4 Up => new(0, 1, 0, 0);
 
@@ -15,7 +15,7 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static Float4 Zero => new(0, 0, 0, 0);
 
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
-    public Float4 Normalized => this / Magnitude;
+    public Float4 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z + w * w);
 
     public Float2 XY => new(x, y);
     public Float2 XZ => new(x, z);
@@ -144,6 +144,8 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         foreach (Float4 d in vals) val = d < val ? d : val;
         return val;
     }
+    public static Float4 Round(Float4 val) =>
+        new(Mathf.Round(val.x), Mathf.Round(val.y), Mathf.Round(val.z), Mathf.Round(val.w));
     public static Float4 Product(params Float4[] vals)
     {
         if (vals.Length < 1) return Zero;
@@ -180,7 +182,7 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public int CompareTo(Float4 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Float4)) return false;
+        if (obj == null || obj.GetType() != typeof(Float4)) return base.Equals(obj);
         return Equals((Float4)obj);
     }
     public bool Equals(Float4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
@@ -205,6 +207,11 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     }
 
     public float[] ToArray() => new[] { x, y, z, w };
+    public Fill<float> ToFill()
+    {
+        Float4 @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => new() { x, y, z, w };
 
     public static Float4 operator +(Float4 a, Float4 b) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
@@ -212,8 +219,10 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static Float4 operator -(Float4 a, Float4 b) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
     public static Float4 operator *(Float4 a, Float4 b) => new(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
     public static Float4 operator *(Float4 a, float b) => new(a.x * b, a.y * b, a.z * b, a.w * b);
+    public static Float4 operator *(Float4 a, Matrix b) => (Float4)((Matrix)a * b);
     public static Float4 operator /(Float4 a, Float4 b) => new(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
     public static Float4 operator /(Float4 a, float b) => new(a.x / b, a.y / b, a.z / b, a.w / b);
+    public static Float4 operator /(Float4 a, Matrix b) => (Float4)((Matrix)a / b);
     public static bool operator ==(Float4 a, Float4 b) => a.Equals(b);
     public static bool operator !=(Float4 a, Float4 b) => !a.Equals(b);
     public static bool operator >(Float4 a, Float4 b) => a.CompareTo(b) > 0;
@@ -221,11 +230,15 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static bool operator >=(Float4 a, Float4 b) => a == b || a > b;
     public static bool operator <=(Float4 a, Float4 b) => a == b || a < b;
 
+    public static implicit operator Float4(Complex val) => new(val.u, val.i, 0, 0);
+    public static implicit operator Float4(Quaternion val) => new(val.u, val.i, val.j, val.k);
     public static implicit operator Float4(Float2 val) => new(val.x, val.y, 0, 0);
     public static implicit operator Float4(Float3 val) => new(val.x, val.y, val.z, 0);
     public static implicit operator Float4(Int2 val) => new(val.x, val.y, 0, 0);
     public static implicit operator Float4(Int3 val) => new(val.x, val.y, val.z, 0);
     public static implicit operator Float4(Int4 val) => new(val.x, val.y, val.z, val.w);
+    public static explicit operator Float4(Matrix m) => new(m[0, 0], m[1, 0], m[2, 0], m[3, 0]);
+    public static explicit operator Float4(Vector2d val) => val.ToXYZ();
     public static implicit operator Float4(Vert val) => new(val.position.x, val.position.y, val.position.z, 0);
     public static implicit operator Float4(RGBA val) => new(val.R, val.G, val.B, val.A);
     public static explicit operator Float4(CMYKA val) => new(val.C, val.M, val.Y, val.K);

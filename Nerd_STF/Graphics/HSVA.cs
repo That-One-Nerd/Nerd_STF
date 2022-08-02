@@ -100,15 +100,15 @@ public struct HSVA : IColor, IEquatable<HSVA>
         for (int i = 0; i < vals.Length; i++) val += vals[i];
         return val / vals.Length;
     }
-    public static HSVA Ceiling(HSVA val, Angle.Type type) => new(Angle.Ceiling(val.H, type), Mathf.Ceiling(val.S),
-        Mathf.Ceiling(val.V), Mathf.Ceiling(val.A));
+    public static HSVA Ceiling(HSVA val, Angle.Type type = Angle.Type.Degrees) => new(Angle.Ceiling(val.H, type),
+        Mathf.Ceiling(val.S), Mathf.Ceiling(val.V), Mathf.Ceiling(val.A));
     public static HSVA Clamp(HSVA val, HSVA min, HSVA max) =>
         new(Angle.Clamp(val.H, min.H, max.H),
             Mathf.Clamp(val.S, min.S, max.S),
             Mathf.Clamp(val.V, min.V, max.V),
             Mathf.Clamp(val.A, min.A, max.A));
-    public static HSVA Floor(HSVA val, Angle.Type type) => new(Angle.Floor(val.H, type), Mathf.Floor(val.S),
-        Mathf.Floor(val.V), Mathf.Floor(val.A));
+    public static HSVA Floor(HSVA val, Angle.Type type = Angle.Type.Degrees) => new(Angle.Floor(val.H, type),
+        Mathf.Floor(val.S), Mathf.Floor(val.V), Mathf.Floor(val.A));
     public static HSVA Lerp(HSVA a, HSVA b, float t, bool clamp = true) =>
         new(Angle.Lerp(a.H, b.H, t, clamp), Mathf.Lerp(a.S, b.S, t, clamp), Mathf.Lerp(a.V, b.V, t, clamp),
             Mathf.Lerp(a.A, b.A, t, clamp));
@@ -136,6 +136,8 @@ public struct HSVA : IColor, IEquatable<HSVA>
         (Angle[] Hs, float[] Ss, float[] Vs, float[] As) = SplitArray(vals);
         return new(Angle.Min(Hs), Mathf.Min(Ss), Mathf.Min(Vs), Mathf.Min(As));
     }
+    public static HSVA Round(HSVA val, Angle.Type type = Angle.Type.Degrees) => new(Angle.Round(val.H, type),
+        Mathf.Round(val.S), Mathf.Round(val.V), Mathf.Round(val.A));
 
     public static (Angle[] Hs, float[] Ss, float[] Vs, float[] As) SplitArray(params HSVA[] vals)
     {
@@ -171,7 +173,7 @@ public struct HSVA : IColor, IEquatable<HSVA>
         || H == col.H && S == col.S && V == col.V && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(HSVA)) return Equals((HSVA)obj);
         else if (t == typeof(CMYKA)) return Equals((IColor)obj);
@@ -182,7 +184,7 @@ public struct HSVA : IColor, IEquatable<HSVA>
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => H.GetHashCode() ^ S.GetHashCode() ^ V.GetHashCode() ^ A.GetHashCode();
     public string ToString(IFormatProvider provider) => "H: " + H.ToString(provider) + " S: " + S.ToString(provider)
@@ -212,6 +214,11 @@ public struct HSVA : IColor, IEquatable<HSVA>
         Mathf.RoundInt(V * 255), Mathf.RoundInt(A * 255));
 
     public float[] ToArray() => new[] { H.Normalized, S, V, A };
+    public Fill<float> ToFill()
+    {
+        HSVA @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => new() { H.Normalized, S, V, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -18,11 +18,11 @@ public static class Calculus
         (equ(x + DefaultStep) - equ(x)) / step;
 
     public static float GetIntegral(Equation equ, float lowerBound, float upperBound, float step = DefaultStep)
-        {
-            float val = 0;
-            for (float x = lowerBound; x <= upperBound; x += step) val += equ(x) * step;
-            return val;
-        }
+    {
+        float val = 0;
+        for (float x = lowerBound; x <= upperBound; x += step) val += equ(x) * step;
+        return val;
+    }
 
     public static float GradientDescent(Equation equ, float initial, float rate, float stepCount = 1000,
         float step = DefaultStep)

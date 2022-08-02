@@ -98,7 +98,7 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Line)) return false;
+        if (obj == null || obj.GetType() != typeof(Line)) return base.Equals(obj);
         return Equals((Line)obj);
     }
     public bool Equals(Line other) => a == other.a && b == other.b;
@@ -161,12 +161,17 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     }
 
     public Vert[] ToArray() => new Vert[] { a, b };
+    public Fill<Vert> ToFill()
+    {
+        Line @this = this;
+        return i => @this[i];
+    }
     public List<Vert> ToList() => new() { a, b };
 
     public float[] ToFloatArray() => new float[] { a.position.x, a.position.y, a.position.z,
-                                                      b.position.x, b.position.y, b.position.z };
+                                                   b.position.x, b.position.y, b.position.z };
     public List<float> ToFloatList() => new() { a.position.x, a.position.y, a.position.z,
-                                                  b.position.x, b.position.y, b.position.z };
+                                                b.position.x, b.position.y, b.position.z };
 
     public static Line operator +(Line a, Line b) => new(a.a + b.a, a.b + b.b);
     public static Line operator +(Line a, Vert b) => new(a.a + b, a.b + b);

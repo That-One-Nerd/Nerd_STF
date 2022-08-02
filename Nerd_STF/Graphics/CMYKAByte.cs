@@ -149,7 +149,7 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
        && Y == col.Y && K == col.K && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(CMYKAByte)) return Equals((CMYKAByte)obj);
         else if (t == typeof(RGBA)) return Equals((IColor)obj);
@@ -160,7 +160,7 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => C.GetHashCode() ^ M.GetHashCode() ^ Y.GetHashCode()
         ^ K.GetHashCode() ^ A.GetHashCode();
@@ -181,6 +181,11 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
     public HSVAByte ToHSVAByte() => ToRGBA().ToHSVAByte();
 
     public byte[] ToArray() => new[] { C, M, Y, K, A };
+    public Fill<byte> ToFill()
+    {
+        CMYKAByte @this = this;
+        return i => @this[i];
+    }
     public List<byte> ToList() => new() { C, M, Y, K, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

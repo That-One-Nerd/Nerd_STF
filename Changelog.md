@@ -1,124 +1,173 @@
-# Nerd_STF v2.2.0
+# Nerd_STF v2.3.0
 
-This update adds many types of graphics-based objects, as well as some math functions and constants.
+This update adds lots of linear algebra tools, like matrixes and vectors, as well as new number systems, like complex numbers and quaternions.
 
 ```
 * Nerd_STF
-    + delegate Fill2D<T>(int, int)
+    + Extensions
+        + ConversionExtension
+        + Container2DExtension
+        + ToFillExtension
+    + Foreach
+    + IGroup2D
+    + Modifier
+    + Modifier2D
+    * IGroup<T>
+        + ToFill()
     * Exceptions
-        + FileParsingException
-    + FileType
-    + Graphics
-        + ColorChannel
-        + CMYKA
-        + CMYKAByte
-        + HSVA
-        + HSVAByte
-        + IColor
-        + IColorByte
-        + IlluminationFlags
-        + IlluminationModel
-        + Image
-        + Material
-        + RGBA
-        + RGBAByte
+        + InvalidSizeException
+        + NoInverseException
+    * Graphics
+        * CMYKA
+            + ToFill()
+            + static Round(CMYKA)
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * CMYKAByte
+            + ToFill()
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * HSVA
+            + ToFill()
+            + static Round(HSVA, Angle.Type)
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * HSVAByte
+            + ToFill()
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * Image
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * Material
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+            = Merged 2 if statements into 1 in `override bool Equals(object?)`
+        * RGBA
+            + ToFill()
+            + ToVector()
+            + static Round(RGBA)
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * RGBAByte
+            + ToFill()
+            + ToVector()
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
     * Mathematics
-        * Angle
-            + Normalized
-            = Made fancier `ToString()` formatting
-            * Type
-                + Normalized
-        + Constants
-        * Float2
-            + static SplitArray(params Float2[])
-            = Renamed `static Multiply(params Float2[])` to `Product`
-        * Float3
-            + static SplitArray(params Float3[])
-            + explicit operator Float3(RGBA)
-            + explicit operator Float3(HSVA)
-            + explicit operator Float3(RGBAByte)
-            + explicit operator Float3(HSVAByte)
-            = Renamed `static Multiply(params Float3[])` to `Product`
-        * Float4
-            + static SplitArray(params Float4[])
-            + implicit operator Float4(RGBA)
-            + explicit operator Float4(CMYKA)
-            + implicit operator Float4(HSVA)
-            + implicit operator Float4(RGBAByte)
-            + explicit operator Float4(CMYKAByte)
-            + implicit operator Float4(HSVAByte)
-            = Renamed `static Multiply(params Float4[])` to `Product`
+        + Algebra
+            + IMatrix
+            + Matrix2x2
+            + Matrix3x3
+            + Matrix4x4
+            + Vector2d
+            + Vector3d
+        + NumberSystems
+            + Complex
+            + Quaternion
+        + Samples
+            + Equations
+                + ScaleType
+        = Moved `Constants` file to Samples folder.
         * Geometry
+            * Box2D
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+            * Box3D
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
             * Line
-                + Midpoint
-                = Renamed `ToDoubleArray()` to `ToFloatArray`
-                = Renamed `ToDoubleList()` to `ToFloatList`
+                + ToFill()
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
             * Polygon
-                + Midpoint
-                = Renamed `ToDoubleArray()` to `ToFloatArray`
-                = Renamed `ToDoubleList()` to `ToFloatList`
-                = Renamed `static ToDoubleArrayAll(params Triangle[])` to `ToFloatArrayAll`
-                = Renamed `static ToDoubleListAll(params Triangle[])` to `ToFloatListAll`
+                + ToFill()
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
             * Quadrilateral
-                + Midpoint
-                = Renamed `ToDoubleArray()` to `ToFloatArray`
-                = Renamed `ToDoubleList()` to `ToFloatList`
-                = Renamed `static ToDoubleArrayAll(params Triangle[])` to `ToFloatArrayAll`
-                = Renamed `static ToDoubleListAll(params Triangle[])` to `ToFloatListAll`
+                + ToFill()
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+            * Sphere
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
             * Triangle
-                + Midpoint
-                = Renamed `ToDoubleArray()` to `ToFloatArray`
-                = Renamed `ToDoubleList()` to `ToFloatList`
-                = Renamed `static ToDoubleArrayAll(params Triangle[])` to `ToFloatArrayAll`
-                = Renamed `static ToDoubleListAll(params Triangle[])` to `ToFloatListAll`
+                + ToFill()
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
             * Vert
-                = Renamed `static ToDouble3Array(params Vert[])` to `ToFloat3Array`
-                = Renamed `static ToDouble3List(params Vert[])` to `ToFloat3List`
+                + ToFill()
+                + ToVector()
+                = Made `Vert(Float2)` not recreate a float group, and instead use itself.
+                = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * Angle
+            + static Down
+            + static Left
+            + static Right
+            + static Up
+            + static Round(Angle, Type)
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * Float2
+            + ToFill()
+            + ToVector()
+            + static Round(Float2)
+            + implicit operator Float2(Complex)
+            + explicit operator Float2(Quaternion)
+            + explicit operator Float2(Matrix)
+            + operator *(Float2, Matrix)
+            + operator /(Float2, Matrix)
+            = Made `Normalized` multiply by the inverse square root instead of dividing by the square root.
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * Float3
+            + ToFill()
+            + ToVector()
+            + static Round(Float3)
+            + implicit operator Float3(Complex)
+            + explicit operator Float3(Quaternion)
+            + explicit operator Float3(Matrix)
+            + operator *(Float3, Matrix)
+            + operator /(Float3, Matrix)
+            = Made `Normalized` multiply by the inverse square root instead of dividing by the square root.
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+        * Float4
+            + ToFill()
+            + static Round(Float4)
+            + implicit operator Float4(Complex)
+            + implicit operator Float4(Quaternion)
+            + explicit operator Float4(Matrix)
+            + operator *(Float4, Matrix)
+            + operator /(Float4, Matrix)
+            = Made `Normalized` multiply by the inverse square root instead of dividing by the square root.
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
+            = Renamed `Float4.Deep` to `Float4.Near`
         * Int2
-            + static SplitArray(params Int[])
-            = Renamed `static Multiply(params Int2[])` to `Product`
+            + ToFill()
+            + explicit operator Int2(Complex)
+            + explicit operator Int2(Quaternion)
+            + explicit operator Int2(Matrix)
+            + operator *(Int2, Matrix)
+            + operator /(Int2, Matrix)
+            = Made `Normalized` multiply by the inverse square root instead of dividing by the square root.
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
         * Int3
-            + static SplitArray(params Int3[])
-            + explicit operator Int3(RGBA)
-            + explicit operator Int3(HSVA)
-            + explicit operator Int3(RGBAByte)
-            + explicit operator Int3(HSVAByte)
-            = Renamed `static Multiply(params Int3[])` to `Product`
+            + ToFill()
+            + explicit operator Int3(Complex)
+            + explicit operator Int3(Quaternion)
+            + explicit operator Int3(Matrix)
+            + operator *(Int3, Matrix)
+            + operator /(Int3, Matrix)
+            = Made `Normalized` multiply by the inverse square root instead of dividing by the square root.
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
         * Int4
-            + static SplitArray(params Int4[])
-            + explicit operator Int4(RGBA)
-            + explicit operator Int4(CMYKA)
-            + explicit operator Int4(HSVA)
-            + implicit operator Int4(RGBAByte)
-            + explicit operator Int4(CMYKAByte)
-            + implicit operator Int4(HSVAByte)
-            = Renamed `static Multiply(params Int4[])` to `Product`
+            + explicit operator Int4(Complex)
+            + explicit operator Int4(Quaternion)
+            + explicit operator Int4(Matrix)
+            + operator *(Int4, Matrix)
+            + operator /(Int4, Matrix)
+            = Made `Normalized` multiply by the inverse square root instead of dividing by the square root.
+            = Replaced a false statement with `base.Equals(object?)` in `override bool Equals(object?)`
         * Mathf
-            + static Combinations(int, int)
-            + static GreatestCommonFactor(params int[])
-            + static InverseSqrt(float)
-            + static LeastCommonMultiple(params int[])
-            + static Mode<T>(params T[]) where T : IEquatable<T>
-            + static Permutations(int, int)
-            + static Pow(float, int)
-            + static Product(Equation, float, float, float)
-            + static Sum(Equation, float, float, float)
-            + static UniqueItems<T>(params T[]) where T : IEquatable<T>
-            + static ZScore(float, params float[])
-            + static ZScore(float, float, float)
-            - const RadToDeg
-            - const E
-            - const GoldenRatio
-            - const HalfPi
-            - const Pi
-            - const DegToRad
-            - const Tau
-            = GreatestCommonFactor actually works now
-            = Pow has been fixed
-            = Mode actually works
-            * static Average(params int[])
-                = Replaced its `int` return type with `float`
+            + Cos(Angle)
+            + Cot(Angle)
+            + Csc(Angle)
+            + Dot(float[], float[])
+            + Dot(float[][])
+            + Max<T>(T[]) where T : IComparable<T>
+            + Median<T>(T[])
+            + Min<T>(T[]) where T : IComparable<T>
+            + Sec(Angle)
+            + Sin(Angle)
+            + Tan(Angle)
     * Miscellaneous
         * GlobalUsings.cs
-            + global using Nerd_STF.Graphics;
+            + global using Nerd_STF.Collections
+            + global using Nerd_STF.Extensions
+            + global using Nerd_STF.Mathematics.Algebra
+            + global using Nerd_STF.Mathematics.NumberSystems
+            + global using Nerd_STF.Mathematics.Samples
 ```

@@ -1,4 +1,4 @@
-﻿namespace Nerd_STF.Mathematics;
+﻿namespace Nerd_STF.Mathematics.Samples;
 
 public static class Constants
 {

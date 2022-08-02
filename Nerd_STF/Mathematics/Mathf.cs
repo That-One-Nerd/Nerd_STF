@@ -17,6 +17,7 @@ public static class Mathf
     public static float ArcSin(float value) => (float)Math.Asin(value);
 
     public static float ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
+    public static float ArcTan2(float a, float b) => ArcTan(a / b);
 
     public static float Average(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
@@ -50,10 +51,13 @@ public static class Mathf
     public static int Combinations(int total, int size) => Factorial(total) /
         (Factorial(size) * Factorial(total - size));
 
+    public static float Cos(Angle angle) => Cos(angle.Radians);
     public static float Cos(float radians) => Sin(radians + Constants.HalfPi);
 
+    public static float Cot(Angle angle) => Cot(angle.Radians);
     public static float Cot(float radians) => Cos(radians) / Sin(radians);
 
+    public static float Csc(Angle angle) => Csc(angle.Radians);
     public static float Csc(float radians) => 1 / Sin(radians);
 
     public static float Divide(float val, params float[] dividends)
@@ -65,6 +69,25 @@ public static class Mathf
     {
         foreach (int i in dividends) val /= i;
         return val;
+    }
+
+    public static float Dot(float[] a, float[] b)
+    {
+        if (a.Length != b.Length) throw new InvalidSizeException("Both arrays must have the same length");
+        float[] vals = new float[a.Length];
+        for (int i = 0; i < a.Length; i++) vals[i] = a[i] * b[i];
+        return Sum(vals);
+    }
+    public static float Dot(params float[][] vals)
+    {
+        float[] res = new float[vals[0].Length];
+        for (int i = 0; i < res.Length; i++)
+        {
+            float m = 1;
+            for (int j = 0; j < vals.Length; j++) m *= vals[j][i];
+            res[i] = m;
+        }
+        return Sum(res);
     }
 
     public static int Factorial(int amount)
@@ -147,6 +170,13 @@ public static class Mathf
         foreach (int i in vals) val = i > val ? i : val;
         return val;
     }
+    public static T? Max<T>(params T[] vals) where T : IComparable<T>
+    {
+        if (vals.Length < 1) return default;
+        T val = vals[0];
+        foreach (T t in vals) val = t.CompareTo(val) > 0 ? t : val;
+        return val;
+    }
 
     public static float Median(params float[] vals)
     {
@@ -154,7 +184,8 @@ public static class Mathf
         float valA = vals[Floor(index)], valB = vals[Ceiling(index)];
         return Average(valA, valB);
     }
-    public static int Median(params int[] vals) => vals[Floor(Average(0, vals.Length - 1))];
+    public static int Median(params int[] vals) => Median<int>(vals);
+    public static T Median<T>(params T[] vals) => vals[Floor(Average(0, vals.Length - 1))];
 
     public static float Min(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
@@ -178,6 +209,13 @@ public static class Mathf
         if (vals.Length < 1) return 0;
         int val = vals[0];
         foreach (int i in vals) val = i < val ? i : val;
+        return val;
+    }
+    public static T? Min<T>(params T[] vals) where T : IComparable<T>
+    {
+        if (vals.Length < 1) return default;
+        T val = vals[0];
+        foreach (T t in vals) val = t.CompareTo(val) < 0 ? t : val;
         return val;
     }
 
@@ -245,8 +283,10 @@ public static class Mathf
     public static float Round(float num, float nearest) => nearest * Round(num / nearest);
     public static int RoundInt(float num) => (int)Round(num);
 
+    public static float Sec(Angle angle) => Sec(angle.Radians);
     public static float Sec(float radians) => 1 / Cos(radians);
 
+    public static float Sin(Angle angle) => Sin(angle.Radians);
     public static float Sin(float radians)
     {
         // Really close polynomial to sin(x) (when modded by 2pi). RMSE of 0.000003833
@@ -303,6 +343,7 @@ public static class Mathf
     // Known as stdev
     public static float StandardDeviation(params float[] vals) => Sqrt(Variance(vals));
 
+    public static float Tan(Angle angle) => Tan(angle.Radians);
     public static float Tan(float radians) => Sin(radians) / Cos(radians);
 
     public static T[] UniqueItems<T>(params T[] vals) where T : IEquatable<T>

@@ -132,6 +132,8 @@ public struct RGBA : IColor, IEquatable<RGBA>
         (float[] Rs, float[] Gs, float[] Bs, float[] As) = SplitArray(vals);
         return new(Mathf.Min(Rs), Mathf.Min(Gs), Mathf.Min(Bs), Mathf.Min(As));
     }
+    public static RGBA Round(RGBA val) =>
+        new(Mathf.Round(val.R), Mathf.Round(val.G), Mathf.Round(val.B), Mathf.Round(val.A));
 
     public static (float[] Rs, float[] Gs, float[] Bs, float[] As) SplitArray(params RGBA[] vals)
     {
@@ -152,7 +154,7 @@ public struct RGBA : IColor, IEquatable<RGBA>
     public bool Equals(RGBA col) => A == 0 && col.A == 0 || R == col.R && G == col.G && B == col.B && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(RGBA)) return Equals((RGBA)obj);
         else if (t == typeof(CMYKA)) return Equals((IColor)obj);
@@ -163,7 +165,7 @@ public struct RGBA : IColor, IEquatable<RGBA>
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode() ^ A.GetHashCode();
     public string ToString(IFormatProvider provider) => "R: " + R.ToString(provider) + " G: " + G.ToString(provider) +
@@ -205,6 +207,11 @@ public struct RGBA : IColor, IEquatable<RGBA>
     public HSVAByte ToHSVAByte() => ToHSVA().ToHSVAByte();
 
     public float[] ToArray() => new[] { R, G, B, A };
+    public Fill<float> ToFill()
+    {
+        RGBA @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => new() { R, G, B, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -217,6 +224,8 @@ public struct RGBA : IColor, IEquatable<RGBA>
     }
 
     public object Clone() => new RGBA(R, G, B, A);
+
+    public Vector3d ToVector() => ((Float3)this).ToVector();
 
     public static RGBA operator +(RGBA a, RGBA b) => new(a.R + b.R, a.G + b.G, a.B + b.B, a.A + b.A);
     public static RGBA operator -(RGBA c) => new(1 - c.R, 1 - c.G, 1 - c.B, c.A != 1 ? 1 - c.A : 1);

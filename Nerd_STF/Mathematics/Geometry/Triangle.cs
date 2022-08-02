@@ -218,7 +218,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Triangle)) return false;
+        if (obj == null || obj.GetType() != typeof(Triangle)) return base.Equals(obj);
         return Equals((Triangle)obj);
     }
     public bool Equals(Triangle other) => A == other.A && B == other.B && C == other.C;
@@ -240,14 +240,19 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     }
 
     public Vert[] ToArray() => new Vert[] { A, B, C };
+    public Fill<Vert> ToFill()
+    {
+        Triangle @this = this;
+        return i => @this[i];
+    }
     public List<Vert> ToList() => new() { A, B, C };
 
     public float[] ToFloatArray() => new float[] { A.position.x, A.position.y, A.position.z,
-                                                      B.position.x, B.position.y, B.position.z,
-                                                      C.position.x, C.position.y, C.position.z };
+                                                   B.position.x, B.position.y, B.position.z,
+                                                   C.position.x, C.position.y, C.position.z };
     public List<float> ToFloatList() => new() { A.position.x, A.position.y, A.position.z,
-                                                  B.position.x, B.position.y, B.position.z,
-                                                  C.position.x, C.position.y, C.position.z };
+                                                B.position.x, B.position.y, B.position.z,
+                                                C.position.x, C.position.y, C.position.z };
     public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);
     public static Triangle operator +(Triangle a, Vert b) => new(a.A + b, a.B + b, a.C + b);
     public static Triangle operator -(Triangle t) => new(-t.A, -t.B, -t.C);

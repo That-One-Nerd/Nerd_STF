@@ -11,7 +11,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public static Float2 Zero => new(0, 0);
 
     public float Magnitude => Mathf.Sqrt(x * x + y * y);
-    public Float2 Normalized => this / Magnitude;
+    public Float2 Normalized => this * Mathf.InverseSqrt(x * x + y * y);
 
     public float x, y;
 
@@ -72,7 +72,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         Float3.Cross(a, b, normalized);
     public static Float2 Divide(Float2 num, params Float2[] vals)
     {
-        foreach (Float2 d in vals) num /= d;
+        foreach (Float2 f in vals) num /= f;
         return num;
     }
     public static float Dot(Float2 a, Float2 b) => a.x * b.x + a.y * b.y;
@@ -80,10 +80,10 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     {
         if (vals.Length < 1) return 0;
         float x = 1, y = 1;
-        foreach (Float2 d in vals)
+        foreach (Float2 f in vals)
         {
-            x *= d.x;
-            y *= d.y;
+            x *= f.x;
+            y *= f.y;
         }
         return x + y;
     }
@@ -101,32 +101,34 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     {
         if (vals.Length < 1) return Zero;
         Float2 val = vals[0];
-        foreach (Float2 d in vals) val = d > val ? d : val;
+        foreach (Float2 f in vals) val = f > val ? f : val;
         return val;
     }
     public static Float2 Min(params Float2[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float2 val = vals[0];
-        foreach (Float2 d in vals) val = d < val ? d : val;
+        foreach (Float2 f in vals) val = f < val ? f : val;
         return val;
     }
     public static Float2 Product(params Float2[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float2 val = One;
-        foreach (Float2 d in vals) val *= d;
+        foreach (Float2 f in vals) val *= f;
         return val;
     }
+    public static Float2 Round(Float2 val) =>
+        new(Mathf.Round(val.x), Mathf.Round(val.y));
     public static Float2 Subtract(Float2 num, params Float2[] vals)
     {
-        foreach (Float2 d in vals) num -= d;
+        foreach (Float2 f in vals) num -= f;
         return num;
     }
     public static Float2 Sum(params Float2[] vals)
     {
         Float2 val = Zero;
-        foreach (Float2 d in vals) val += d;
+        foreach (Float2 f in vals) val += f;
         return val;
     }
 
@@ -144,7 +146,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public int CompareTo(Float2 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Float2)) return false;
+        if (obj == null || obj.GetType() != typeof(Float2)) return base.Equals(obj);
         return Equals((Float2)obj);
     }
     public bool Equals(Float2 other) => x == other.x && y == other.y;
@@ -165,15 +167,24 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     }
 
     public float[] ToArray() => new[] { x, y };
+    public Fill<float> ToFill()
+    {
+        Float2 @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => new() { x, y };
+
+    public Vector2d ToVector() => new(new(Mathf.ArcTan(y / x), Angle.Type.Radians), Magnitude);
 
     public static Float2 operator +(Float2 a, Float2 b) => new(a.x + b.x, a.y + b.y);
     public static Float2 operator -(Float2 d) => new(-d.x, -d.y);
     public static Float2 operator -(Float2 a, Float2 b) => new(a.x - b.x, a.y - b.y);
     public static Float2 operator *(Float2 a, Float2 b) => new(a.x * b.x, a.y * b.y);
     public static Float2 operator *(Float2 a, float b) => new(a.x * b, a.y * b);
+    public static Float2 operator *(Float2 a, Matrix b) => (Float2)((Matrix)a * b);
     public static Float2 operator /(Float2 a, Float2 b) => new(a.x / b.x, a.y / b.y);
     public static Float2 operator /(Float2 a, float b) => new(a.x / b, a.y / b);
+    public static Float2 operator /(Float2 a, Matrix b) => (Float2)((Matrix)a / b);
     public static bool operator ==(Float2 a, Float2 b) => a.Equals(b);
     public static bool operator !=(Float2 a, Float2 b) => !a.Equals(b);
     public static bool operator >(Float2 a, Float2 b) => a.CompareTo(b) > 0;
@@ -181,11 +192,15 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public static bool operator >=(Float2 a, Float2 b) => a == b || a > b;
     public static bool operator <=(Float2 a, Float2 b) => a == b || a < b;
 
+    public static implicit operator Float2(Complex val) => new(val.u, val.i);
+    public static explicit operator Float2(Quaternion val) => new(val.u, val.i);
     public static explicit operator Float2(Float3 val) => new(val.x, val.y);
     public static explicit operator Float2(Float4 val) => new(val.x, val.y);
     public static implicit operator Float2(Int2 val) => new(val.x, val.y);
     public static explicit operator Float2(Int3 val) => new(val.x, val.y);
     public static explicit operator Float2(Int4 val) => new(val.x, val.y);
+    public static explicit operator Float2(Matrix m) => new(m[0, 0], m[1, 0]);
+    public static explicit operator Float2(Vector2d val) => val.ToXYZ();
     public static explicit operator Float2(Vert val) => new(val.position.x, val.position.y);
     public static implicit operator Float2(Fill<float> fill) => new(fill);
     public static implicit operator Float2(Fill<int> fill) => new(fill);

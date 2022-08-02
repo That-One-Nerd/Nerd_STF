@@ -146,6 +146,8 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
         (float[] Cs, float[] Ms, float[] Ys, float[] Ks, float[] As) = SplitArray(vals);
         return new(Mathf.Min(Cs), Mathf.Min(Ms), Mathf.Min(Ys), Mathf.Min(Ks), Mathf.Min(As));
     }
+    public static CMYKA Round(CMYKA val) => new(Mathf.Round(val.C), Mathf.Round(val.M),
+        Mathf.Round(val.Y), Mathf.Round(val.K), Mathf.Round(val.A));
 
     public static (float[] Cs, float[] Ms, float[] Ys, float[] Ks, float[] As) SplitArray(params CMYKA[] vals)
     {
@@ -169,7 +171,7 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
         && Y == col.Y && K == col.K && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(CMYKA)) return Equals((CMYKA)obj);
         else if (t == typeof(RGBA)) return Equals((IColor)obj);
@@ -180,7 +182,7 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => C.GetHashCode() ^ M.GetHashCode() ^ Y.GetHashCode() ^ K.GetHashCode() ^ A.GetHashCode();
     public string ToString(IFormatProvider provider) => "C: " + C.ToString(provider) + " M: " + M.ToString(provider)
@@ -205,6 +207,11 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
     public HSVAByte ToHSVAByte() => ToRGBA().ToHSVAByte();
 
     public float[] ToArray() => new[] { C, M, Y, K, A };
+    public Fill<float> ToFill()
+    {
+        CMYKA @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => new() { C, M, Y, K, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

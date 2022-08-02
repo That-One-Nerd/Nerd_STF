@@ -69,11 +69,11 @@ public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, ICompara
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type type = obj.GetType();
         if (type == typeof(Sphere)) return Equals((Sphere)obj);
         if (type == typeof(float)) return Equals((float)obj);
-        return false;
+        return base.Equals(obj);
     }
     public bool Equals(float other) => Volume == other;
     public bool Equals(Sphere other) => center == other.center && radius == other.radius;

@@ -17,7 +17,7 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
 
     public Float3 position;
 
-    public Vert(Float2 pos) : this(pos.x, pos.y, 0) { }
+    public Vert(Float2 pos) : this((Float3)pos) { }
     public Vert(Float3 pos) => position = pos;
     public Vert(float x, float y) : this(new Float2(x, y)) { }
     public Vert(float x, float y, float z) : this(new Float3(x, y, z)) { }
@@ -61,7 +61,7 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Vert)) return false;
+        if (obj == null || obj.GetType() != typeof(Vert)) return base.Equals(obj);
         return Equals((Vert)obj);
     }
     public bool Equals(Vert other) => position == other.position;
@@ -76,7 +76,14 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
     public IEnumerator<float> GetEnumerator() => position.GetEnumerator();
 
     public float[] ToArray() => position.ToArray();
+    public Fill<float> ToFill()
+    {
+        Vert @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => position.ToList();
+
+    public Vector3d ToVector() => ((Float3)this).ToVector();
 
     public static Vert operator +(Vert a, Vert b) => new(a.position + b.position);
     public static Vert operator -(Vert d) => new(-d.position);

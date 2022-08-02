@@ -266,7 +266,7 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Quadrilateral)) return false;
+        if (obj == null || obj.GetType() != typeof(Quadrilateral)) return base.Equals(obj);
         return Equals((Quadrilateral)obj);
     }
     public bool Equals(Quadrilateral other) => A == other.A && B == other.B && C == other.C && D == other.D;
@@ -289,6 +289,11 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     }
 
     public Vert[] ToArray() => new Vert[] { A, B, C, D };
+    public Fill<Vert> ToFill()
+    {
+        Quadrilateral @this = this;
+        return i => @this[i];
+    }
     public List<Vert> ToList() => new() { A, B, C, D };
 
     public float[] ToFloatArray() => new float[] { A.position.x, A.position.y, A.position.z,

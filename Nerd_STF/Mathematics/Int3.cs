@@ -13,7 +13,7 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static Int3 Zero => new(0, 0, 0);
 
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
-    public Int3 Normalized => (Int3)((Float3)this / Magnitude);
+    public Int3 Normalized => (Int3)((Float3)this * Mathf.InverseSqrt(x * x + y * y + z * z));
 
     public Int2 XY => new(x, y);
     public Int2 XZ => new(x, z);
@@ -159,7 +159,7 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public int CompareTo(Int3 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Int3)) return false;
+        if (obj == null || obj.GetType() != typeof(Int3)) return base.Equals(obj);
         return Equals((Int3)obj);
     }
     public bool Equals(Int3 other) => x == other.x && y == other.y && z == other.z;
@@ -179,15 +179,24 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     }
 
     public int[] ToArray() => new[] { x, y, z };
+    public Fill<int> ToFill()
+    {
+        Int3 @this = this;
+        return i => @this[i];
+    }
     public List<int> ToList() => new() { x, y, z };
+
+    public Vector3d ToVector() => ((Float3)this).ToVector();
 
     public static Int3 operator +(Int3 a, Int3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);
     public static Int3 operator -(Int3 i) => new(-i.x, -i.y, -i.z);
     public static Int3 operator -(Int3 a, Int3 b) => new(a.x - b.x, a.y - b.y, a.z - b.z);
     public static Int3 operator *(Int3 a, Int3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
     public static Int3 operator *(Int3 a, int b) => new(a.x * b, a.y * b, a.z * b);
+    public static Int3 operator *(Int3 a, Matrix b) => (Int3)((Matrix)(Float3)a * b);
     public static Int3 operator /(Int3 a, Int3 b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
     public static Int3 operator /(Int3 a, int b) => new(a.x / b, a.y / b, a.z / b);
+    public static Int3 operator /(Int3 a, Matrix b) => (Int3)((Matrix)(Float3)a / b);
     public static Int3 operator &(Int3 a, Int3 b) => new(a.x & b.x, a.y & b.y, a.z & b.z);
     public static Int3 operator |(Int3 a, Int3 b) => new(a.x | b.x, a.y | b.y, a.z | b.z);
     public static Int3 operator ^(Int3 a, Int3 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z);
@@ -198,11 +207,15 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static bool operator >=(Int3 a, Int3 b) => a == b || a > b;
     public static bool operator <=(Int3 a, Int3 b) => a == b || a < b;
 
+    public static explicit operator Int3(Complex val) => new((int)val.u, (int)val.i, 0);
+    public static explicit operator Int3(Quaternion val) => new((int)val.u, (int)val.i, (int)val.j);
     public static explicit operator Int3(Float2 val) => new((int)val.x, (int)val.y, 0);
     public static explicit operator Int3(Float3 val) => new((int)val.x, (int)val.y, (int)val.z);
     public static explicit operator Int3(Float4 val) => new((int)val.x, (int)val.y, (int)val.z);
     public static implicit operator Int3(Int2 val) => new(val.x, val.y, 0);
     public static explicit operator Int3(Int4 val) => new(val.x, val.y, val.z);
+    public static explicit operator Int3(Matrix m) => new((int)m[0, 0], (int)m[1, 0], (int)m[2, 0]);
+    public static explicit operator Int3(Vector2d val) => (Int3)val.ToXYZ();
     public static explicit operator Int3(Vert val) => new((int)val.position.x, (int)val.position.y,
                                                           (int)val.position.z);
     public static explicit operator Int3(RGBA val) => (Int3)val.ToRGBAByte();

@@ -11,7 +11,7 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     public static Int2 Zero => new(0, 0);
 
     public float Magnitude => Mathf.Sqrt(x * x + y * y);
-    public Int2 Normalized => (Int2)((Float2)this / Magnitude);
+    public Int2 Normalized => (Int2)((Float2)this * Mathf.InverseSqrt(x * x + y * y));
 
     public int x, y;
 
@@ -139,7 +139,7 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     public int CompareTo(Int2 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Int2)) return false;
+        if (obj == null || obj.GetType() != typeof(Int2)) return base.Equals(obj);
         return Equals((Int2)obj);
     }
     public bool Equals(Int2 other) => x == other.x && y == other.y;
@@ -160,15 +160,24 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     }
 
     public int[] ToArray() => new[] { x, y };
+    public Fill<int> ToFill()
+    {
+        Int2 @this = this;
+        return i => @this[i];
+    }
     public List<int> ToList() => new() { x, y };
+
+    public Vector2d ToVector() => ((Float2)this).ToVector();
 
     public static Int2 operator +(Int2 a, Int2 b) => new(a.x + b.x, a.y + b.y);
     public static Int2 operator -(Int2 i) => new(-i.x, -i.y);
     public static Int2 operator -(Int2 a, Int2 b) => new(a.x - b.x, a.y - b.y);
     public static Int2 operator *(Int2 a, Int2 b) => new(a.x * b.x, a.y * b.y);
     public static Int2 operator *(Int2 a, int b) => new(a.x * b, a.y * b);
+    public static Int2 operator *(Int2 a, Matrix b) => (Int2)((Matrix)(Float2)a * b);
     public static Int2 operator /(Int2 a, Int2 b) => new(a.x / b.x, a.y / b.y);
     public static Int2 operator /(Int2 a, int b) => new(a.x / b, a.y / b);
+    public static Int2 operator /(Int2 a, Matrix b) => (Int2)((Matrix)(Float2)a / b);
     public static Int2 operator &(Int2 a, Int2 b) => new(a.x & b.x, a.y & b.y);
     public static Int2 operator |(Int2 a, Int2 b) => new(a.x | b.x, a.y | b.y);
     public static Int2 operator ^(Int2 a, Int2 b) => new(a.x ^ b.x, a.y ^ b.y);
@@ -179,9 +188,13 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     public static bool operator >=(Int2 a, Int2 b) => a == b || a > b;
     public static bool operator <=(Int2 a, Int2 b) => a == b || a < b;
 
+    public static explicit operator Int2(Complex val) => new((int)val.u, (int)val.i);
+    public static explicit operator Int2(Quaternion val) => new((int)val.u, (int)val.i);
     public static explicit operator Int2(Float2 val) => new((int)val.x, (int)val.y);
     public static explicit operator Int2(Float3 val) => new((int)val.x, (int)val.y);
     public static explicit operator Int2(Float4 val) => new((int)val.x, (int)val.y);
+    public static explicit operator Int2(Matrix m) => new((int)m[0, 0], (int)m[1, 0]);
+    public static explicit operator Int2(Vector2d val) => (Int2)val.ToXYZ();
     public static explicit operator Int2(Int3 val) => new(val.x, val.y);
     public static explicit operator Int2(Int4 val) => new(val.x, val.y);
     public static explicit operator Int2(Vert val) => new((int)val.position.x, (int)val.position.y);

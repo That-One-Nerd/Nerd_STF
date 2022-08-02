@@ -75,9 +75,9 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
     public bool Equals(Image other) => Pixels == other.Pixels;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         if (obj.GetType() == typeof(Image)) return Equals((Image)obj);
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => Pixels.GetHashCode();
 

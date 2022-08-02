@@ -15,7 +15,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static Int4 Zero => new(0, 0, 0, 0);
 
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
-    public Int4 Normalized => (Int4)((Float4)this / Magnitude);
+    public Int4 Normalized => (Int4)((Float4)this * Mathf.InverseSqrt(x * x + y * y + z * z + w * w));
 
     public Int2 XY => new(x, y);
     public Int2 XZ => new(x, z);
@@ -175,7 +175,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public int CompareTo(Int4 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Int4)) return false;
+        if (obj == null || obj.GetType() != typeof(Int4)) return base.Equals(obj);
         return Equals((Int4)obj);
     }
     public bool Equals(Int4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
@@ -200,6 +200,11 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     }
 
     public int[] ToArray() => new[] { x, y, z, w };
+    public Fill<int> ToFill()
+    {
+        Int4 @this = this;
+        return i => @this[i];
+    }
     public List<int> ToList() => new() { x, y, z, w };
 
     public static Int4 operator +(Int4 a, Int4 b) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
@@ -207,8 +212,10 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static Int4 operator -(Int4 a, Int4 b) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
     public static Int4 operator *(Int4 a, Int4 b) => new(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
     public static Int4 operator *(Int4 a, int b) => new(a.x * b, a.y * b, a.z * b, a.w * b);
+    public static Int4 operator *(Int4 a, Matrix b) => (Int4)((Matrix)(Float4)a * b);
     public static Int4 operator /(Int4 a, Int4 b) => new(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
     public static Int4 operator /(Int4 a, int b) => new(a.x / b, a.y / b, a.z / b, a.w / b);
+    public static Int4 operator /(Int4 a, Matrix b) => (Int4)((Matrix)(Float4)a / b);
     public static Int4 operator &(Int4 a, Int4 b) => new(a.x & b.x, a.y & b.y, a.z & b.z, a.w & b.w);
     public static Int4 operator |(Int4 a, Int4 b) => new(a.x | b.x, a.y | b.y, a.z | b.z, a.w | b.w);
     public static Int4 operator ^(Int4 a, Int4 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w);
@@ -219,11 +226,15 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static bool operator >=(Int4 a, Int4 b) => a == b || a > b;
     public static bool operator <=(Int4 a, Int4 b) => a == b || a < b;
 
+    public static explicit operator Int4(Complex val) => new((int)val.u, (int)val.i, 0, 0);
+    public static explicit operator Int4(Quaternion val) => new((int)val.u, (int)val.i, (int)val.j, (int)val.k);
     public static explicit operator Int4(Float2 val) => new((int)val.x, (int)val.y, 0, 0);
     public static explicit operator Int4(Float3 val) => new((int)val.x, (int)val.y, (int)val.z, 0);
     public static explicit operator Int4(Float4 val) => new((int)val.x, (int)val.y, (int)val.z, (int)val.w);
     public static implicit operator Int4(Int2 val) => new(val.x, val.y, 0, 0);
     public static implicit operator Int4(Int3 val) => new(val.x, val.y, val.z, 0);
+    public static explicit operator Int4(Matrix m) => new((int)m[0, 0], (int)m[1, 0], (int)m[2, 0], (int)m[3, 0]);
+    public static explicit operator Int4(Vector2d val) => (Int4)val.ToXYZ();
     public static explicit operator Int4(Vert val) => new((int)val.position.x, (int)val.position.y,
                                                           (int)val.position.z, 0);
     public static explicit operator Int4(RGBA val) => val.ToRGBAByte();

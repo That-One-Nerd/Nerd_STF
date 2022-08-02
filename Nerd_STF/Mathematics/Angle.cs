@@ -2,6 +2,11 @@
 
 public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
 {
+    public static Angle Down => new(270);
+    public static Angle Left => new(180);
+    public static Angle Right => new(0);
+    public static Angle Up => new(90);
+
     public static Angle Full => new(360);
     public static Angle Half => new(180);
     public static Angle One => new(1);
@@ -47,14 +52,18 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
 
     public static Angle Absolute(Angle val) => new(Mathf.Absolute(val.p_deg));
     public static Angle Average(params Angle[] vals) => new(Mathf.Average(SplitArray(Type.Degrees, vals)));
-    public static Angle Ceiling(Angle val, Type type = Type.Degrees) => new(Mathf.Ceiling(val.ValueFromType(type)));
+    public static Angle Ceiling(Angle val, Type type = Type.Degrees) =>
+        new(Mathf.Ceiling(val.ValueFromType(type)), type);
     public static Angle Clamp(Angle val, Angle min, Angle max) => new(Mathf.Clamp(val.p_deg, min.p_deg, max.p_deg));
-    public static Angle Floor(Angle val, Type type = Type.Degrees) => new(Mathf.Floor(val.ValueFromType(type)));
+    public static Angle Floor(Angle val, Type type = Type.Degrees) =>
+        new(Mathf.Floor(val.ValueFromType(type)), type);
     public static Angle Lerp(Angle a, Angle b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.p_deg, b.p_deg, t, clamp));
     public static Angle Max(params Angle[] vals) => new(Mathf.Max(SplitArray(Type.Degrees, vals)));
     public static Angle Median(params Angle[] vals) => new(Mathf.Median(SplitArray(Type.Degrees, vals)));
     public static Angle Min(params Angle[] vals) => new(Mathf.Min(SplitArray(Type.Degrees, vals)));
+    public static Angle Round(Angle val, Type type = Type.Degrees) =>
+        new(Mathf.Floor(val.ValueFromType(type)), type);
 
     public static float[] SplitArray(Type outputType, params Angle[] vals)
     {
@@ -76,7 +85,7 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public int CompareTo(Angle other) => p_deg.CompareTo(other.p_deg);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Angle)) return false;
+        if (obj == null || obj.GetType() != typeof(Angle)) return base.Equals(obj);
         return Equals((Angle)obj);
     }
     public bool Equals(Angle other) => p_deg == other.p_deg;

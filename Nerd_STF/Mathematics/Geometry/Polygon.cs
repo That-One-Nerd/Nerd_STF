@@ -256,7 +256,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
 
     public override bool Equals([NotNullWhen(true)] object? obj)
         {
-            if (obj == null || obj.GetType() != typeof(Polygon)) return false;
+            if (obj == null || obj.GetType() != typeof(Polygon)) return base.Equals(obj);
             return Equals((Polygon)obj);
         }
     public bool Equals(Polygon other)
@@ -285,6 +285,11 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
     public IEnumerator<Vert> GetEnumerator() { foreach (Vert v in Verts) yield return v; }
 
     public Vert[] ToArray() => Verts;
+    public Fill<Vert> ToFill()
+    {
+        Polygon @this = this;
+        return i => @this[i];
+    }
     public List<Vert> ToList() => new(Verts);
 
     public float[] ToFloatArray()

@@ -137,7 +137,7 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public bool Equals(RGBAByte col) => A == 0 && col.A == 0 || R == col.R && G == col.G && B == col.B && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(RGBAByte)) return Equals((RGBAByte)obj);
         else if (t == typeof(CMYKA)) return Equals((IColor)obj);
@@ -148,7 +148,7 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode() ^ A.GetHashCode();
     public string ToString(IFormatProvider provider) => "R: " + R.ToString(provider) + " G: " + G.ToString(provider) +
@@ -166,6 +166,11 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public HSVAByte ToHSVAByte() => ToRGBA().ToHSVAByte();
 
     public byte[] ToArray() => new[] { R, G, B, A };
+    public Fill<byte> ToFill()
+    {
+        HSVAByte @this = this;
+        return i => @this[i];
+    }
     public List<byte> ToList() => new() { R, G, B, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -178,6 +183,8 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     }
 
     public object Clone() => new RGBAByte(R, G, B, A);
+
+    public Vector3d ToVector() => ((RGBA)this).ToVector();
 
     public static RGBAByte operator +(RGBAByte a, RGBAByte b) => new(a.R + b.R, a.G + b.G, a.B + b.B, a.A + b.A);
     public static RGBAByte operator -(RGBAByte c) => new(255 - c.R, 255 - c.G, 255 - c.B, c.A != 255 ? 255 - c.A : 255);

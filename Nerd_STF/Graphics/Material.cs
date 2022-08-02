@@ -171,9 +171,8 @@ public struct Material : ICloneable, IEquatable<Material>
         SpecularHighlightTexture.Equals(other.SpecularHighlightTexture) && StencilTexture.Equals(other.StencilTexture);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
-        if (obj.GetType() == typeof(Material)) return Equals((Material)obj);
-        return false;
+        if (obj == null || obj.GetType() != typeof(Material)) return base.Equals(obj);
+        return Equals((Material)obj);
     }
     public override int GetHashCode() => Alpha.GetHashCode() ^ AmbientColor.GetHashCode() ^ Anisotropy.GetHashCode() ^
         AnisotropyRoughness.GetHashCode() ^ ClearcoatRoughness.GetHashCode() ^ ClearcoatThickness.GetHashCode() ^

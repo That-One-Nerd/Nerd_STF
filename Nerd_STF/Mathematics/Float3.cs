@@ -13,7 +13,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public static Float3 Zero => new(0, 0, 0);
 
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
-    public Float3 Normalized => this / Magnitude;
+    public Float3 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z);
 
     public Float2 XY => new(x, y);
     public Float2 XZ => new(x, z);
@@ -138,6 +138,8 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
         foreach (Float3 d in vals) val *= d;
         return val;
     }
+    public static Float3 Round(Float3 val) =>
+        new(Mathf.Round(val.x), Mathf.Round(val.y), Mathf.Round(val.z));
     public static Float3 Subtract(Float3 num, params Float3[] vals)
     {
         foreach (Float3 d in vals) num -= d;
@@ -165,7 +167,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public int CompareTo(Float3 other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Float3)) return false;
+        if (obj == null || obj.GetType() != typeof(Float3)) return base.Equals(obj);
         return Equals((Float3)obj);
     }
     public bool Equals(Float3 other) => x == other.x && y == other.y && z == other.z;
@@ -187,15 +189,28 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     }
 
     public float[] ToArray() => new[] { x, y, z };
+    public Fill<float> ToFill()
+    {
+        Float3 @this = this;
+        return i => @this[i];
+    }
     public List<float> ToList() => new() { x, y, z };
+
+    public Vector3d ToVector()
+    {
+        float mag = Magnitude;
+        return new(new Angle(Mathf.ArcTan(y / x), Angle.Type.Radians), new(Mathf.ArcCos(z / mag), Angle.Type.Radians), mag);
+    }
 
     public static Float3 operator +(Float3 a, Float3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);
     public static Float3 operator -(Float3 d) => new(-d.x, -d.y, -d.z);
     public static Float3 operator -(Float3 a, Float3 b) => new(a.x - b.x, a.y - b.y, a.z - b.z);
     public static Float3 operator *(Float3 a, Float3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
     public static Float3 operator *(Float3 a, float b) => new(a.x * b, a.y * b, a.z * b);
+    public static Float3 operator *(Float3 a, Matrix b) => (Float3)((Matrix)a * b);
     public static Float3 operator /(Float3 a, Float3 b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
     public static Float3 operator /(Float3 a, float b) => new(a.x / b, a.y / b, a.z / b);
+    public static Float3 operator /(Float3 a, Matrix b) => (Float3)((Matrix)a / b);
     public static bool operator ==(Float3 a, Float3 b) => a.Equals(b);
     public static bool operator !=(Float3 a, Float3 b) => !a.Equals(b);
     public static bool operator >(Float3 a, Float3 b) => a.CompareTo(b) > 0;
@@ -203,11 +218,15 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public static bool operator >=(Float3 a, Float3 b) => a == b || a > b;
     public static bool operator <=(Float3 a, Float3 b) => a == b || a < b;
 
+    public static implicit operator Float3(Complex val) => new(val.u, val.i, 0);
+    public static explicit operator Float3(Quaternion val) => new(val.u, val.i, val.j);
     public static implicit operator Float3(Float2 val) => new(val.x, val.y, 0);
     public static explicit operator Float3(Float4 val) => new(val.x, val.y, val.z);
     public static implicit operator Float3(Int2 val) => new(val.x, val.y, 0);
     public static implicit operator Float3(Int3 val) => new(val.x, val.y, val.z);
     public static explicit operator Float3(Int4 val) => new(val.x, val.y, val.z);
+    public static explicit operator Float3(Matrix m) => new(m[0, 0], m[1, 0], m[2, 0]);
+    public static explicit operator Float3(Vector2d val) => val.ToXYZ();
     public static implicit operator Float3(Vert val) => new(val.position.x, val.position.y, val.position.z);
     public static explicit operator Float3(RGBA val) => new(val.R, val.G, val.B);
     public static explicit operator Float3(HSVA val) => new(val.H.Normalized, val.S, val.V);

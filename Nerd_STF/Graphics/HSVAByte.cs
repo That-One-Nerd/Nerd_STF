@@ -138,7 +138,7 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
         || H == col.H && S == col.S && V == col.V && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null) return false;
+        if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(HSVAByte)) return Equals((HSVAByte)obj);
         else if (t == typeof(CMYKA)) return Equals((IColor)obj);
@@ -149,7 +149,7 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
         else if (t == typeof(HSVA)) return Equals((IColor)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
-        return false;
+        return base.Equals(obj);
     }
     public override int GetHashCode() => H.GetHashCode() ^ S.GetHashCode() ^ V.GetHashCode() ^ A.GetHashCode();
     public string ToString(IFormatProvider provider) => "H: " + H.ToString(provider) + " S: " + S.ToString(provider)
@@ -167,6 +167,11 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
     public HSVAByte ToHSVAByte() => this;
 
     public byte[] ToArray() => new[] { H, S, V, A };
+    public Fill<byte> ToFill()
+    {
+        HSVAByte @this = this;
+        return i => @this[i];
+    }
     public List<byte> ToList() => new() { H, S, V, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -87,7 +87,7 @@ public struct Box3D : ICloneable, IContainer<Vert>, IEquatable<Box3D>
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
-        if (obj == null || obj.GetType() != typeof(Box3D)) return false;
+        if (obj == null || obj.GetType() != typeof(Box3D)) return base.Equals(obj);
         return Equals((Box3D)obj);
     }
     public bool Equals(Box3D other) => center == other.center && size == other.size;
