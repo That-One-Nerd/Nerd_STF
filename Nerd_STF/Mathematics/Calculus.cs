@@ -4,16 +4,8 @@ public static class Calculus
 {
     public const float DefaultStep = 0.001f;
 
-    public static Equation GetDerivative(Equation equ, float min, float max, float step = DefaultStep)
-    {
-        Dictionary<float, float> vals = new();
-        for (float x = min; x <= max; x += step)
-        {
-            float val1 = equ(x), val2 = equ(x + step), change = (val2 - val1) / step;
-            vals.Add(x, change);
-        }
-        return Mathf.MakeEquation(vals);
-    }
+    public static Equation GetDerivative(Equation equ, float step = DefaultStep) =>
+        x => GetDerivativeAtPoint(equ, x, step);
     public static float GetDerivativeAtPoint(Equation equ, float x, float step = DefaultStep) =>
         (equ(x + DefaultStep) - equ(x)) / step;
 
@@ -24,6 +16,12 @@ public static class Calculus
         return val;
     }
 
+    public static Equation GetDynamicIntegral(Equation equ, Equation lowerBound, Equation upperBound,
+        float step = DefaultStep) => x => GetIntegral(equ, lowerBound(x), upperBound(x), step);
+
+    // Unfortunately, I cannot test this function, as I have literally no idea how it works and
+    // I can't find any tools online (and couldn't make my own) to compare my results.
+    // Something to know, though I didn't feel like it deserved its own [Obsolete] attribute.
     public static float GradientDescent(Equation equ, float initial, float rate, float stepCount = 1000,
         float step = DefaultStep)
     {

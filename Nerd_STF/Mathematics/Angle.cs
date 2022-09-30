@@ -34,21 +34,19 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
         set => p_deg = value * Constants.RadToDeg;
     }
 
-    public Angle Bounded => new(p_deg % 360);
+    public Angle Bounded => new(Mathf.AbsoluteMod(p_deg, 360));
+    public Angle Reflected => new Angle(-p_deg).Bounded;
 
     private float p_deg;
 
-    public Angle(float value, Type valueType = Type.Degrees)
+    public Angle(float value, Type valueType = Type.Degrees) => p_deg = valueType switch
     {
-        p_deg = valueType switch
-        {
-            Type.Degrees => value,
-            Type.Gradians => value * 0.9f,
-            Type.Normalized => value * 360,
-            Type.Radians => value * Constants.RadToDeg,
-            _ => throw new ArgumentException("Unknown type.", nameof(valueType)),
-        };
-    }
+        Type.Degrees => value,
+        Type.Gradians => value * 0.9f,
+        Type.Normalized => value * 360,
+        Type.Radians => value * Constants.RadToDeg,
+        _ => throw new ArgumentException("Unknown type.", nameof(valueType)),
+    };
 
     public static Angle Absolute(Angle val) => new(Mathf.Absolute(val.p_deg));
     public static Angle Average(params Angle[] vals) => new(Mathf.Average(SplitArray(Type.Degrees, vals)));
@@ -59,11 +57,27 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
         new(Mathf.Floor(val.ValueFromType(type)), type);
     public static Angle Lerp(Angle a, Angle b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.p_deg, b.p_deg, t, clamp));
-    public static Angle Max(params Angle[] vals) => new(Mathf.Max(SplitArray(Type.Degrees, vals)));
+    public static Angle Max(params Angle[] vals) => Max(true, vals);
+    public static Angle Max(bool useBounded, params Angle[] vals)
+    {
+        if (!useBounded) return new(Mathf.Max(SplitArray(Type.Degrees, vals)));
+
+        Angle[] boundeds = new Angle[vals.Length];
+        for (int i = 0; i < vals.Length; i++) boundeds[i] = vals[i].Bounded;
+        return new(Mathf.Max(SplitArray(Type.Degrees, boundeds)));
+    }
     public static Angle Median(params Angle[] vals) => new(Mathf.Median(SplitArray(Type.Degrees, vals)));
-    public static Angle Min(params Angle[] vals) => new(Mathf.Min(SplitArray(Type.Degrees, vals)));
+    public static Angle Min(params Angle[] vals) => Min(true, vals);
+    public static Angle Min(bool useBounded, params Angle[] vals)
+    {
+        if (!useBounded) return new(Mathf.Min(SplitArray(Type.Degrees, vals)));
+
+        Angle[] boundeds = new Angle[vals.Length];
+        for (int i = 0; i < vals.Length; i++) boundeds[i] = vals[i].Bounded;
+        return new(Mathf.Min(SplitArray(Type.Degrees, boundeds)));
+    }
     public static Angle Round(Angle val, Type type = Type.Degrees) =>
-        new(Mathf.Floor(val.ValueFromType(type)), type);
+        new(Mathf.Round(val.ValueFromType(type)), type);
 
     public static float[] SplitArray(Type outputType, params Angle[] vals)
     {
@@ -121,11 +135,9 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     };
 
     public static Angle operator +(Angle a, Angle b) => new(a.p_deg + b.p_deg);
-    public static Angle operator -(Angle a) => new(-a.p_deg);
+    public static Angle operator -(Angle a) => new(a.p_deg + 180);
     public static Angle operator -(Angle a, Angle b) => new(a.p_deg - b.p_deg);
-    public static Angle operator *(Angle a, Angle b) => new(a.p_deg * b.p_deg);
     public static Angle operator *(Angle a, float b) => new(a.p_deg * b);
-    public static Angle operator /(Angle a, Angle b) => new(a.p_deg / b.p_deg);
     public static Angle operator /(Angle a, float b) => new(a.p_deg / b);
     public static bool operator ==(Angle a, Angle b) => a.Equals(b);
     public static bool operator !=(Angle a, Angle b) => !a.Equals(b);

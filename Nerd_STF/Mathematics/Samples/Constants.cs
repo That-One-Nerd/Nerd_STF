@@ -2,10 +2,10 @@
 
 public static class Constants
 {
-    public const float DegToRad = 180 / Pi;
+    public const float DegToRad = Pi / 180;
     public const float HalfPi = Pi / 2;
     public const float Pi = 3.14159265359f;
-    public const float RadToDeg = Pi / 180;
+    public const float RadToDeg = 180 / Pi;
     public const float Tau = Pi * 2;
 
     public const float E = 2.71828182846f;

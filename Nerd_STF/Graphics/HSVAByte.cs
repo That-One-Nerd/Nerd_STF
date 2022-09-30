@@ -86,8 +86,6 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
     public static HSVAByte Lerp(HSVAByte a, HSVAByte b, byte t, bool clamp = true) =>
         new(Mathf.Lerp(a.H, b.H, t, clamp), Mathf.Lerp(a.S, b.S, t, clamp), Mathf.Lerp(a.V, b.V, t, clamp),
             Mathf.Lerp(a.A, b.A, t, clamp));
-    public static HSVAByte LerpSquared(HSVAByte a, HSVAByte b, byte t, Angle.Type type, bool clamp = true) =>
-        HSVA.LerpSquared(a.ToHSVA(), b.ToHSVA(), t, type, clamp).ToHSVAByte();
     public static HSVAByte Median(params HSVAByte[] vals)
     {
         float index = Mathf.Average(0, vals.Length - 1);

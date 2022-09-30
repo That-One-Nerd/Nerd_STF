@@ -89,11 +89,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
                           a.x * b.y - b.x * a.y);
         return normalized ? val.Normalized : val;
     }
-    public static Float3 Divide(Float3 num, params Float3[] vals)
-    {
-        foreach (Float3 d in vals) num /= d;
-        return num;
-    }
+    public static Float3 Divide(Float3 num, params Float3[] vals) => num / Product(vals);
     public static float Dot(Float3 a, Float3 b) => a.x * b.x + a.y * b.y + a.z * b.z;
     public static float Dot(params Float3[] vals)
     {
@@ -113,9 +109,9 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp));
     public static Float3 Median(params Float3[] vals)
     {
-        float index = Mathf.Average(0, vals.Length - 1);
+        float index = (vals.Length - 1) * 0.5f;
         Float3 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return Average(valA, valB);
+        return (valA + valB) * 0.5f;
     }
     public static Float3 Max(params Float3[] vals)
     {
@@ -140,11 +136,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     }
     public static Float3 Round(Float3 val) =>
         new(Mathf.Round(val.x), Mathf.Round(val.y), Mathf.Round(val.z));
-    public static Float3 Subtract(Float3 num, params Float3[] vals)
-    {
-        foreach (Float3 d in vals) num -= d;
-        return num;
-    }
+    public static Float3 Subtract(Float3 num, params Float3[] vals) => num - Sum(vals);
     public static Float3 Sum(params Float3[] vals)
     {
         Float3 val = Zero;
@@ -199,7 +191,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public Vector3d ToVector()
     {
         float mag = Magnitude;
-        return new(new Angle(Mathf.ArcTan(y / x), Angle.Type.Radians), new(Mathf.ArcCos(z / mag), Angle.Type.Radians), mag);
+        return new(Mathf.ArcTan(y / x), Mathf.ArcCos(z / mag), mag);
     }
 
     public static Float3 operator +(Float3 a, Float3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);

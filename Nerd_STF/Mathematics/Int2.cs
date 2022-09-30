@@ -67,11 +67,7 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     }
     public static Int3 Cross(Int2 a, Int2 b, bool normalized = false) =>
         Int3.Cross(a, b, normalized);
-    public static Int2 Divide(Int2 num, params Int2[] vals)
-    {
-        foreach (Int2 d in vals) num /= d;
-        return num;
-    }
+    public static Int2 Divide(Int2 num, params Int2[] vals) => num / Product(vals);
     public static int Dot(Int2 a, Int2 b) => a.x * b.x + a.y * b.y;
     public static int Dot(params Int2[] vals)
     {
@@ -88,9 +84,9 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp));
     public static Int2 Median(params Int2[] vals)
     {
-        float index = Mathf.Average(0, vals.Length - 1);
+        float index = (vals.Length - 1) * 0.5f;
         Int2 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return Average(valA, valB);
+        return (valA + valB) / 2;
     }
     public static Int2 Max(params Int2[] vals)
     {
@@ -113,11 +109,7 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
         foreach (Int2 d in vals) val *= d;
         return val;
     }
-    public static Int2 Subtract(Int2 num, params Int2[] vals)
-    {
-        foreach (Int2 d in vals) num -= d;
-        return num;
-    }
+    public static Int2 Subtract(Int2 num, params Int2[] vals) => num - Sum(vals);
     public static Int2 Sum(params Int2[] vals)
     {
         Int2 val = Zero;

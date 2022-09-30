@@ -70,11 +70,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     }
     public static Float3 Cross(Float2 a, Float2 b, bool normalized = false) =>
         Float3.Cross(a, b, normalized);
-    public static Float2 Divide(Float2 num, params Float2[] vals)
-    {
-        foreach (Float2 f in vals) num /= f;
-        return num;
-    }
+    public static Float2 Divide(Float2 num, params Float2[] vals) => num / Product(vals);
     public static float Dot(Float2 a, Float2 b) => a.x * b.x + a.y * b.y;
     public static float Dot(params Float2[] vals)
     {
@@ -93,9 +89,9 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp));
     public static Float2 Median(params Float2[] vals)
     {
-        float index = Mathf.Average(0, vals.Length - 1);
+        float index = (vals.Length - 1) * 0.5f;
         Float2 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return Average(valA, valB);
+        return (valA + valB) * 0.5f;
     }
     public static Float2 Max(params Float2[] vals)
     {
@@ -120,11 +116,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     }
     public static Float2 Round(Float2 val) =>
         new(Mathf.Round(val.x), Mathf.Round(val.y));
-    public static Float2 Subtract(Float2 num, params Float2[] vals)
-    {
-        foreach (Float2 f in vals) num -= f;
-        return num;
-    }
+    public static Float2 Subtract(Float2 num, params Float2[] vals) => num - Sum(vals);
     public static Float2 Sum(params Float2[] vals)
     {
         Float2 val = Zero;
@@ -174,7 +166,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     }
     public List<float> ToList() => new() { x, y };
 
-    public Vector2d ToVector() => new(new(Mathf.ArcTan(y / x), Angle.Type.Radians), Magnitude);
+    public Vector2d ToVector() => new(Mathf.ArcTan(y / x), Magnitude);
 
     public static Float2 operator +(Float2 a, Float2 b) => new(a.x + b.x, a.y + b.y);
     public static Float2 operator -(Float2 d) => new(-d.x, -d.y);

@@ -4,9 +4,15 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
 {
     public static Float4 Back => new(0, 0, -1, 0);
     public static Float4 Down => new(0, -1, 0, 0);
+    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
+        "This field will be removed in v2.4.0.", false)]
     public static Float4 Far => new(0, 0, 0, 1);
     public static Float4 Forward => new(0, 0, 1, 0);
+    public static Float4 HighW => new(0, 0, 0, 1);
     public static Float4 Left => new(-1, 0, 0, 0);
+    public static Float4 LowW => new(0, 0, 0, -1);
+    [Obsolete("Field has been replaced by " + nameof(LowW) + ", because it has a better name. " +
+        "This field will be removed in v2.4.0.", false)]
     public static Float4 Near => new(0, 0, 0, -1);
     public static Float4 Right => new(1, 0, 0, 0);
     public static Float4 Up => new(0, 1, 0, 0);
@@ -100,11 +106,7 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         else if (mag > maxMag) val *= maxMag;
         return val;
     }
-    public static Float4 Divide(Float4 num, params Float4[] vals)
-    {
-        foreach (Float4 d in vals) num /= d;
-        return num;
-    }
+    public static Float4 Divide(Float4 num, params Float4[] vals) => num / Product(vals);
     public static float Dot(Float4 a, Float4 b) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     public static float Dot(params Float4[] vals)
     {
@@ -126,9 +128,9 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
             Mathf.Lerp(a.w, b.w, t, clamp));
     public static Float4 Median(params Float4[] vals)
     {
-        float index = Mathf.Average(0, vals.Length - 1);
+        float index = (vals.Length - 1) * 0.5f;
         Float4 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return Average(valA, valB);
+        return (valA + valB) * 0.5f;
     }
     public static Float4 Max(params Float4[] vals)
     {
@@ -153,11 +155,7 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         foreach (Float4 d in vals) val *= d;
         return val;
     }
-    public static Float4 Subtract(Float4 num, params Float4[] vals)
-    {
-        foreach (Float4 d in vals) num -= d;
-        return num;
-    }
+    public static Float4 Subtract(Float4 num, params Float4[] vals) => num - Sum(vals);
     public static Float4 Sum(params Float4[] vals)
     {
         Float4 val = Zero;
