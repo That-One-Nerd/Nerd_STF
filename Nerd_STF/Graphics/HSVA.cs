@@ -112,14 +112,6 @@ public struct HSVA : IColor, IEquatable<HSVA>
     public static HSVA Lerp(HSVA a, HSVA b, float t, bool clamp = true) =>
         new(Angle.Lerp(a.H, b.H, t, clamp), Mathf.Lerp(a.S, b.S, t, clamp), Mathf.Lerp(a.V, b.V, t, clamp),
             Mathf.Lerp(a.A, b.A, t, clamp));
-    public static HSVA LerpSquared(HSVA a, HSVA b, float t, Angle.Type type = Angle.Type.Normalized,
-        bool clamp = true)
-    {
-        HSVA val = Lerp(a * a, b * b, t, clamp);
-        float H = Mathf.Sqrt(val.H.ValueFromType(type)), S = Mathf.Sqrt(val.S), V = Mathf.Sqrt(val.V),
-              A = Mathf.Sqrt(val.A);
-        return new(new Angle(H, Angle.Type.Normalized), S, V, A);
-    }
     public static HSVA Median(params HSVA[] vals)
     {
         float index = Mathf.Average(0, vals.Length - 1);
@@ -235,9 +227,7 @@ public struct HSVA : IColor, IEquatable<HSVA>
     public static HSVA operator +(HSVA a, HSVA b) => new(a.H + b.H, a.S + b.S, a.V + b.V, a.A + b.A);
     public static HSVA operator -(HSVA c) => new(1 - c.H.Normalized, 1 - c.S, 1 - c.V, c.A != 1 ? 1 - c.A : 1);
     public static HSVA operator -(HSVA a, HSVA b) => new(a.H - b.H, a.S - b.S, a.V - b.V, a.A - b.A);
-    public static HSVA operator *(HSVA a, HSVA b) => new(a.H * b.H, a.S * b.S, a.V * b.V, a.A * b.A);
     public static HSVA operator *(HSVA a, float b) => new(a.H * b, a.S * b, a.V * b, a.A * b);
-    public static HSVA operator /(HSVA a, HSVA b) => new(a.H / b.H, a.S / b.S, a.V / b.V, a.A / b.A);
     public static HSVA operator /(HSVA a, float b) => new(a.H / b, a.S / b, a.V / b, a.A / b);
     public static bool operator ==(HSVA a, RGBA b) => a.Equals(b);
     public static bool operator !=(HSVA a, RGBA b) => !a.Equals(b);

@@ -5,19 +5,32 @@ public static class Mathf
     public static float Absolute(float val) => val < 0 ? -val : val;
     public static int Absolute(int val) => val < 0 ? -val : val;
 
-    public static float ArcCos(float value) => -ArcSin(value) + Constants.HalfPi;
+    public static float AbsoluteMod(float val, float mod)
+    {
+        while (val >= mod) val -= mod;
+        while (val < 0) val += mod;
+        return val;
+    }
+    public static int AbsoluteMod(int val, int mod)
+    {
+        while (val >= mod) val -= mod;
+        while (val < 0) val += mod;
+        return val;
+    }
 
-    public static float ArcCot(float value) => ArcCos(value / Sqrt(1 + value * value));
+    public static Angle ArcCos(float value) => ArcSin(-value) + Angle.Quarter;
 
-    public static float ArcCsc(float value) => ArcSin(1 / value);
+    public static Angle ArcCot(float value) => ArcCos(value / Sqrt(1 + value * value));
 
-    public static float ArcSec(float value) => ArcCos(1 / value);
+    public static Angle ArcCsc(float value) => ArcSin(1 / value);
+
+    public static Angle ArcSec(float value) => ArcCos(1 / value);
 
     // Maybe one day I'll have a polynomial for this, but the RMSE for an order 10 polynomial is only 0.00876.
-    public static float ArcSin(float value) => (float)Math.Asin(value);
-
-    public static float ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
-    public static float ArcTan2(float a, float b) => ArcTan(a / b);
+    public static Angle ArcSin(float value) => new((float)Math.Asin(value), Angle.Type.Radians);
+    
+    public static Angle ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
+    public static Angle ArcTan2(float a, float b) => ArcTan(a / b);
 
     public static float Average(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
@@ -26,9 +39,16 @@ public static class Mathf
         return Average(vals.ToArray());
     }
     public static float Average(params float[] vals) => Sum(vals) / vals.Length;
-    public static float Average(params int[] vals) => Sum(vals) / (float)vals.Length;
+    public static int Average(params int[] vals) => Sum(vals) / vals.Length;
 
-    public static int Ceiling(float val) => (int)(val + (1 - (val % 1)));
+    public static float Binomial(int n, int total, float successRate) =>
+        Combinations(total, n) * Power(successRate, n) * Power(1 - successRate, total - n);
+
+    public static int Ceiling(float val)
+    {
+        float mod = val % 1;
+        return (int)(mod == 0 ? val : (val + (1 - mod)));
+    }
 
     public static float Clamp(float val, float min, float max)
     {
@@ -38,14 +58,7 @@ public static class Mathf
         val = val > max ? max : val;
         return val;
     }
-    public static int Clamp(int val, int min, int max)
-    {
-        if (max < min) throw new ArgumentOutOfRangeException(nameof(max),
-            nameof(max) + " must be greater than or equal to " + nameof(min));
-        val = val < min ? min : val;
-        val = val > max ? max : val;
-        return val;
-    }
+    public static int Clamp(int val, int min, int max) => (int)Clamp((float)val, min, max);
 
     // nCr (n = total, r = size)
     public static int Combinations(int total, int size) => Factorial(total) /
@@ -60,16 +73,8 @@ public static class Mathf
     public static float Csc(Angle angle) => Csc(angle.Radians);
     public static float Csc(float radians) => 1 / Sin(radians);
 
-    public static float Divide(float val, params float[] dividends)
-    {
-        foreach (float d in dividends) val /= d;
-        return val;
-    }
-    public static int Divide(int val, params int[] dividends)
-    {
-        foreach (int i in dividends) val /= i;
-        return val;
-    }
+    public static float Divide(float val, params float[] dividends) => val / Product(dividends);
+    public static int Divide(int val, params int[] dividends) => val / Product(dividends);
 
     public static float Dot(float[] a, float[] b)
     {
@@ -96,6 +101,15 @@ public static class Mathf
         int val = 1;
         for (int i = 2; i <= amount; i++) val *= i;
         return val;
+    }
+
+    public static int[] Factors(int val)
+    {
+        List<int> factors = new();
+        factors.Add(1);
+        for (int i = 2; i < val; i++) if (val % i == 0) factors.Add(i);
+        factors.Add(val);
+        return factors.ToArray();
     }
 
     public static int Floor(float val) => (int)(val - (val % 1));
@@ -127,23 +141,51 @@ public static class Mathf
     public static float Lerp(float a, float b, float t, bool clamp = true)
     {
         float v = a + t * (b - a);
-        if (clamp) v = Clamp(v, a, b);
+        if (clamp) v = Clamp(v, Min(a, b), Max(a, b));
         return v;
     }
-    public static int Lerp(int a, int b, float value, bool clamp = true) => Floor(Lerp(a, b, value, clamp));
+    public static int Lerp(int a, int b, float value, bool clamp = true) => (int)Lerp((float)a, b, value, clamp);
 
-    public static Equation MakeEquation(Dictionary<float, float> vals) => (x) =>
+    public static Equation MakeEquation(Dictionary<float, float> vals) => delegate (float x)
     {
-        float min = -1, max = -1;
-        foreach (KeyValuePair<float, float> val in vals)
-        {
-            if (val.Key <= x) min = val.Key;
-            if (val.Key >= x) max = val.Key;
+        if (vals.Count < 1) throw new UndefinedException();
+        if (vals.Count == 1) return vals.Values.First();
 
-            if (min != -1 && max != -1) break;
+        if (vals.ContainsKey(x)) return vals[x];
+        float? min, max;
+
+        if (x < (min = vals.Keys.Min()))
+        {
+            max = vals.Keys.Where(x => x != min).Min();
+            float distX = x - min.Value, distAB = max.Value - min.Value;
+            return Lerp(vals[min.Value], vals[max.Value], distX / distAB, false);
         }
-        float per = x % (max - min);
-        return Lerp(min, max, per);
+        else if (x > (max = vals.Keys.Max()))
+        {
+            min = vals.Keys.Where(x => x != max).Max();
+            float distX = x - min.Value, distAB = max.Value - min.Value;
+            return Lerp(vals[min.Value], vals[max.Value], distX / distAB, false);
+        }
+
+        float curDistMax = float.MaxValue, curDistMin = float.MaxValue;
+        foreach (float keyX in vals.Keys)
+        {
+            float dist = Absolute(keyX - x);
+            if (keyX < x && dist <= curDistMin)
+            {
+                min = keyX;
+                curDistMin = dist;
+            }
+            if (keyX > x && dist <= curDistMax)
+            {
+                max = keyX;
+                curDistMax = dist;
+            }
+        }
+
+        if (!min.HasValue || !max.HasValue || min == max) throw new UndefinedException();
+        float all = max.Value - min.Value, diff = x - min.Value;
+        return Lerp(vals[min.Value], vals[max.Value], diff / all);
     };
 
     public static float Max(Equation equ, float min, float max, float step = Calculus.DefaultStep)
@@ -180,12 +222,13 @@ public static class Mathf
 
     public static float Median(params float[] vals)
     {
-        float index = Average(0, vals.Length - 1);
-        float valA = vals[Floor(index)], valB = vals[Ceiling(index)];
-        return Average(valA, valB);
+        float index = (vals.Length - 1) * 0.5f;
+        if (index % 1 == 0) return vals[(int)index];
+        float valA = vals[(int)index], valB = vals[(int)index + 1];
+        return (valA + valB) * 0.5f;
     }
     public static int Median(params int[] vals) => Median<int>(vals);
-    public static T Median<T>(params T[] vals) => vals[Floor(Average(0, vals.Length - 1))];
+    public static T Median<T>(params T[] vals) => vals[(vals.Length - 1) / 2];
 
     public static float Min(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
@@ -262,22 +305,34 @@ public static class Mathf
     public static float Power(float num, float pow) => (float)Math.Pow(num, pow);
     public static float Power(float num, int pow)
     {
-        if (pow < 0) return 0;
+        if (pow <= 0) return 0;
+        if (pow == 1) return num;
         float val = 1;
-        for (int i = 0; i < Absolute(pow); i++) val *= num;
+        float abs = Absolute(pow);
+        for (int i = 0; i < abs; i++) val *= num;
         if (pow < 1) val = 1 / val;
         return val;
     }
     public static int Power(int num, int pow)
     {
-        if (pow < 0) return 0;
+        if (pow == 1) return num;
+        if (pow < 1) return 0;
         int val = 1;
-        for (int i = 0; i < Absolute(pow); i++) val *= num;
-        if (pow < 1) val = 1 / val;
+        for (int i = 0; i < pow; i++) val *= num;
         return val;
     }
 
-    public static float Root(float value, float index) => (float)Math.Exp(index * Math.Log(value));
+    public static int PowerMod(int num, int pow, int mod)
+    {
+        if (pow == 1) return num;
+        if (pow < 1) return 0;
+        int val = 1;
+        int abs = Absolute(pow);
+        for (int i = 0; i < abs; i++) val = val * num % mod;
+        return val;
+    }
+
+    public static float Root(float value, float index) => (float)Math.Exp(Math.Log(value) / index);
 
     public static float Round(float num) => num % 1 >= 0.5 ? Ceiling(num) : Floor(num);
     public static float Round(float num, float nearest) => nearest * Round(num / nearest);
@@ -300,7 +355,7 @@ public static class Mathf
                     h = -0.000577413f,
                     i =  0.0000613134f,
                     j = -0.00000216852f;
-        float x = radians % Constants.Tau;
+        float x = AbsoluteMod(radians, Constants.Tau);
 
         return
             a + (b * x) + (c * x * x) + (d * x * x * x) + (e * x * x * x * x) + (f * x * x * x * x * x)
@@ -310,16 +365,8 @@ public static class Mathf
 
     public static float Sqrt(float value) => Root(value, 2);
 
-    public static float Subtract(float num, params float[] vals)
-    {
-        foreach (float d in vals) num -= d;
-        return num;
-    }
-    public static int Subtract(int num, params int[] vals)
-    {
-        foreach (int i in vals) num -= i;
-        return num;
-    }
+    public static float Subtract(float num, params float[] vals) => num - Sum(vals);
+    public static int Subtract(int num, params int[] vals) => num - Sum(vals);
 
     public static float Sum(params float[] vals)
     {
@@ -361,7 +408,7 @@ public static class Mathf
             float val = vals[i] - mean;
             sum += val * val;
         }
-        return sum / vals.Length;
+        return sum / (vals.Length - 1);
     }
 
     public static float ZScore(float val, params float[] vals) => ZScore(val, Average(vals), StandardDeviation(vals));

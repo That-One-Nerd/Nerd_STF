@@ -76,11 +76,6 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
     }
     public static Vector3d Cross(Vector3d a, Vector3d b, bool normalized = false) =>
         Float3.Cross(a.ToXYZ(), b.ToXYZ(), normalized).ToVector();
-    public static Vector3d Divide(Vector3d num, params Vector3d[] vals)
-    {
-        foreach (Vector3d v in vals) num /= v;
-        return num;
-    }
     public static float Dot(Vector3d a, Vector3d b) => Float3.Dot(a.ToXYZ(), b.ToXYZ());
     public static float Dot(params Vector3d[] vals)
     {
@@ -111,13 +106,6 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
         if (vals.Length < 1) return Zero;
         Vector3d val = vals[0];
         foreach (Vector3d f in vals) val = f < val ? f : val;
-        return val;
-    }
-    public static Vector3d Product(params Vector3d[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Vector3d val = One;
-        foreach (Vector3d v in vals) val *= v;
         return val;
     }
     public static Vector3d Round(Vector3d val, Angle.Type angleRound = Angle.Type.Degrees) =>
@@ -172,15 +160,9 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
     public static Vector3d operator -(Vector3d v) => v.Inverse;
     public static Vector3d operator -(Vector3d a, Vector3d b) => new(a.yaw - b.yaw, a.pitch - b.pitch,
         a.magnitude - b.magnitude);
-    public static Vector3d operator *(Vector3d a, Angle b) => new(a.yaw * b, a.pitch * b, a.magnitude);
     public static Vector3d operator *(Vector3d a, float b) => new(a.yaw, a.pitch, a.magnitude * b);
-    public static Vector3d operator *(Vector3d a, Vector3d b) => new(a.yaw * b.yaw, a.pitch * b.pitch,
-        a.magnitude * b.magnitude);
     public static Vector3d operator *(Vector3d a, Matrix b) => (Vector3d)((Matrix)a * b);
-    public static Vector3d operator /(Vector3d a, Angle b) => new(a.yaw / b, a.pitch / b, a.magnitude);
     public static Vector3d operator /(Vector3d a, float b) => new(a.yaw, a.pitch, a.magnitude / b);
-    public static Vector3d operator /(Vector3d a, Vector3d b) => new(a.yaw / b.yaw, a.pitch / b.pitch,
-        a.magnitude / b.magnitude);
     public static Vector3d operator /(Vector3d a, Matrix b) => (Vector3d)((Matrix)a / b);
     public static bool operator ==(Vector3d a, Vector3d b) => a.Equals(b);
     public static bool operator !=(Vector3d a, Vector3d b) => !a.Equals(b);

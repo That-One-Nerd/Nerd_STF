@@ -40,11 +40,6 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
     }
     public static Vector3d Cross(Vector2d a, Vector2d b, bool normalized = false) =>
         Float2.Cross(a.ToXYZ(), b.ToXYZ(), normalized).ToVector();
-    public static Vector2d Divide(Vector2d num, params Vector2d[] vals)
-    {
-        foreach (Vector2d v in vals) num /= v;
-        return num;
-    }
     public static float Dot(Vector2d a, Vector2d b) => Float2.Dot(a.ToXYZ(), b.ToXYZ());
     public static float Dot(params Vector2d[] vals)
     {
@@ -74,13 +69,6 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
         if (vals.Length < 1) return Zero;
         Vector2d val = vals[0];
         foreach (Vector2d f in vals) val = f < val ? f : val;
-        return val;
-    }
-    public static Vector2d Product(params Vector2d[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Vector2d val = One;
-        foreach (Vector2d v in vals) val *= v;
         return val;
     }
     public static Vector2d Round(Vector2d val, Angle.Type angleRound = Angle.Type.Degrees) =>
@@ -127,18 +115,14 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
 
     public object Clone() => new Vector2d(theta, magnitude);
 
-    public Float2 ToXYZ() => new(Mathf.Cos(theta));
+    public Float2 ToXYZ() => new Float2(Mathf.Cos(theta), Mathf.Sin(theta)) * magnitude;
 
     public static Vector2d operator +(Vector2d a, Vector2d b) => new(a.theta + b.theta, a.magnitude + b.magnitude);
     public static Vector2d operator -(Vector2d v) => v.Inverse;
     public static Vector2d operator -(Vector2d a, Vector2d b) => new(a.theta - b.theta, a.magnitude - b.magnitude);
-    public static Vector2d operator *(Vector2d a, Angle b) => new(a.theta * b, a.magnitude);
     public static Vector2d operator *(Vector2d a, float b) => new(a.theta, a.magnitude * b);
-    public static Vector2d operator *(Vector2d a, Vector2d b) => new(a.theta * b.theta, a.magnitude * b.magnitude);
     public static Vector2d operator *(Vector2d a, Matrix b) => (Vector2d)((Matrix)a * b);
-    public static Vector2d operator /(Vector2d a, Angle b) => new(a.theta / b, a.magnitude);
     public static Vector2d operator /(Vector2d a, float b) => new(a.theta, a.magnitude / b);
-    public static Vector2d operator /(Vector2d a, Vector2d b) => new(a.theta / b.theta, a.magnitude / b.magnitude);
     public static Vector2d operator /(Vector2d a, Matrix b) => (Vector2d)((Matrix)a / b);
     public static bool operator ==(Vector2d a, Vector2d b) => a.Equals(b);
     public static bool operator !=(Vector2d a, Vector2d b) => !a.Equals(b);

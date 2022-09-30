@@ -5,9 +5,13 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static Int4 Back => new(0, 0, -1, 0);
     public static Int4 Deep => new(0, 0, 0, -1);
     public static Int4 Down => new(0, -1, 0, 0);
+    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
+        "This field will be removed in v2.4.0.", false)]
     public static Int4 Far => new(0, 0, 0, 1);
     public static Int4 Forward => new(0, 0, 1, 0);
+    public static Int4 HighW => new(0, 0, 0, 1);
     public static Int4 Left => new(-1, 0, 0, 0);
+    public static Int4 LowW => new(0, 0, 0, -1);
     public static Int4 Right => new(1, 0, 0, 0);
     public static Int4 Up => new(0, 1, 0, 0);
 
@@ -97,11 +101,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
         else if (mag > maxMag) val *= maxMag;
         return val;
     }
-    public static Int4 Divide(Int4 num, params Int4[] vals)
-    {
-        foreach (Int4 d in vals) num /= d;
-        return num;
-    }
+    public static Int4 Divide(Int4 num, params Int4[] vals) => num / Product(vals);
     public static int Dot(Int4 a, Int4 b) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     public static int Dot(params Int4[] vals)
     {
@@ -121,9 +121,9 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
             Mathf.Lerp(a.w, b.w, t, clamp));
     public static Int4 Median(params Int4[] vals)
     {
-        float index = Mathf.Average(0, vals.Length - 1);
+        float index = (vals.Length - 1) * 0.5f;
         Int4 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return Average(valA, valB);
+        return (valA + valB) / 2;
     }
     public static Int4 Max(params Int4[] vals)
     {
@@ -146,11 +146,7 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
         foreach (Int4 d in vals) val *= d;
         return val;
     }
-    public static Int4 Subtract(Int4 num, params Int4[] vals)
-    {
-        foreach (Int4 d in vals) num -= d;
-        return num;
-    }
+    public static Int4 Subtract(Int4 num, params Int4[] vals) => num - Sum(vals);
     public static Int4 Sum(params Int4[] vals)
     {
         Int4 val = Zero;

@@ -11,6 +11,7 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public static Complex Zero => new(0, 0);
 
     public Complex Conjugate => new(u, -i);
+    public Complex Inverse => Conjugate / (u * u + i * i);
     public float Magnitude => Mathf.Sqrt(u * u + i * i);
     public Complex Normalized => this * Mathf.InverseSqrt(u * u + i * i);
 
@@ -125,6 +126,8 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
         return (Us, Is);
     }
 
+    public Angle GetAngle() => Mathf.ArcTan(i / u);
+
     public int CompareTo(Complex other) => Magnitude.CompareTo(other.Magnitude);
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
@@ -135,9 +138,9 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public override int GetHashCode() => u.GetHashCode() ^ i.GetHashCode();
     public override string ToString() => ToString((string?)null);
     public string ToString(string? provider) =>
-        u.ToString(provider) + (i >= 0 ? " + " : " - ") + i.ToString(provider) + "i";
+        u.ToString(provider) + (i >= 0 ? " + " : " - ") + Mathf.Absolute(i).ToString(provider) + "i";
     public string ToString(IFormatProvider provider) =>
-        u.ToString(provider) + (i >= 0 ? " + " : " - ") + i.ToString(provider) + "i";
+        u.ToString(provider) + (i >= 0 ? " + " : " - ") + Mathf.Absolute(i).ToString(provider) + "i";
 
     public object Clone() => new Complex(u, i);
 
@@ -164,11 +167,7 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public static Complex operator *(Complex a, Complex b) => new(a.u * b.u - a.i * b.i, a.u * b.i + a.i * b.u);
     public static Complex operator *(Complex a, float b) => new(a.u * b, a.i * b);
     public static Complex operator *(Complex a, Matrix b) => (Complex)((Matrix)a * b);
-    public static Complex operator /(Complex a, Complex b)
-    {
-        float c = b.u * b.u + b.i * b.i;
-        return new((a.u * b.u + a.i * b.i) / c, (a.i * b.u - a.u * b.i) / c);
-    }
+    public static Complex operator /(Complex a, Complex b) => a * b.Inverse;
     public static Complex operator /(Complex a, float b) => new(a.u / b, a.i / b);
     public static Complex operator /(Complex a, Matrix b) => (Complex)((Matrix)a / b);
     public static bool operator ==(Complex a, Complex b) => a.Equals(b);
