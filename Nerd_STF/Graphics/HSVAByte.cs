@@ -130,7 +130,7 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
         return (Hs, Ss, Vs, As);
     }
 
-    public bool Equals(IColor? col) => col != null && Equals(col.ToHSVAByte());
+    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToHSVAByte());
     public bool Equals(IColorByte? col) => col != null && Equals(col.ToHSVAByte());
     public bool Equals(HSVAByte col) => S == 0 && col.S == 0 || V == 0 && col.V == 0 || A == 0 && col.A == 0
         || H == col.H && S == col.S && V == col.V && A == col.A;
@@ -139,12 +139,12 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
         if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(HSVAByte)) return Equals((HSVAByte)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColor)obj);
-        else if (t == typeof(RGBA)) return Equals((IColor)obj);
-        else if (t == typeof(IColor)) return Equals((IColor)obj);
+        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(RGBA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
         else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(HSVA)) return Equals((IColor)obj);
+        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
         return base.Equals(obj);
@@ -192,12 +192,12 @@ public struct HSVAByte : IColorByte, IEquatable<HSVAByte>
     public static HSVAByte operator /(HSVAByte a, HSVAByte b) => new(a.H / b.H, a.S / b.S, a.V / b.V, a.A / b.A);
     public static HSVAByte operator /(HSVAByte a, int b) => new(a.H / b, a.S / b, a.V / b, a.A / b);
     public static HSVAByte operator /(HSVAByte a, float b) => (a.ToHSVA() * b).ToHSVAByte();
-    public static bool operator ==(HSVAByte a, RGBA b) => a.Equals((IColor?)b);
-    public static bool operator !=(HSVAByte a, RGBA b) => !a.Equals((IColor?)b);
-    public static bool operator ==(HSVAByte a, CMYKA b) => a.Equals((IColor?)b);
-    public static bool operator !=(HSVAByte a, CMYKA b) => !a.Equals((IColor?)b);
-    public static bool operator ==(HSVAByte a, HSVA b) => a.Equals((IColor?)b);
-    public static bool operator !=(HSVAByte a, HSVA b) => !a.Equals((IColor?)b);
+    public static bool operator ==(HSVAByte a, RGBA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(HSVAByte a, RGBA b) => !a.Equals((IColorFloat?)b);
+    public static bool operator ==(HSVAByte a, CMYKA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(HSVAByte a, CMYKA b) => !a.Equals((IColorFloat?)b);
+    public static bool operator ==(HSVAByte a, HSVA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(HSVAByte a, HSVA b) => !a.Equals((IColorFloat?)b);
     public static bool operator ==(HSVAByte a, RGBAByte b) => a.Equals(b);
     public static bool operator !=(HSVAByte a, RGBAByte b) => !a.Equals(b);
     public static bool operator ==(HSVAByte a, CMYKAByte b) => a.Equals(b);

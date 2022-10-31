@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public interface IColor : ICloneable, IEquatable<IColor?>, IEquatable<IColorByte?>, IGroup<float>
+public interface IColor : ICloneable, IEquatable<IColorFloat?>, IEquatable<IColorByte?>
 {
     public RGBA ToRGBA();
     public CMYKA ToCMYKA();

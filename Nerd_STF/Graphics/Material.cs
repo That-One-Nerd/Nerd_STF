@@ -5,17 +5,17 @@ public struct Material : ICloneable, IEquatable<Material>
     public float Alpha;
     public float Anisotropy;
     public float AnisotropyRoughness;
-    public IColor AmbientColor;
+    public IColorFloat AmbientColor;
     public float ClearcoatRoughness;
     public float ClearcoatThickness;
-    public IColor DiffuseColor;
-    public IColor Emissive;
+    public IColorFloat DiffuseColor;
+    public IColorFloat Emissive;
     public IlluminationModel IllumModel;
     public float Metallic;
     public float OpticalDensity;
     public float Roughness;
     public float Sheen;
-    public IColor SpecularColor;
+    public IColorFloat SpecularColor;
     public float SpecularExponent;
 
     public (Image Image, TextureConfig Config) AlphaTexture;
@@ -67,17 +67,17 @@ public struct Material : ICloneable, IEquatable<Material>
         Alpha = (float)fill(0);
         Anisotropy = (float)fill(1);
         AnisotropyRoughness = (float)fill(2);
-        AmbientColor = (IColor)fill(3);
+        AmbientColor = (IColorFloat)fill(3);
         ClearcoatRoughness = (float)fill(4);
         ClearcoatThickness = (float)fill(5);
-        DiffuseColor = (IColor)fill(6);
-        Emissive = (IColor)fill(7);
+        DiffuseColor = (IColorFloat)fill(6);
+        Emissive = (IColorFloat)fill(7);
         IllumModel = (IlluminationModel)fill(8);
         Metallic = (float)fill(9);
         OpticalDensity = (float)fill(10);
         Roughness = (float)fill(11);
         Sheen = (float)fill(12);
-        SpecularColor = (IColor)fill(13);
+        SpecularColor = (IColorFloat)fill(13);
         SpecularExponent = (float)fill(14);
 
         AlphaTexture = ((Image, TextureConfig))fill(15);
@@ -93,7 +93,7 @@ public struct Material : ICloneable, IEquatable<Material>
         SpecularHighlightTexture = ((Image, TextureConfig))fill(25);
         StencilTexture = ((Image, TextureConfig))fill(26);
     }
-    public Material(IlluminationModel illum, Fill<float> floats, Fill<IColor> colors, Fill<(Image, TextureConfig)> images)
+    public Material(IlluminationModel illum, Fill<float> floats, Fill<IColorFloat> colors, Fill<(Image, TextureConfig)> images)
     {
         Alpha = floats(0);
         Anisotropy = floats(1);

@@ -15,12 +15,13 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
     {
         Pixels = new IColor[width, height];
         Size = new(width, height);
-        for (int y = 0; y < width; y++) for (int x = 0; x < height; x++) Pixels[x, y] = cols[y * width + x];
+        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) Pixels[x, y] = cols[y * width + x];
     }
     public Image(int width, int height, IColor[,] cols)
     {
-        Pixels = cols;
+        Pixels = new IColor[width, height];
         Size = new(width, height);
+        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) Pixels[x, y] = cols[y, x];
     }
     public Image(int width, int height, Fill<IColor> fill)
     {
@@ -32,28 +33,13 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
     {
         Pixels = new IColor[width, height];
         Size = new(width, height);
-        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) Pixels[x, y] = fill(x, y);
-    }
-    public Image(int width, int height, Fill<IColorByte> fill)
-    {
-        Pixels = new IColor[width, height];
-        Size = new(width, height);
-        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
-                Pixels[x, y] = (IColor)fill(y * width + x);
-    }
-    public Image(int width, int height, Fill2D<IColorByte> fill)
-    {
-        Pixels = new IColor[width, height];
-        Size = new(width, height);
-        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) Pixels[x, y] = (IColor)fill(x, y);
+        for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) Pixels[x, y] = fill(y, x);
     }
     public Image(Int2 size) : this(size.x, size.y) { }
     public Image(Int2 size, IColor[] cols) : this(size.x, size.y, cols) { }
     public Image(Int2 size, IColor[,] cols) : this(size.x, size.y, cols) { }
     public Image(Int2 size, Fill<IColor> fill) : this(size.x, size.y, fill) { }
     public Image(Int2 size, Fill2D<IColor> fill) : this(size.x, size.y, fill) { }
-    public Image(Int2 size, Fill<IColorByte> fill) : this(size.x, size.y, fill) { }
-    public Image(Int2 size, Fill2D<IColorByte> fill) : this(size.x, size.y, fill) { }
 
     public IColor this[int indexX, int indexY]
     {
@@ -124,7 +110,7 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
         for (int y = 0; y < Size.y; y++) for (int x = 0; x < Size.x; x++)
             {
                 HSVA col = Pixels[x, y].ToHSVA();
-                col.S = (set ? 0 : col.S) + value;
+                col.S = (set ? 0 : col.S) * value;
                 Pixels[x, y] = col;
             }
     }
@@ -144,7 +130,7 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
         for (int y = 0; y < newSize.y; y++) for (int x = 0; x < newSize.x; x++)
             {
                 Float2 f = new((float)x / newSize.x, (float)y / newSize.y);
-                RGBA col = Pixels[Mathf.RoundInt(f.x * Size.x), Mathf.RoundInt(f.y * Size.y)].ToRGBA();
+                RGBA col = Pixels[Mathf.Floor(f.x * Size.x), Mathf.Floor(f.y * Size.y)].ToRGBA();
                 img[x, y] = col;
             }
         this = img;

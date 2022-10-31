@@ -191,7 +191,10 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public Vector3d ToVector()
     {
         float mag = Magnitude;
-        return new(Mathf.ArcTan(y / x), Mathf.ArcCos(z / mag), mag);
+        Float3 normalized = Normalized;
+        Angle yaw = Mathf.ArcCos(normalized.y);
+        Angle pitch = Mathf.ArcSin(normalized.x / Mathf.Sin(yaw));
+        return new(yaw, pitch, mag);
     }
 
     public static Float3 operator +(Float3 a, Float3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -200,6 +203,7 @@ public struct Float3 : ICloneable, IComparable<Float3>, IEquatable<Float3>, IGro
     public static Float3 operator *(Float3 a, Float3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
     public static Float3 operator *(Float3 a, float b) => new(a.x * b, a.y * b, a.z * b);
     public static Float3 operator *(Float3 a, Matrix b) => (Float3)((Matrix)a * b);
+    public static Quaternion operator *(Float3 a, Quaternion b) => (Quaternion)a * b;
     public static Float3 operator /(Float3 a, Float3 b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
     public static Float3 operator /(Float3 a, float b) => new(a.x / b, a.y / b, a.z / b);
     public static Float3 operator /(Float3 a, Matrix b) => (Float3)((Matrix)a / b);

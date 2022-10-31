@@ -174,6 +174,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public static Float2 operator *(Float2 a, Float2 b) => new(a.x * b.x, a.y * b.y);
     public static Float2 operator *(Float2 a, float b) => new(a.x * b, a.y * b);
     public static Float2 operator *(Float2 a, Matrix b) => (Float2)((Matrix)a * b);
+    public static Quaternion operator *(Float2 a, Quaternion b) => (Quaternion)a * b;
     public static Float2 operator /(Float2 a, Float2 b) => new(a.x / b.x, a.y / b.y);
     public static Float2 operator /(Float2 a, float b) => new(a.x / b, a.y / b);
     public static Float2 operator /(Float2 a, Matrix b) => (Float2)((Matrix)a / b);

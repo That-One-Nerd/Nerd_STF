@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct CMYKA : IColor, IEquatable<CMYKA>
+public struct CMYKA : IColorFloat, IEquatable<CMYKA>
 {
     public static CMYKA Black => new(0, 0, 0, 1);
     public static CMYKA Blue => new(1, 1, 0, 0);
@@ -165,7 +165,7 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
         return (Cs, Ms, Ys, Ks, As);
     }
 
-    public bool Equals(IColor? col) => col != null && Equals(col.ToCMYKA());
+    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToCMYKA());
     public bool Equals(IColorByte? col) => col != null && Equals(col.ToCMYKA());
     public bool Equals(CMYKA col) => A == 0 && col.A == 0 || K == 1 && col.K == 1 || C == col.C && M == col.M
         && Y == col.Y && K == col.K && A == col.A;
@@ -174,9 +174,9 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
         if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(CMYKA)) return Equals((CMYKA)obj);
-        else if (t == typeof(RGBA)) return Equals((IColor)obj);
-        else if (t == typeof(HSVA)) return Equals((IColor)obj);
-        else if (t == typeof(IColor)) return Equals((IColor)obj);
+        else if (t == typeof(RGBA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
         else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
@@ -196,7 +196,7 @@ public struct CMYKA : IColor, IEquatable<CMYKA>
     public RGBA ToRGBA()
     {
         float kInv = 1 - K, r = 1 - C, g = 1 - M, b = 1 - Y;
-        return new(r * kInv, g * kInv, b * kInv);
+        return new(r * kInv, g * kInv, b * kInv, A);
     }
     public CMYKA ToCMYKA() => this;
     public HSVA ToHSVA() => ToRGBA().ToHSVA();

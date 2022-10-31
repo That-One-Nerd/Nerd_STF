@@ -35,6 +35,8 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     }
 
     public Angle Bounded => new(Mathf.AbsoluteMod(p_deg, 360));
+    public Angle Complimentary => Quarter - this;
+    public Angle Supplementary => Half - this;
     public Angle Reflected => new Angle(-p_deg).Bounded;
 
     private float p_deg;

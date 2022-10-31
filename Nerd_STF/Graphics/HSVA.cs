@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct HSVA : IColor, IEquatable<HSVA>
+public struct HSVA : IColorFloat, IEquatable<HSVA>
 {
     public static HSVA Black => new(Angle.Zero, 0, 0);
     public static HSVA Blue => new(new Angle(240), 1, 1);
@@ -159,7 +159,7 @@ public struct HSVA : IColor, IEquatable<HSVA>
         return (Hs, Ss, Vs, As);
     }
 
-    public bool Equals(IColor? col) => col != null && Equals(col.ToHSVA());
+    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToHSVA());
     public bool Equals(IColorByte? col) => col != null && Equals(col.ToHSVA());
     public bool Equals(HSVA col) => S == 0 && col.S == 0 || V == 0 && col.V == 0 || A == 0 && col.A == 0
         || H == col.H && S == col.S && V == col.V && A == col.A;
@@ -168,9 +168,9 @@ public struct HSVA : IColor, IEquatable<HSVA>
         if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(HSVA)) return Equals((HSVA)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColor)obj);
-        else if (t == typeof(RGBA)) return Equals((IColor)obj);
-        else if (t == typeof(IColor)) return Equals((IColor)obj);
+        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(RGBA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
         else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
@@ -195,7 +195,7 @@ public struct HSVA : IColor, IEquatable<HSVA>
         else if (d < 240) vals = (0, x, c);
         else if (d < 300) vals = (x, 0, c);
         else if (d < 360) vals = (c, 0, x);
-        return new(vals.r + m, vals.g + m, vals.b + m);
+        return new(vals.r + m, vals.g + m, vals.b + m, A);
     }
     public CMYKA ToCMYKA() => ToRGBA().ToCMYKA();
     public HSVA ToHSVA() => this;

@@ -14,12 +14,21 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
     public static Quaternion One => new(1, 1, 1, 1);
     public static Quaternion Zero => new(0, 0, 0, 0);
 
-    public Quaternion Conjugate => new(u, -i, -j, -k);
+    public Quaternion Conjugate => new(u, -IJK);
     public Quaternion Inverse => Conjugate / (u * u + i * i + j * j + k * k);
     public float Magnitude => Mathf.Sqrt(u * u + i * i + j * j + k * k);
     public Quaternion Normalized => this * Mathf.InverseSqrt(u * u + i * i + j * j + k * k);
 
-    public Float3 IJK => new(i, j, k);
+    public Float3 IJK
+    {
+        get => new(i, j, k);
+        set
+        {
+            i = value.x;
+            j = value.y;
+            k = value.z;
+        }
+    }
 
     public float u, i, j, k;
 
@@ -136,27 +145,31 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
         return Float4.Sum(floats.ToArray());
     }
 
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
     public static Quaternion FromAngles(Angle yaw, Angle pitch, Angle? roll = null)
     {
         roll ??= Angle.Zero;
-        float cosYaw = Mathf.Cos(yaw), cosPitch = Mathf.Cos(pitch), cosRoll = Mathf.Cos(roll.Value),
-              sinYaw = Mathf.Sin(yaw), sinPitch = Mathf.Sin(pitch), sinRoll = Mathf.Sin(roll.Value);
+        float cosYaw, cosPitch, cosRoll, sinYaw, sinPitch, sinRoll,
+              cosYawCosPitch, sinYawSinPitch, cosYawSinPitch, sinYawCosPitch;
 
-        float cosYawCosPitch = cosYaw * cosPitch,
-              cosYawSinPitch = cosYaw * sinPitch,
-              sinYawCosPitch = sinYaw * cosPitch,
-              sinYawSinPitch = sinYaw * sinPitch;
+        cosYaw = Mathf.Cos(yaw * 0.5f);
+        cosPitch = Mathf.Cos(pitch * 0.5f);
+        cosRoll = Mathf.Cos(roll.Value * 0.5f);
+        sinYaw = Mathf.Sin(yaw * 0.5f);
+        sinPitch = Mathf.Sin(pitch * 0.5f);
+        sinRoll = Mathf.Sin(roll.Value * 0.5f);
+
+        cosYawCosPitch = cosYaw * cosPitch;
+        sinYawSinPitch = sinYaw * sinPitch;
+        cosYawSinPitch = cosYaw * sinPitch;
+        sinYawCosPitch = sinYaw * cosPitch;
 
         return new(cosYawCosPitch * cosRoll + sinYawSinPitch * sinRoll,
-                   cosYawCosPitch * sinRoll + sinYawSinPitch * cosRoll,
+                   cosYawCosPitch * sinRoll - sinYawSinPitch * cosRoll,
                    cosYawSinPitch * cosRoll + sinYawCosPitch * sinRoll,
-                   sinYawCosPitch * cosRoll + cosYawSinPitch * sinRoll);
+                   sinYawCosPitch * cosRoll - cosYawSinPitch * sinRoll);
     }
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
     public static Quaternion FromAngles(Float3 vals, Angle.Type valType) =>
         FromAngles(new(vals.x, valType), new(vals.y, valType), new(vals.z, valType));
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
     public static Quaternion FromVector(Vector3d vec) => FromAngles(vec.yaw, vec.pitch);
 
     public static (float[] Us, float[] Is, float[] Js, float[] Ks) SplitArray(params Quaternion[] vals)
@@ -193,18 +206,8 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
 
     public object Clone() => new Quaternion(u, i, j, k);
 
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
     public Angle GetAngle() => Mathf.ArcCos(u) * 2;
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
-    public Float3 GetAxis()
-    {
-        Float3 axis = IJK;
-        float mag = Magnitude;
-
-        if (mag < 0) return Float3.Zero;
-        return axis / mag;
-    }
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
+    public Float3 GetAxis() => IJK.Normalized;
     public (Angle yaw, Angle pitch, Angle roll) ToAngles()
     {
         Quaternion doubled = this;
@@ -213,42 +216,47 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
         doubled.j *= j;
         doubled.k *= k;
 
-        Matrix3x3 rotMatrix = new(new[,]
+        Matrix3x3 rot = new(new[,]
         {
-            { doubled.u + doubled.i - doubled.j - doubled.k, 0, 0 },
-            { 2 * (i * j + u * k), 0, 0 },
-            { 2 * (i * k + u * j), 2 * (j * k + u * i), doubled.u - doubled.i - doubled.j + doubled.k }
+            { u * u + i * i - j * j - k * k, 2 * i * j + 2 * k * u, 2 * i * k - 2 * j * u },
+            { 2 * i * j - 2 * k * u, u * u - i * i + j * j - k * k, 2 * j * k + 2 * i * u },
+            { 2 * k * i + 2 * j * u, 2 * k * j - 2 * i * u, u * u - i * i - j * j + k * k }
         });
 
         Angle yaw, pitch, roll;
 
-        float r3c1Abs = Mathf.Absolute(rotMatrix.r3c1);
-        if (r3c1Abs >= 1)
+        float absr3c1 = Mathf.Absolute(rot.r3c1);
+        if (absr3c1 >= 1)
         {
-            rotMatrix.r1c2 = 2 * (i * j - u * k);
-            rotMatrix.r1c3 = 2 * (i * k + u * j);
-
-            yaw = Mathf.ArcTan2(-rotMatrix.r1c2, -rotMatrix.r3c1 * rotMatrix.r1c3);
-            pitch = new(-Constants.HalfPi * rotMatrix.r3c1 / r3c1Abs, Angle.Type.Radians);
+            yaw = Mathf.ArcTan2(-rot.r1c2, -rot.r3c1 * rot.r1c3);
+            pitch = new(-Constants.HalfPi * rot.r3c1 / absr3c1, Angle.Type.Radians);
             roll = Angle.Zero;
         }
         else
         {
-            yaw = Mathf.ArcTan2(rotMatrix.r2c1, rotMatrix.r1c1);
-            pitch = Mathf.ArcSin(-rotMatrix.r3c1);
-            roll = Mathf.ArcTan2(rotMatrix.r3c2, rotMatrix.r3c3);
+            yaw = Mathf.ArcTan2(rot.r2c1, rot.r1c1);
+            pitch = Mathf.ArcSin(-rot.r3c1);
+            roll = Mathf.ArcTan2(rot.r3c2, rot.r3c3);
         }
 
         return (yaw, pitch, roll);
     }
-    [Obsolete("This method does not produce the correct output. Please update to a newer release.")]
-    public Vector3d ToVector()
+    public Float3 ToAnglesFloat3(Angle.Type type = Angle.Type.Degrees)
     {
-        (Angle yaw, Angle pitch, _) = ToAngles();
-        return new(yaw, pitch);
+        (Angle yaw, Angle pitch, Angle roll) = ToAngles();
+        return new(yaw.ValueFromType(type), pitch.ValueFromType(type), roll.ValueFromType(type));
     }
 
-    public Quaternion Rotate(Quaternion other) => other * this * other.Conjugate;
+    public Quaternion Rotate(Quaternion other) => this * other * Conjugate;
+    public Float3 Rotate(Float3 other)
+    {
+        const float tolerance = 0.001f;
+        Quaternion res = this * other * Conjugate;
+        if (Mathf.Absolute(res.u) > tolerance)
+            throw new MathException("A rotated vector should never have non-zero scalar part.");
+        return res.IJK;
+    }
+    public Vector3d Rotate(Vector3d other) => Rotate(other.ToXYZ()).ToVector();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -275,7 +283,7 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
         float a = x.u, b = x.i, c = x.j, d = x.k, e = y.u, f = y.i, g = y.j, h = y.k,
               u = a * e - b * f - c * g - d * h,
               i = a * f + b * e + c * h - d * g,
-              j = a * g + c * e + b * h - d * f,
+              j = a * g - b * h + c * e + d * f,
               k = a * h + b * g + d * e - c * f;
         return new(u, i, j, k);
     }
@@ -286,6 +294,7 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
     public static Quaternion operator /(Quaternion a, float b) => new(a.u / b, a.i / b, a.j / b, a.k / b);
     public static Quaternion operator /(Quaternion a, Matrix b) => (Quaternion)((Matrix)a / b);
     public static Quaternion operator /(Quaternion a, Float3 b) => a / new Quaternion(b);
+    public static Quaternion operator ~(Quaternion v) => v.Conjugate;
     public static bool operator ==(Quaternion a, Quaternion b) => a.Equals(b);
     public static bool operator !=(Quaternion a, Quaternion b) => !a.Equals(b);
     public static bool operator >(Quaternion a, Quaternion b) => a.CompareTo(b) > 0;
