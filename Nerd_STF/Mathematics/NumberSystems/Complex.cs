@@ -170,6 +170,7 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public static Complex operator /(Complex a, Complex b) => a * b.Inverse;
     public static Complex operator /(Complex a, float b) => new(a.u / b, a.i / b);
     public static Complex operator /(Complex a, Matrix b) => (Complex)((Matrix)a / b);
+    public static Complex operator ~(Complex v) => v.Conjugate;
     public static bool operator ==(Complex a, Complex b) => a.Equals(b);
     public static bool operator !=(Complex a, Complex b) => !a.Equals(b);
     public static bool operator >(Complex a, Complex b) => a.CompareTo(b) > 0;

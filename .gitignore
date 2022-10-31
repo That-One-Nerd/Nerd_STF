@@ -1,13 +1,11 @@
-# Visual Studio stuff
-*.csproj
-*.editorconfig
-*.sln
+# Useless Visual Studio stuff
 /Nerd_STF/.vs/
+
+# Build Stuff
 /Nerd_STF/obj
-/Nerd_STF/bin/Debug
-/Nerd_STF/bin/Release/net6.0/Nerd_STF.deps.json
-/Nerd_STF/bin/Release/net6.0/Nerd_STF.dll
-/Nerd_STF/bin/Release/net6.0/Nerd_STF.pdb
+/Nerd_STF/bin
+*.dll
+*.pdb
 
 # Testing project
 /Testing

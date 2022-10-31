@@ -143,7 +143,7 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
         return (Cs, Ms, Ys, Ks, As);
     }
 
-    public bool Equals(IColor? col) => col != null && Equals(col.ToCMYKAByte());
+    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToCMYKAByte());
     public bool Equals(IColorByte? col) => col != null && Equals(col.ToCMYKAByte());
     public bool Equals(CMYKAByte col) => A == 0 && col.A == 0 || K == 1 && col.K == 255 || C == col.C && M == col.M
        && Y == col.Y && K == col.K && A == col.A;
@@ -152,11 +152,11 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
         if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(CMYKAByte)) return Equals((CMYKAByte)obj);
-        else if (t == typeof(RGBA)) return Equals((IColor)obj);
-        else if (t == typeof(HSVA)) return Equals((IColor)obj);
-        else if (t == typeof(IColor)) return Equals((IColor)obj);
+        else if (t == typeof(RGBA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
         else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColor)obj);
+        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
 
@@ -174,11 +174,11 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
 
     public RGBA ToRGBA() => ToCMYKA().ToRGBA();
     public CMYKA ToCMYKA() => new(C / 255f, M / 255f, Y / 255f, K / 255f, A / 255f);
-    public HSVA ToHSVA() => ToRGBA().ToHSVA();
+    public HSVA ToHSVA() => ToCMYKA().ToHSVA();
 
     public RGBAByte ToRGBAByte() => ToCMYKA().ToRGBAByte();
     public CMYKAByte ToCMYKAByte() => this;
-    public HSVAByte ToHSVAByte() => ToRGBA().ToHSVAByte();
+    public HSVAByte ToHSVAByte() => ToCMYKA().ToHSVAByte();
 
     public byte[] ToArray() => new[] { C, M, Y, K, A };
     public Fill<byte> ToFill()
@@ -216,12 +216,12 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
     public static CMYKAByte operator /(CMYKAByte a, int b) =>
         new(a.C / b, a.M / b, a.Y / b, a.K / b, a.A / b);
     public static CMYKAByte operator /(CMYKAByte a, float b) => (a.ToCMYKA() / b).ToCMYKAByte();
-    public static bool operator ==(CMYKAByte a, RGBA b) => a.Equals((IColor?)b);
-    public static bool operator !=(CMYKAByte a, RGBA b) => !a.Equals((IColor?)b);
-    public static bool operator ==(CMYKAByte a, CMYKA b) => a.Equals((IColor?)b);
-    public static bool operator !=(CMYKAByte a, CMYKA b) => !a.Equals((IColor?)b);
-    public static bool operator ==(CMYKAByte a, HSVA b) => a.Equals((IColor?)b);
-    public static bool operator !=(CMYKAByte a, HSVA b) => !a.Equals((IColor?)b);
+    public static bool operator ==(CMYKAByte a, RGBA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(CMYKAByte a, RGBA b) => !a.Equals((IColorFloat?)b);
+    public static bool operator ==(CMYKAByte a, CMYKA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(CMYKAByte a, CMYKA b) => !a.Equals((IColorFloat?)b);
+    public static bool operator ==(CMYKAByte a, HSVA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(CMYKAByte a, HSVA b) => !a.Equals((IColorFloat?)b);
     public static bool operator ==(CMYKAByte a, RGBAByte b) => a.Equals(b);
     public static bool operator !=(CMYKAByte a, RGBAByte b) => !a.Equals(b);
     public static bool operator ==(CMYKAByte a, CMYKAByte b) => a.Equals(b);

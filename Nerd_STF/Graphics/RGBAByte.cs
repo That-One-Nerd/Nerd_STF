@@ -132,7 +132,7 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
         return (Rs, Gs, Bs, As);
     }
 
-    public bool Equals(IColor? col) => col != null && Equals(col.ToRGBAByte());
+    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToRGBAByte());
     public bool Equals(IColorByte? col) => col != null && Equals(col.ToRGBAByte());
     public bool Equals(RGBAByte col) => A == 0 && col.A == 0 || R == col.R && G == col.G && B == col.B && A == col.A;
     public override bool Equals([NotNullWhen(true)] object? obj)
@@ -140,9 +140,9 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
         if (obj == null) return base.Equals(obj);
         Type t = obj.GetType();
         if (t == typeof(RGBAByte)) return Equals((RGBAByte)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColor)obj);
-        else if (t == typeof(HSVA)) return Equals((IColor)obj);
-        else if (t == typeof(IColor)) return Equals((IColor)obj);
+        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
+        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
         else if (t == typeof(RGBA)) return Equals((IColorByte)obj);
         else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
         else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
@@ -195,12 +195,12 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public static RGBAByte operator /(RGBAByte a, RGBAByte b) => new(a.R / b.R, a.G / b.G, a.B / b.B, a.A / b.A);
     public static RGBAByte operator /(RGBAByte a, int b) => new(a.R / b, a.G / b, a.B / b, a.A / b);
     public static RGBAByte operator /(RGBAByte a, float b) => (a.ToRGBA() / b).ToRGBAByte();
-    public static bool operator ==(RGBAByte a, RGBA b) => a.Equals((IColor?)b);
-    public static bool operator !=(RGBAByte a, RGBA b) => !a.Equals((IColor?)b);
-    public static bool operator ==(RGBAByte a, CMYKA b) => a.Equals((IColor?)b);
-    public static bool operator !=(RGBAByte a, CMYKA b) => !a.Equals((IColor?)b);
-    public static bool operator ==(RGBAByte a, HSVA b) => a.Equals((IColor?)b);
-    public static bool operator !=(RGBAByte a, HSVA b) => !a.Equals((IColor?)b);
+    public static bool operator ==(RGBAByte a, RGBA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(RGBAByte a, RGBA b) => !a.Equals((IColorFloat?)b);
+    public static bool operator ==(RGBAByte a, CMYKA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(RGBAByte a, CMYKA b) => !a.Equals((IColorFloat?)b);
+    public static bool operator ==(RGBAByte a, HSVA b) => a.Equals((IColorFloat?)b);
+    public static bool operator !=(RGBAByte a, HSVA b) => !a.Equals((IColorFloat?)b);
     public static bool operator ==(RGBAByte a, RGBAByte b) => a.Equals(b);
     public static bool operator !=(RGBAByte a, RGBAByte b) => !a.Equals(b);
     public static bool operator ==(RGBAByte a, CMYKAByte b) => a.Equals(b);

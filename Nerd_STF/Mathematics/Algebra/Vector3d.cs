@@ -145,15 +145,20 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
     public bool Equals(Vector3d other) => yaw == other.yaw && pitch == other.pitch
         && magnitude == other.magnitude;
     public override int GetHashCode() => yaw.GetHashCode() ^ pitch.GetHashCode() ^ magnitude.GetHashCode();
+    public override string ToString() => ToString((string?)null);
+    public string ToString(Angle.Type outputType) => ToString((string?)null, outputType);
     public string ToString(string? provider, Angle.Type outputType = Angle.Type.Degrees) =>
-        "Mag: " + magnitude.ToString(provider) + " Theta: " + yaw.ToString(provider, outputType) +
-        " Phi: " + pitch.ToString(provider, outputType);
+        "Mag: " + magnitude.ToString(provider) + " Yaw: " + yaw.ToString(provider, outputType) +
+        " Pitch: " + pitch.ToString(provider, outputType);
+    public string ToString(IFormatProvider provider, Angle.Type outputType = Angle.Type.Degrees) =>
+        "Mag: " + magnitude.ToString(provider) + " Yaw: " + yaw.ToString(provider, outputType) +
+        " Pitch: " + pitch.ToString(provider, outputType);
 
     public object Clone() => new Vector3d(yaw, pitch, magnitude);
 
-    public Float3 ToXYZ() => new(Mathf.Sin(pitch) * Mathf.Cos(yaw) * magnitude,
-                                 Mathf.Sin(pitch) * Mathf.Sin(yaw) * magnitude,
-                                 Mathf.Cos(pitch) * magnitude);
+    public Float3 ToXYZ() => new Float3(Mathf.Sin(pitch) * Mathf.Sin(yaw),
+                                        Mathf.Cos(yaw),
+                                        Mathf.Cos(pitch) * Mathf.Sin(yaw)) * magnitude;
 
     public static Vector3d operator +(Vector3d a, Vector3d b) => new(a.yaw + b.yaw, a.pitch + b.pitch,
         a.magnitude + b.magnitude);

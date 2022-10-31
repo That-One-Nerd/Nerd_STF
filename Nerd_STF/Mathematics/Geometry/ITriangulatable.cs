@@ -8,6 +8,12 @@ public interface ITriangulatable
         foreach (ITriangulatable triangulatable in triangulatables) res.AddRange(triangulatable.Triangulate());
         return res.ToArray();
     }
+    public static Triangle[] TriangulateAll<T>(params T[] triangulatables) where T : ITriangulatable
+    {
+        List<Triangle> res = new();
+        foreach (ITriangulatable triangulatable in triangulatables) res.AddRange(triangulatable.Triangulate());
+        return res.ToArray();
+    }
 
     public Triangle[] Triangulate();
 }

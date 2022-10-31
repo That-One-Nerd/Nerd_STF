@@ -107,7 +107,7 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
     public bool Equals(Vector2d other) => theta == other.theta && magnitude == other.magnitude;
     public override int GetHashCode() => theta.GetHashCode() ^ magnitude.GetHashCode();
     public override string ToString() => ToString((string?)null);
-    public string ToString(Angle.Type outputType = Angle.Type.Degrees) => ToString((string?)null, outputType);
+    public string ToString(Angle.Type outputType) => ToString((string?)null, outputType);
     public string ToString(string? provider, Angle.Type outputType = Angle.Type.Degrees) =>
         "Mag: " + magnitude.ToString(provider) + " Rot: " + theta.ToString(provider, outputType);
     public string ToString(IFormatProvider provider, Angle.Type outputType = Angle.Type.Degrees) =>
