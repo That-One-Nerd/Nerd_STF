@@ -18,7 +18,7 @@
     <Product>Nerd_STF</Product>
     <PackageId>Nerd_STF</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>Logo Square0001.png</PackageIcon>
+    <PackageIcon>Logo Square.png</PackageIcon>
     <PackageReleaseNotes>The `v2.3.1.x` updates go through every single field and method in Nerd_STF to make sure it works correctly.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -37,7 +37,7 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\..\..\Nerd_STF\Icons\Logo Square0001.png">
+    <None Include="..\Extras\Logo Square.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
