@@ -1,5 +1,6 @@
 # Useless Visual Studio stuff
 /Nerd_STF/.vs/
+*.sln
 
 # Build Stuff
 /Nerd_STF/obj
