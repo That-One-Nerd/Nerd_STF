@@ -19,7 +19,8 @@
     <PackageId>Nerd_STF</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Logo Square.png</PackageIcon>
-    <PackageReleaseNotes># Nerd_STF v2.3.1
+    <PackageReleaseNotes>
+# Nerd_STF v2.3.1
 
 ***Everything has been tested and most things work!***
 
@@ -40,93 +41,7 @@ Next up is the documentation update. Stay tuned!
 (This may be another update with beta parts, but I'm not sure yet. We'll see).
 
 *P.S. (NuGet only message): I didn't know I had the room to put the whole changelog here. I'll do that from now on.*
-
-```
-* Nerd_STF
-    * Exceptions
-        * DifferingVertCountException
-            = Marked as deprecated (uses deprecated struct `Polygon`)
-    * Extensions
-        * Container2DExtension
-            + GetSize&lt;T&gt;(T[,])
-            + SwapDimensions&lt;T&gt;(T[,], Int2?)
-            * Flatten&lt;T&gt;(T[,])
-                = Replaced a `size` parameter from an `Int2` to an `Int2?`
-    * Mathematics
-        * Algebra
-            * IMatrix
-                - ToDictionary()
-            * Matrix
-                + Cofactor()
-                + IdentityIsh(Int2)
-                + MinorOf(Int2)
-                - ToDictionary()
-                = Fixed `Determinant()`
-                = Fixed `Minors()`
-                = Fixed `Inverse()`
-                = Made `Identity(Int2)` only work with square matricies (since that's only when an identity exists)
-                = Marked the struct as `readonly`
-                = Simplified `Transpose()`
-                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
-                = Swapped code for `Adjugate()` with `Cofactor()`
-            * Matrix2x2
-                + Cofactor()
-                + operator *(Matrix2x2, Float2)
-                + operator /(Matrix2x2, Float2)
-                - ToDictionary()
-                = Swapped code for `Adjugate()` with `Cofactor()`
-                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
-                = Fixed `this[int, int]` to compensate for the swapped variables.
-                = Fixed `operator -(Matrix2x2, Matrix2x2)` to not have an addition in one of the variables (fun).
-                = Fixed `Inverse()`
-                = Fixed `explicit operator Matrix2x2(Matrix)`
-            * Matrix3x3
-                + Cofactor()
-                + operator *(Matrix3x3, Float3)
-                + operator /(Matrix3x3, Float3)
-                - ToDictionary()
-                = Swapped code for `Adjugate()` with `Cofactor()`
-                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
-                = Fixed `this[int, int]` to compensate for the swapped variables.
-                = Fixed `Determinant()`
-                = Fixed `Inverse()`
-                = Fixed `explicit operator Matrix3x3(Matrix)`
-            * Matrix4x4
-                + Cofactor()
-                + override string ToString()
-                + operator *(Matrix4x4, Float4)
-                + operator /(Matrix4x4, Float4)
-                - ToDictionary()
-                = Swapped code for `Adjugate()` with `Cofactor()`
-                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
-                = Fixed `this[int, int]` to compensate for the swapped variables.
-                = Fixed `Determinant()`
-                = Fixed a typo in `Absolute(Matrix4x4)`, `Ceiling(Matrix4x4)`, `Floor(Matrix4x4)`, and `Round(Matrix4x4)`
-                = Fixed a typo in `Row1`, `Row2`, `Row3`, and `Row4`. Oops.
-                = Fixed some missing elements in `SplitArray(Matrix4x4[])`
-                = Fixed `explicit operator Matrix4x4(Matrix)`
-        * Geometry
-            * Box2D
-                = Simplified some code in `Perimeter`
-            * Box3D
-                + SurfaceArea
-                = Renamed `Area` to `Volume`
-                = Simplified some code in `Perimeter`
-            * Polygon
-                = Marked as deprecated (will be redone in v2.4.0)
-                = Simplified collection initialization in `Triangulate()`
-            * Quadrilateral
-                - explicit operator Triangle(Polygon)
-                = Marked `Area` as deprecated (uses deprecated `Triangle.Area` field)
-            * Sphere
-                = Fixed `ClosestTo(Vert)`
-            * Triangle
-                - explicit operator Triangle(Polygon)
-                = Marked `Area` as deprecated (will be fixed in v2.4.0)
-            * Vert
-                = Marked as deprecated (will be removed in v2.4.0).
-                = Optimized `Normalized` to not clone more than required.
-```</PackageReleaseNotes>
+</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
