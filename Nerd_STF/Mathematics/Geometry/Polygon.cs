@@ -1,5 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
+[Obsolete("This struct is a garbage fire. This will be completely redesigned in v2.4.0")]
 public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdividable<Polygon>, ITriangulatable
 {
     public Line[] Lines
@@ -379,8 +380,10 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             if (closest.Value.posB > closest.Value.posA)
                 closest = (closest.Value.posB, closest.Value.posA, closest.Value.line);
 
-            List<Line> partA = new(Lines[closest.Value.posA..(closest.Value.posB - 1)]);
-            partA.Add(closest.Value.line);
+            List<Line> partA = new(Lines[closest.Value.posA..(closest.Value.posB - 1)])
+            {
+                closest.Value.line
+            };
 
             Polygon pA = new(partA.ToArray());
 

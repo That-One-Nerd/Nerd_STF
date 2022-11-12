@@ -1,8 +1,15 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public struct Matrix : IMatrix<Matrix, Matrix>
+public readonly struct Matrix : IMatrix<Matrix, Matrix>
 {
     public static Matrix Identity(Int2 size)
+    {
+        if (size.x != size.y) throw new InvalidSizeException("Can only create an identity matrix of a square matrix.");
+        Matrix m = Zero(size);
+        for (int i = 0; i < size.x; i++) m[i, i] = 1;
+        return m;
+    }
+    public static Matrix IdentityIsh(Int2 size)
     {
         Matrix m = Zero(size);
         int max = Mathf.Min(size.x, size.y);
@@ -27,7 +34,7 @@ public struct Matrix : IMatrix<Matrix, Matrix>
         array = new float[size.x, size.y];
 
         if (all == 0) return;
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = all;
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = all;
     }
     public Matrix(Int2 size, float[] vals)
     {
@@ -37,7 +44,7 @@ public struct Matrix : IMatrix<Matrix, Matrix>
         if (vals.Length < size.x * size.y)
             throw new InvalidSizeException("Array must contain enough values to fill the matrix.");
 
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals[c + r * size.y];
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals[c + r * size.y];
     }
     public Matrix(Int2 size, int[] vals)
     {
@@ -47,45 +54,45 @@ public struct Matrix : IMatrix<Matrix, Matrix>
         if (vals.Length < size.x * size.y)
             throw new InvalidSizeException("Array must contain enough values to fill the matrix.");
 
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals[c + r * size.y];
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals[c + r * size.y];
     }
     public Matrix(Int2 size, Fill<float> vals)
     {
         Size = size;
         array = new float[size.x, size.y];
 
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals(c + r * size.y);
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals(c + r * size.y);
     }
     public Matrix(Int2 size, Fill<int> vals)
     {
         Size = size;
         array = new float[size.x, size.y];
 
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals(c + r * size.y);
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals(c + r * size.y);
     }
     public Matrix(Int2 size, float[,] vals)
     {
         Size = size;
         array = new float[size.x, size.y];
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals[c, r];
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals[r, c];
     }
     public Matrix(Int2 size, int[,] vals)
     {
         Size = size;
         array = new float[size.x, size.y];
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals[c, r];
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals[r, c];
     }
     public Matrix(Int2 size, Fill2D<float> vals)
     {
         Size = size;
         array = new float[size.x, size.y];
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals(c, r);
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals(r, c);
     }
     public Matrix(Int2 size, Fill2D<int> vals)
     {
         Size = size;
         array = new float[size.x, size.y];
-        for (int r = 0; r < size.y; r++) for (int c = 0; c < size.x; c++) array[c, r] = vals(c, r);
+        for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals(r, c);
     }
 
     public float this[int r, int c]
@@ -135,37 +142,38 @@ public struct Matrix : IMatrix<Matrix, Matrix>
 
     public void Apply(Modifier2D modifier)
     {
-        for (int r = 0; r < Size.y; r++) for (int c = 0; c < Size.x; c++)
+        for (int r = 0; r < Size.x; r++) for (int c = 0; c < Size.y; c++)
                 array[r, c] = modifier(new(r, c), array[r, c]);
     }
 
     public float[] GetColumn(int column)
     {
-        float[] vals = new float[Size.y];
-        for (int i = 0; i < Size.y; i++) vals[i] = array[i, column];
+        float[] vals = new float[Size.x];
+        for (int i = 0; i < Size.x; i++) vals[i] = array[i, column];
         return vals;
     }
     public float[] GetRow(int row)
     {
-        float[] vals = new float[Size.x];
-        for (int i = 0; i < Size.x; i++) vals[i] = array[row, i];
+        float[] vals = new float[Size.y];
+        for (int i = 0; i < Size.y; i++) vals[i] = array[row, i];
         return vals;
     }
 
     public void SetColumn(int column, float[] vals)
     {
-        if (vals.Length < Size.y)
+        if (vals.Length < Size.x)
             throw new InvalidSizeException("Array must contain enough values to fill the column.");
-        for (int i = 0; i < Size.y; i++) array[i, column] = vals[i];
+        for (int i = 0; i < Size.x; i++) array[i, column] = vals[i];
     }
     public void SetRow(int row, float[] vals)
     {
-        if (vals.Length < Size.x)
+        if (vals.Length < Size.y)
             throw new InvalidSizeException("Array must contain enough values to fill the row.");
-        for (int i = 0; i < Size.x; i++) array[row, i] = vals[i];
+        for (int i = 0; i < Size.y; i++) array[row, i] = vals[i];
     }
-    
-    public Matrix Adjugate()
+
+    public Matrix Adjugate() => Cofactor().Transpose();
+    public Matrix Cofactor()
     {
         Matrix dets = new(Size);
         Matrix[,] minors = Minors();
@@ -175,12 +183,12 @@ public struct Matrix : IMatrix<Matrix, Matrix>
     public float Determinant()
     {
         if (!IsSquare) throw new InvalidSizeException("Matrix must be square to calculate determinant.");
-        if (Size.x <= 0 || Size.y <= 0) return 0;
-        if (Size.x == 1 || Size.y == 1) return array[0, 0];
+        if (Size.x <= 0) return 0;
+        if (Size.x == 1) return array[0, 0];
 
         Matrix[] minors = Minors().GetRow(0, Size.x);
         float det = 0;
-        for (int i = 0; i < minors.Length; i++) det += minors[i].Determinant() * (i % 2 == 0 ? 1 : -1);
+        for (int i = 0; i < minors.Length; i++) det += array[0, i] * minors[i].Determinant() * (i % 2 == 0 ? 1 : -1);
 
         return det;
     }
@@ -188,45 +196,30 @@ public struct Matrix : IMatrix<Matrix, Matrix>
     {
         float d = Determinant();
         if (d == 0) throw new NoInverseException();
-        return Transpose().Adjugate() / d;
+        return Adjugate() / d;
     }
     public Matrix[,] Minors()
     {
-        // This will absolutely blow my mind if it works.
-        // Remember that whole "don't have a way to test" thing?
-
         if (!HasMinors) return new Matrix[0,0];
-
-        Int2 newSize = Size - Int2.One;
-        Matrix[,] array = new Matrix[Size.x, Size.y];
-        for (int r1 = 0; r1 < Size.y; r1++) for (int c1 = 0; c1 < Size.x; c1++)
-            {
-                Matrix m = new(newSize);
-                for (int r2 = 0; r2 < newSize.y; r2++) for (int c2 = 0; c2 < newSize.x; c2++)
-                    {
-                        int toSkip = c2 + r2 * newSize.y;
-                        for (int r3 = 0; r3 < newSize.y; r3++) for (int c3 = 0; c3 < newSize.x; c3++)
-                            {
-                                if (r3 == r1 || c3 == c1) continue;
-                                if (toSkip > 0)
-                                {
-                                    toSkip--;
-                                    continue;
-                                }
-                                m[c2, r2] = this.array[c3, r3];
-                                break;
-                            }
-                    }
-                array[c1, r1] = m;
-            }
-        return array;
+        Matrix[,] minors = new Matrix[Size.x, Size.y];
+        for (int r = 0; r < Size.x; r++) for (int c = 0; c < Size.y; c++) minors[r, c] = MinorOf(new(r, c));
+        return minors;
     }
     public Matrix Transpose()
     {
-        Matrix m = new(new(Size.y, Size.x));
-        for (int r = 0; r < Size.y; r++) m.SetColumn(r, GetRow(r));
-        for (int c = 0; c < Size.x; c++) m.SetRow(c, GetColumn(c));
-        return m;
+        Matrix @this = this;
+        return new(Size, (r, c) => @this[c, r]);
+    }
+
+    public Matrix MinorOf(Int2 index)
+    {
+        Matrix @this = this;
+        return new(@this.Size - Int2.One, delegate (int r, int c)
+        {
+            if (r >= index.x) r++;
+            if (c >= index.y) c++;
+            return @this[r, c];
+        });
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
@@ -246,9 +239,9 @@ public struct Matrix : IMatrix<Matrix, Matrix>
     public string ToString(string? provider)
     {
         string res = "";
-        for (int r = 0; r < Size.y; r++)
+        for (int r = 0; r < Size.x; r++)
         {
-            for (int c = 0; c < Size.x; c++) res += array[c, r].ToString(provider) + " ";
+            for (int c = 0; c < Size.y; c++) res += array[r, c].ToString(provider) + " ";
             res += "\n";
         }
         return res;
@@ -258,7 +251,7 @@ public struct Matrix : IMatrix<Matrix, Matrix>
         string res = "";
         for (int r = 0; r < Size.y; r++)
         {
-            for (int c = 0; c < Size.x; c++) res += array[c, r].ToString(provider) + " ";
+            for (int c = 0; c < Size.x; c++) res += array[r, c].ToString(provider) + " ";
             res += "\n";
         }
         return res;
@@ -272,14 +265,8 @@ public struct Matrix : IMatrix<Matrix, Matrix>
         for (int r = 0; r < Size.y; r++) for (int c = 0; c < Size.x; c++) yield return array[c, r];
     }
 
-    public float[] ToArray() => array.Flatten(Size);
+    public float[] ToArray() => array.Flatten(new(Size.y, Size.x));
     public float[,] ToArray2D() => array;
-    public Dictionary<Int2, float> ToDictionary()
-    {
-        Dictionary<Int2, float> dict = new();
-        for (int r = 0; r < Size.y; r++) for (int c = 0; c < Size.x; c++) dict.Add(new(c, r), array[c, r]);
-        return dict;
-    }
     public Fill<float> ToFill() => ToFillExtension.ToFill(this);
     public Fill2D<float> ToFill2D()
     {
@@ -292,8 +279,11 @@ public struct Matrix : IMatrix<Matrix, Matrix>
     public static Matrix operator -(Matrix m) => m.Inverse();
     public static Matrix operator -(Matrix a, Matrix b) => new(a.Size, (r, c) => a[r, c] - b[r, c]);
     public static Matrix operator *(Matrix a, float b) => new(a.Size, (r, c) => a[r, c] * b);
-    public static Matrix operator *(Matrix a, Matrix b) =>
-        new(new(a.Size.y, b.Size.x), (r, c) => Mathf.Dot(a.GetRow(r), b.GetColumn(c)));
+    public static Matrix operator *(Matrix a, Matrix b)
+    {
+        if (a.Size.y != b.Size.x) throw new InvalidSizeException("Incompatible Dimensions.");
+        return new(new(a.Size.x, b.Size.y), (r, c) => Mathf.Dot(a.GetRow(r), b.GetColumn(c)));
+    }
     public static Complex operator *(Matrix a, Complex b) => (Complex)(a * (Matrix)b);
     public static Quaternion operator *(Matrix a, Quaternion b) => (Quaternion)(a * (Matrix)b);
     public static Float2 operator *(Matrix a, Float2 b) => (Float2)(a * (Matrix)b);

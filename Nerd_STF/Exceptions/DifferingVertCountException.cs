@@ -3,6 +3,7 @@
 namespace Nerd_STF.Exceptions;
 
 [Serializable]
+[Obsolete("The Polygon struct is a garbage fire, and will be fixed in v2.4.0", false)]
 public class DifferingVertCountException : Nerd_STFException
 {
     public string? ParamName;

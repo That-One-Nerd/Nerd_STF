@@ -13,7 +13,7 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
     public static Vert Zero => new(0, 0, 0);
 
     public float Magnitude => position.Magnitude;
-    public Vert Normalized => new(this / Magnitude);
+    public Vert Normalized => this / Magnitude;
 
     public Float3 position;
 

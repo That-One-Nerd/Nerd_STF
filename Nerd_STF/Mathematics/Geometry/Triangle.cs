@@ -72,6 +72,7 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     private Vert p_a, p_b, p_c;
     private Line p_ab, p_bc, p_ca;
 
+    [Obsolete("This field doesn't account for the Z-axis. This will be fixed in v2.4.0")]
     public float Area => (float)Mathf.Absolute((A.position.x * B.position.y) + (B.position.x * C.position.y) +
         (C.position.x * A.position.y) - ((B.position.x * A.position.y) + (C.position.x * B.position.y) +
         (A.position.x * C.position.y))) * 0.5f;
@@ -273,5 +274,4 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public static implicit operator Triangle(Fill<Line> fill) => new(fill);
     public static implicit operator Triangle(Fill<float> fill) => new(fill);
     public static implicit operator Triangle(Fill<int> fill) => new(fill);
-    public static explicit operator Triangle(Polygon poly) => new(poly.Lines[0], poly.Lines[1], poly.Lines[2]);
 }

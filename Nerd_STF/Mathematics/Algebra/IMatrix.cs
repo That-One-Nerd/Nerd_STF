@@ -7,8 +7,6 @@ public interface IMatrix<T> : ICloneable, IEnumerable, IEquatable<T>, IGroup2D<f
     public float Determinant();
     public T Inverse();
     public T Transpose();
-
-    public Dictionary<Int2, float> ToDictionary();
 }
 
 public interface IMatrix<This, TMinor> : IMatrix<This> where This : IMatrix<This, TMinor>

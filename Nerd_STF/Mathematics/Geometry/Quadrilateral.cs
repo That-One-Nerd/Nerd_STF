@@ -94,6 +94,7 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     private Vert p_a, p_b, p_c, p_d;
     private Line p_ab, p_bc, p_cd, p_da;
 
+    [Obsolete("This field doesn't account for the Z-axis. This will be fixed in v2.4.0")]
     public float Area
     {
         get
@@ -332,6 +333,4 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     public static implicit operator Quadrilateral(Fill<Line> fill) => new(fill);
     public static implicit operator Quadrilateral(Fill<float> fill) => new(fill);
     public static implicit operator Quadrilateral(Fill<int> fill) => new(fill);
-    public static explicit operator Quadrilateral(Polygon poly) => new(poly.Lines[0], poly.Lines[1],
-                                                                       poly.Lines[2], poly.Lines[3]);
 }
