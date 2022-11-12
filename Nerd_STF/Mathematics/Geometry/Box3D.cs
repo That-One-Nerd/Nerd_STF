@@ -23,8 +23,9 @@ public struct Box3D : ICloneable, IContainer<Vert>, IEquatable<Box3D>
         }
     }
 
-    public float Area => size.x * size.y * size.z;
-    public float Perimeter => size.x * 2 + size.y * 2 + size.z * 2;
+    public float Perimeter => 2 * (size.x + size.y + size.z);
+    public float SurfaceArea => 2 * (size.x * size.y + size.y * size.z + size.x * size.z);
+    public float Volume => size.x * size.y * size.z;
 
     public Vert center;
     public Float3 size;

@@ -1,150 +1,106 @@
-# Nerd_STF v2.3.1.52
+# Nerd_STF v2.3.1
 
-***Read this to know what works and what doesn't!***
+***Everything has been tested and most things work!***
+
+**WARNING:**
+All of the matrix classes have had all of their constructors' row and column variables swapped. You'll have to switch all your variables around.
+Sorry for the inconvenience :(.
 
 The `v2.3.1.x` updates go through every single field and method in Nerd_STF to make sure it works correctly.
 You see, up until now I haven't actually tested literally anything at all. Partly because I didn't have the tools to and partly because I was lazy. But now, it's guarenteed to work in most cases (unless I like don't pick up some bug, you know).
 
-The following types have been checked for the most part and can be safe to use:
-- `Nerd_STF.FileType`
-- `Nerd_STF.Fill`
-- `Nerd_STF.Fill2D`
-- `Nerd_STF.Foreach`
-- `Nerd_STF.IClosest`
-- `Nerd_STF.IContainer`
-- `Nerd_STF.IEncapsulator`
-- `Nerd_STF.IGroup`
-- `Nerd_STF.IGroup2D`
-- `Nerd_STF.Logger`
-- `Nerd_STF.LogMessage`
-- `Nerd_STF.LogSeverity`
-- `Nerd_STF.Modifier`
-- `Nerd_STF.Modifier2D`
-- `Nerd_STF.Exceptions.DifferingVertCountException`
-- `Nerd_STF.Exceptions.DisconnectedLinesException`
-- `Nerd_STF.Exceptions.InvalidSizeException`
-- `Nerd_STF.Exceptions.Nerd_STFException`
-- `Nerd_STF.Exceptions.NoInverseException`
-- `Nerd_STF.Extensions.Container2DExtension`
-- `Nerd_STF.Extensions.ConversionExtension`
-- `Nerd_STF.Extensions.EquationExtension`
-- `Nerd_STF.Extensions.ToFillExtension`
-- `Nerd_STF.Graphics.CMYKA`
-- `Nerd_STF.Graphics.CMYKAByte`
-- `Nerd_STF.Graphics.ColorChannel`
-- `Nerd_STF.Graphics.HSVA`
-- `Nerd_STF.Graphics.HSVAByte`
-- `Nerd_STF.Graphics.IColor`
-- `Nerd_STF.Graphics.IColorByte`
-- `Nerd_STF.Graphics.IlluminationFlags`
-- `Nerd_STF.Graphics.IlluminationModel`
-- `Nerd_STF.Graphics.Image`
-- `Nerd_STF.Graphics.Material`
-- `Nerd_STF.Graphics.RGBA`
-- `Nerd_STF.Graphics.RGBAByte`
-- `Nerd_STF.Graphics.TextureConfig`
-- `Nerd_STF.Mathematics.Angle`
-- `Nerd_STF.Mathematics.Calculus`
-- `Nerd_STF.Mathematics.Equation`
-- `Nerd_STF.Mathematics.Float2`
-- `Nerd_STF.Mathematics.Float3`
-- `Nerd_STF.Mathematics.Float4`
-- `Nerd_STF.Mathematics.Int2`
-- `Nerd_STF.Mathematics.Int3`
-- `Nerd_STF.Mathematics.Int4`
-- `Nerd_STF.Mathematics.Mathf`
-- `Nerd_STF.Mathematics.Geometry.ISubdividable`
-- `Nerd_STF.Mathematics.NumberSystems.Complex`
-- `Nerd_STF.Mathematics.NumberSystems.Quaternion`
-- `Nerd_STF.Mathematics.Samples.Constants`
-- `Nerd_STF.Mathematics.Samples.Equations`
+Hi everyone! Everything has been checked now and most stuff works! Not everything, like the triangle and quadrilateral area stuff, but for the most part, it's all cool and good.
 
-The following types haven't been checked yet, and should still be taken with a grain of salt:
-- `Nerd_STF.Mathematics.Algebra.IMatrix`
-- `Nerd_STF.Mathematics.Algebra.Matrix`
-- `Nerd_STF.Mathematics.Algebra.Matrix2x2`
-- `Nerd_STF.Mathematics.Algebra.Matrix3x3`
-- `Nerd_STF.Mathematics.Algebra.Matrix4x4`
-- `Nerd_STF.Mathematics.Algebra.Vector2d`
-- `Nerd_STF.Mathematics.Algebra.Vector3d`
-- `Nerd_STF.Mathematics.Geometry.Box2D`
-- `Nerd_STF.Mathematics.Geometry.Box3D`
-- `Nerd_STF.Mathematics.Geometry.ITriangulatable`
-- `Nerd_STF.Mathematics.Geometry.Line`
-- `Nerd_STF.Mathematics.Geometry.Polygon`
-- `Nerd_STF.Mathematics.Geometry.Quadrilateral`
-- `Nerd_STF.Mathematics.Geometry.Sphere`
-- `Nerd_STF.Mathematics.Geometry.Triangle`
-- `Nerd_STF.Mathematics.Geometry.Vert`
+I've just now remembered how bad the Polygon struct was. It's getting remade. The v2.4.0 update will be mostly geometry focused, so that'll be the best time to figure out how to fix this stuff. The new Polygon struct will be much better, trust me.
 
-16 left to go.
+But all the matrix structs work like charm now! I'm honestly suprised they worked as well as they did before (especially the dynamic matrix). They can now be relied on.
 
-Honestly, most of the time taken for this update was spent on Quaternions. Turns out my multiply function was subtley wrong. Who knew!
-Just a relief to be done with it. The other stuff wasn't too much of a problem. Matrixes are probably going to be a huge pain if they don't work first try, though. That'll be in the next update, probably.
-
-I should also note that I just realized after way to long that the `.csproj` file isn't included in the Github. It's included in this new release, and sometime in the future I'll go back and add a correctly working `.csproj` file to all the other releases as well (with the exception of the legacy Nerd_STF 2021 versions likely. We'll see). I'll now not include the `/bin` build files. They'll be in the release and you can build it yourself if you need to now. Anyway, have fun.
+Next up is the documentation update. Stay tuned!
+(This may be another update with beta parts, but I'm not sure yet. We'll see).
 
 ```
 * Nerd_STF
+    * Exceptions
+        * DifferingVertCountException
+            = Marked as deprecated (uses deprecated struct `Polygon`)
     * Extensions
         * Container2DExtension
-            = Fixed `Flatten<T>(T[,], Int2)`
-            = `GetColumn<T>(T[,], int, int)` and `GetRow<T>(T[,], int, int)` have been fixed (They had swapped roles)
-        * ConversionExtension
-            + ToFill<T>(T[])
-            + ToFill<T>(T[,], Int2)
-            + ToFill2D<T>(T[,])
-        * EquationExtension
-            = Fixed `Scale(Equation, float, ScaleType)` by swapping all instances of `x` and `value` (oops)
-            = Moved `ScaleType` out of parent class `EquationExtension` and into namespace `Nerd_STF`
-    * Geometry
-        * ITriangulatable
-            + TriangulateAll<T>(T[]) where T : ITriangulatable
-    * Graphics
-        + Renamed `IColor` to `IColorFloat`
-        = Made IColor an object both `IColorFloat` and `IColorByte` inherit from.
-        * CMYKA
-            = Made `ToRGBA()` include the alpha value of the color.
-        * CMYKAByte
-            = In `ToHSVA()` and `ToHSVAByte()`, swapped some conversions from `RGBA` to `CMYKA`
-        * HSVA
-            = Made `ToRGBA()` include the alpha value of the color.
-        * Image
-            - Removed some useless constructors
-            = Fixed some broken constructors
+            + GetSize<T>(T[,])
+            + SwapDimensions<T>(T[,], Int2?)
+            * Flatten<T>(T[,])
+                = Replaced a `size` parameter from an `Int2` to an `Int2?`
     * Mathematics
         * Algebra
-            * Vector2d
-                = Removed a default parameter value in `ToString(Angle.Type)` to prevent confusion.
-            * Vector3d                
-                + string ToString()
-                + string ToString(Angle.Type)
-                + string ToString(IFormatProvider, Angle.Type)
-                = Fixed `ToXYZ()`
-        * NumberSystems
-            * Complex
-                + operator ~(Complex)
-            * Quaternion
-                + Rotate(Float3)
-                + Rotate(Vector3d)
-                + operator ~(Quaternion)
-                - ToVector()
-                = Gave `IJK` proper get and set accessors.
-                = Renamed some terms in `ToString()`
-                = Fixed the `Quaternion.FromAngles(*)` methods to do the proper thing.
-                = Fixed `Quaternion.Rotate(Quaternion)`
-                = Fixed `Quaternion.Rotate(Float3)`
-                = Fixed `operator *(Quaternion, Quaternion)`
-                = Optimized `GetAxis()`
-                = Simplified `ToXYZ()`
-                = Swapped the order of `Rotate(Quaternion)`
-                = Made `GetAxis()` not accidentally create an infinite vector.
-        * Angle
-            + Complimentary
-            + Supplementary
-        * Float2
-            + operator *(Float2, Quaternion)
-        * Float3
-            + operator *(Float3, Quaternion)
-            = Fixed `ToVector()`
+            * IMatrix
+                - ToDictionary()
+            * Matrix
+                + Cofactor()
+                + IdentityIsh(Int2)
+                + MinorOf(Int2)
+                - ToDictionary()
+                = Fixed `Determinant()`
+                = Fixed `Minors()`
+                = Fixed `Inverse()`
+                = Made `Identity(Int2)` only work with square matricies (since that's only when an identity exists)
+                = Marked the struct as `readonly`
+                = Simplified `Transpose()`
+                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
+                = Swapped code for `Adjugate()` with `Cofactor()`
+            * Matrix2x2
+                + Cofactor()
+                + operator *(Matrix2x2, Float2)
+                + operator /(Matrix2x2, Float2)
+                - ToDictionary()
+                = Swapped code for `Adjugate()` with `Cofactor()`
+                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
+                = Fixed `this[int, int]` to compensate for the swapped variables.
+                = Fixed `operator -(Matrix2x2, Matrix2x2)` to not have an addition in one of the variables (fun).
+                = Fixed `Inverse()`
+                = Fixed `explicit operator Matrix2x2(Matrix)`
+            * Matrix3x3
+                + Cofactor()
+                + operator *(Matrix3x3, Float3)
+                + operator /(Matrix3x3, Float3)
+                - ToDictionary()
+                = Swapped code for `Adjugate()` with `Cofactor()`
+                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
+                = Fixed `this[int, int]` to compensate for the swapped variables.
+                = Fixed `Determinant()`
+                = Fixed `Inverse()`
+                = Fixed `explicit operator Matrix3x3(Matrix)`
+            * Matrix4x4
+                + Cofactor()
+                + override string ToString()
+                + operator *(Matrix4x4, Float4)
+                + operator /(Matrix4x4, Float4)
+                - ToDictionary()
+                = Swapped code for `Adjugate()` with `Cofactor()`
+                = Swapped row variables with column variables in all constructors (and methods that require those constructors).
+                = Fixed `this[int, int]` to compensate for the swapped variables.
+                = Fixed `Determinant()`
+                = Fixed a typo in `Absolute(Matrix4x4)`, `Ceiling(Matrix4x4)`, `Floor(Matrix4x4)`, and `Round(Matrix4x4)`
+                = Fixed a typo in `Row1`, `Row2`, `Row3`, and `Row4`. Oops.
+                = Fixed some missing elements in `SplitArray(Matrix4x4[])`
+                = Fixed `explicit operator Matrix4x4(Matrix)`
+        * Geometry
+            * Box2D
+                = Simplified some code in `Perimeter`
+            * Box3D
+                + SurfaceArea
+                = Renamed `Area` to `Volume`
+                = Simplified some code in `Perimeter`
+            * Polygon
+                = Marked as deprecated (will be redone in v2.4.0)
+                = Simplified collection initialization in `Triangulate()`
+            * Quadrilateral
+                - explicit operator Triangle(Polygon)
+                = Marked `Area` as deprecated (uses deprecated `Triangle.Area` field)
+            * Sphere
+                = Fixed `ClosestTo(Vert)`
+            * Triangle
+                - explicit operator Triangle(Polygon)
+                = Marked `Area` as deprecated (will be fixed in v2.4.0)
+            * Vert
+                = Marked as deprecated (will be removed in v2.4.0).
+                = Optimized `Normalized` to not clone more than required.
 ```

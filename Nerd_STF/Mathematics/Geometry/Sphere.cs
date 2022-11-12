@@ -91,7 +91,7 @@ public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, ICompara
 
     public bool Contains(Vert vert) => (center - vert).Magnitude <= radius;
 
-    public Vert ClosestTo(Vert vert) => Contains(vert) ? vert : ((vert - center).Normalized * radius) + vert;
+    public Vert ClosestTo(Vert vert) => Contains(vert) ? vert : ((vert - center).Normalized * radius) + center;
 
     public static Sphere operator +(Sphere a, Sphere b) => new(a.center + b.center, a.radius + b.radius);
     public static Sphere operator +(Sphere a, Vert b) => new(a.center + b, a.radius);

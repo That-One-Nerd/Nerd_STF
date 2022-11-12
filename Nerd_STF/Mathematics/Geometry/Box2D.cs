@@ -24,7 +24,7 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
     }
 
     public float Area => size.x * size.y;
-    public float Perimeter => size.x * 2 + size.y * 2;
+    public float Perimeter => 2 * (size.x + size.y);
 
     public Vert center;
     public Float2 size;

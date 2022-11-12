@@ -5,14 +5,14 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static Float4 Back => new(0, 0, -1, 0);
     public static Float4 Down => new(0, -1, 0, 0);
     [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
-        "This field will be removed in v2.4.0.", false)]
+              "This field will be removed in v2.4.0.", false)]
     public static Float4 Far => new(0, 0, 0, 1);
     public static Float4 Forward => new(0, 0, 1, 0);
     public static Float4 HighW => new(0, 0, 0, 1);
     public static Float4 Left => new(-1, 0, 0, 0);
     public static Float4 LowW => new(0, 0, 0, -1);
     [Obsolete("Field has been replaced by " + nameof(LowW) + ", because it has a better name. " +
-        "This field will be removed in v2.4.0.", false)]
+              "This field will be removed in v2.4.0.", false)]
     public static Float4 Near => new(0, 0, 0, -1);
     public static Float4 Right => new(1, 0, 0, 0);
     public static Float4 Up => new(0, 1, 0, 0);
