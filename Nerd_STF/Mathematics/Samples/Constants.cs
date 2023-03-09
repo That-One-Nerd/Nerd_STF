@@ -33,7 +33,7 @@ public static class Constants
     public const float Sqrt3 = 1.7320508076f;
     public const float Sqrt5 = 2.2360679775f;
     public const float Sqrt10 = 3.16227766017f;
-    public const float TwelthRoot2 = 1.05946309436f;
+    public const float TwelfthRoot2 = 1.05946309436f;
 
     public const float Cos0Deg = 1;
     public const float Cos30Deg = Sqrt3 / 2;
@@ -85,7 +85,7 @@ public static class Constants
     public const float ConnectiveConstant = 1.847759065f;
     public const float DeVicciTesseractConstant = 1.0074347568f;
     public const float EmbreeTrefethenConstant = 0.70258f;
-    public const float EulerMascheroniConstant = 0.5772156649f;
+    public const float EulerMascheroniConstant = EulerConstant;
     public const float ErdosBorweinConstant = 1.6066951524f;
     public const float ErdosTenenbaumFordConstant = 0.8607133205f;
     public const float FeigenbaumConstant1 = 4.6692016091f;
@@ -108,7 +108,7 @@ public static class Constants
     public const float LandauConstant = (0.5f + 0.54326f) / 2;
     public const float LandauThirdConstant = (0.5f + 0.7853f) / 2;
     public const float LandauRamanujanConstant = 0.7642236535f;
-    public const float LiebSquareIceConstant = 8 / (3 * Sqrt3);
+    public const float LiebSquareIceConstant = 8 * Sqrt3 / 9;
     public const float LemniscateConstant = 2.6220575542f;
     public const float LevyConstant1 = Pi * Pi / (12 * Ln2);
     public const float LevyConstant2 = 3.2758229187f;
@@ -141,8 +141,8 @@ public static class Constants
     public const float FirstNielsenRamanujanConstant = Pi * Pi / 12;
     public const float SecondDuBoisRaymondConstant = (E * E - 7) / 2;
     public const float SecondFavardConstant = 1.2337005501f;
-    public const float SecondHermiteConstant = 2 / Sqrt3;
-    public const float UniversalHyperbolicConstant = 2.2955871493f;
+    public const float SecondHermiteConstant = 2 * Sqrt3 / 9;
+    public const float UniversalParabolicConstant = 2.2955871493f;
 
     public const float DottieNumber = 0.7390851332f;
     public const float FractalDimensionOfTheApollonianPackingOfCircles = 1.305688f;
@@ -152,5 +152,5 @@ public static class Constants
     public const float PlasticNumber = 1.3247179572f;
     public const float LaplaceLimit = 0.6627434193f;
     public const float LogarithmicCapacityOfTheUnitDisk = 0.5901702995f;
-    public const float RegularPaperfoldingSequence = 0.8507361882f;
+    public const float RegularPaperfoldingConstant = 0.8507361882f;
 }

@@ -1,9 +1,9 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct Image : ICloneable, IEnumerable, IEquatable<Image>
+public class Image : ICloneable, IEnumerable<IColor>, IEquatable<Image>
 {
-    public IColor[,] Pixels { get; init; }
-    public Int2 Size { get; init; }
+    public IColor[,] Pixels { get; private set; }
+    public Int2 Size { get; private set; }
 
     public Image(int width, int height)
     {
@@ -58,7 +58,7 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
 
     public object Clone() => new Image(Size, Pixels);
 
-    public bool Equals(Image other) => Pixels == other.Pixels;
+    public bool Equals(Image? other) => other is not null && Pixels == other.Pixels;
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         if (obj == null) return base.Equals(obj);
@@ -110,7 +110,7 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
         for (int y = 0; y < Size.y; y++) for (int x = 0; x < Size.x; x++)
             {
                 HSVA col = Pixels[x, y].ToHSVA();
-                col.S = (set ? 0 : col.S) * value;
+                col.S = (set ? 1 : col.S) * value;
                 Pixels[x, y] = col;
             }
     }
@@ -133,7 +133,8 @@ public struct Image : ICloneable, IEnumerable, IEquatable<Image>
                 RGBA col = Pixels[Mathf.Floor(f.x * Size.x), Mathf.Floor(f.y * Size.y)].ToRGBA();
                 img[x, y] = col;
             }
-        this = img;
+        Pixels = img.Pixels;
+        Size = img.Size;
     }
 
     public IColor[] ToArray()

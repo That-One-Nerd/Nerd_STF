@@ -1,10 +1,13 @@
-﻿namespace Nerd_STF.Mathematics.Algebra;
+﻿using System.Buffers;
 
-public readonly struct Matrix : IMatrix<Matrix, Matrix>
+namespace Nerd_STF.Mathematics.Algebra;
+
+public class Matrix : IMatrix<Matrix, Matrix>
 {
     public static Matrix Identity(Int2 size)
     {
-        if (size.x != size.y) throw new InvalidSizeException("Can only create an identity matrix of a square matrix.");
+        if (size.x != size.y) throw new InvalidSizeException("Can only create an identity matrix of a square matrix." +
+            " You may want to use " + nameof(IdentityIsh) + " instead.");
         Matrix m = Zero(size);
         for (int i = 0; i < size.x; i++) m[i, i] = 1;
         return m;
@@ -105,6 +108,51 @@ public readonly struct Matrix : IMatrix<Matrix, Matrix>
         get => this[index.x, index.y];
         set => this[index.x, index.y] = value;
     }
+    public float this[Index r, Index c]
+    {
+        get
+        {
+            int row = r.IsFromEnd ? Size.x - r.Value : r.Value,
+                col = c.IsFromEnd ? Size.y - c.Value : c.Value;
+            return array[row, col];
+        }
+        set
+        {
+            int row = r.IsFromEnd ? Size.x - r.Value : r.Value,
+                col = c.IsFromEnd ? Size.y - c.Value : c.Value;
+            array[row, col] = value;
+        }
+    }
+    public Matrix this[Range rs, Range cs]
+    {
+        get
+        {
+            int rowStart = rs.Start.IsFromEnd ? Size.x - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? Size.x - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? Size.y - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? Size.y - cs.End.Value : cs.End.Value;
+
+            Matrix newMatrix = new((rowEnd - rowStart - 1, colEnd - colStart - 1));
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    newMatrix[r, c] = array[r, c];
+            return newMatrix;
+        }
+        set
+        {
+            int rowStart = rs.Start.IsFromEnd ? Size.x - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? Size.x - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? Size.y - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? Size.y - cs.End.Value : cs.End.Value;
+
+            if (value.Size != (rowEnd - rowStart - 1, colEnd - colStart - 1))
+                throw new InvalidSizeException("Matrix has invalid size.");
+
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    array[r, c] = value[r, c];
+        }
+    }
 
     public static Matrix Absolute(Matrix val) => new(val.Size, (r, c) => Mathf.Absolute(val[r, c]));
     public static Matrix Ceiling(Matrix val) => new(val.Size, (r, c) => Mathf.Ceiling(val[r, c]));
@@ -192,10 +240,11 @@ public readonly struct Matrix : IMatrix<Matrix, Matrix>
 
         return det;
     }
-    public Matrix Inverse()
+    public Matrix? Inverse()
     {
         float d = Determinant();
-        if (d == 0) throw new NoInverseException();
+        if (d == 0) return null;
+
         return Adjugate() / d;
     }
     public Matrix[,] Minors()
@@ -233,25 +282,18 @@ public readonly struct Matrix : IMatrix<Matrix, Matrix>
 
         return base.Equals(obj);
     }
-    public bool Equals(Matrix other) => array == other.array;
+    public bool Equals(Matrix? other)
+    {
+        if (other is null) return false;
+        return array.Equals(other.array);
+    }
     public override int GetHashCode() => array.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider)
+    public override string ToString()
     {
         string res = "";
         for (int r = 0; r < Size.x; r++)
         {
-            for (int c = 0; c < Size.y; c++) res += array[r, c].ToString(provider) + " ";
-            res += "\n";
-        }
-        return res;
-    }
-    public string ToString(IFormatProvider provider)
-    {
-        string res = "";
-        for (int r = 0; r < Size.y; r++)
-        {
-            for (int c = 0; c < Size.x; c++) res += array[r, c].ToString(provider) + " ";
+            for (int c = 0; c < Size.y; c++) res += array[r, c] + " ";
             res += "\n";
         }
         return res;
@@ -276,7 +318,7 @@ public readonly struct Matrix : IMatrix<Matrix, Matrix>
     public List<float> ToList() => ToArray().ToList();
 
     public static Matrix operator +(Matrix a, Matrix b) => new(a.Size, (r, c) => a[r, c] + b[r, c]);
-    public static Matrix operator -(Matrix m) => m.Inverse();
+    public static Matrix? operator -(Matrix m) => m.Inverse();
     public static Matrix operator -(Matrix a, Matrix b) => new(a.Size, (r, c) => a[r, c] - b[r, c]);
     public static Matrix operator *(Matrix a, float b) => new(a.Size, (r, c) => a[r, c] * b);
     public static Matrix operator *(Matrix a, Matrix b)
@@ -292,7 +334,12 @@ public readonly struct Matrix : IMatrix<Matrix, Matrix>
     public static Vector2d operator *(Matrix a, Vector2d b) => (Vector2d)(a * (Matrix)b);
     public static Vector3d operator *(Matrix a, Vector3d b) => (Vector3d)(a * (Matrix)b);
     public static Matrix operator /(Matrix a, float b) => new(a.Size, (r, c) => a[r, c] / b);
-    public static Matrix operator /(Matrix a, Matrix b) => a * b.Inverse();
+    public static Matrix operator /(Matrix a, Matrix b)
+    {
+        Matrix? bInv = b.Inverse();
+        if (bInv is null) throw new NoInverseException(b);
+        return a * bInv;
+    }
     public static Complex operator /(Matrix a, Complex b) => (Complex)(a / (Matrix)b);
     public static Quaternion operator /(Matrix a, Quaternion b) => (Quaternion)(a / (Matrix)b);
     public static Float2 operator /(Matrix a, Float2 b) => (Float2)(a / (Matrix)b);

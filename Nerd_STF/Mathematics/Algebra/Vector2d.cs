@@ -1,6 +1,11 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
+public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
+    IClampMagnitude<Vector2d, float>, IComparable<Vector2d>, ICross<Vector2d, Vector3d>,
+    IDot<Vector2d, float>, IEquatable<Vector2d>, IFromTuple<Vector2d, (Angle angle, float mag)>,
+    ILerp<Vector2d, float>, IMax<Vector2d>, IMagnitude<float>, IMedian<Vector2d>, IMin<Vector2d>,
+    IPresets2D<Vector2d>, ISplittable<Vector2d, (Angle[] rots, float[] mags)>, ISubtract<Vector2d>,
+    ISum<Vector2d>
 {
     public static Vector2d Down => new(Angle.Down);
     public static Vector2d Left => new(Angle.Left);
@@ -9,6 +14,12 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
 
     public static Vector2d One => new(Angle.Zero);
     public static Vector2d Zero => new(Angle.Zero, 0);
+
+    public float Magnitude
+    {
+        get => magnitude;
+        set => magnitude = value;
+    }
 
     public Vector2d Inverse => new(-theta, magnitude);
     public Vector2d Normalized => new(theta, 1);
@@ -86,7 +97,7 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
         return val;
     }
 
-    public static (Angle[] Rots, float[] Mags) SplitArray(params Vector2d[] vals)
+    public static (Angle[] rots, float[] mags) SplitArray(params Vector2d[] vals)
     {
         Angle[] rots = new Angle[vals.Length];
         float[] mags = new float[vals.Length];
@@ -99,21 +110,11 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
     }
 
     public int CompareTo(Vector2d other) => magnitude.CompareTo(other.magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Vector2d)) return base.Equals(obj);
-        return Equals((Vector2d)obj);
-    }
     public bool Equals(Vector2d other) => theta == other.theta && magnitude == other.magnitude;
-    public override int GetHashCode() => theta.GetHashCode() ^ magnitude.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(Angle.Type outputType) => ToString((string?)null, outputType);
-    public string ToString(string? provider, Angle.Type outputType = Angle.Type.Degrees) =>
-        "Mag: " + magnitude.ToString(provider) + " Rot: " + theta.ToString(provider, outputType);
-    public string ToString(IFormatProvider provider, Angle.Type outputType = Angle.Type.Degrees) =>
-        "Mag: " + magnitude.ToString(provider) + " Rot: " + theta.ToString(provider, outputType);
-
-    public object Clone() => new Vector2d(theta, magnitude);
+    public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() => ToString(Angle.Type.Degrees);
+    public string ToString(Angle.Type outputType) =>
+        nameof(Vector2d) + " { Mag = " + magnitude + ", Rot = " + theta.ToString(outputType) + " }";
 
     public Float2 ToXYZ() => new Float2(Mathf.Cos(theta), Mathf.Sin(theta)) * magnitude;
 
@@ -124,8 +125,6 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
     public static Vector2d operator *(Vector2d a, Matrix b) => (Vector2d)((Matrix)a * b);
     public static Vector2d operator /(Vector2d a, float b) => new(a.theta, a.magnitude / b);
     public static Vector2d operator /(Vector2d a, Matrix b) => (Vector2d)((Matrix)a / b);
-    public static bool operator ==(Vector2d a, Vector2d b) => a.Equals(b);
-    public static bool operator !=(Vector2d a, Vector2d b) => !a.Equals(b);
     public static bool operator >(Vector2d a, Vector2d b) => a.CompareTo(b) > 0;
     public static bool operator <(Vector2d a, Vector2d b) => a.CompareTo(b) < 0;
     public static bool operator >=(Vector2d a, Vector2d b) => a == b || a > b;
@@ -139,4 +138,5 @@ public struct Vector2d : ICloneable, IComparable<Vector2d>, IEquatable<Vector2d>
     public static explicit operator Vector2d(Matrix m) => ((Float2)m).ToVector();
     public static explicit operator Vector2d(Vert val) => (Vector2d)val.ToVector();
     public static explicit operator Vector2d(Vector3d val) => new(val.yaw, val.magnitude);
+    public static implicit operator Vector2d((Angle angle, float mag) val) => new(val.angle, val.mag);
 }

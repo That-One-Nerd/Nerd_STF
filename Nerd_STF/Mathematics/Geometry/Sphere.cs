@@ -1,7 +1,9 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, IComparable<float>, IContainer<Vert>,
-    IEquatable<Sphere>, IEquatable<float>
+public record class Sphere : IAverage<Sphere>, ICeiling<Sphere>, IClamp<Sphere>, IClosestTo<Vert>,
+    IComparable<Sphere>, IComparable<float>, IContains<Vert>, IEquatable<Sphere>, IEquatable<float>, IFloor<Sphere>,
+    IFromTuple<Sphere, (Vert center, float radius)>, ILerp<Sphere, float>, IMax<Sphere>, IMedian<Sphere>,
+    IMin<Sphere>, IRound<Sphere>, ISplittable<Sphere, (Vert[] centers, float[] radii)>
 {
     public static Sphere Unit => new(Vert.Zero, 1);
 
@@ -54,6 +56,7 @@ public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, ICompara
         (Vert[] centers, float[] radii) = SplitArray(vals);
         return new(Vert.Min(centers), Mathf.Min(radii));
     }
+    public static Sphere Round(Sphere val) => new(Vert.Round(val.center), Mathf.Round(val.radius));
 
     public static (Vert[] centers, float[] radii) SplitArray(params Sphere[] spheres)
     {
@@ -67,31 +70,37 @@ public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, ICompara
         return (centers, radii);
     }
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null) return base.Equals(obj);
-        Type type = obj.GetType();
-        if (type == typeof(Sphere)) return Equals((Sphere)obj);
-        if (type == typeof(float)) return Equals((float)obj);
-        return base.Equals(obj);
-    }
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public bool Equals(float other) => Volume == other;
-    public bool Equals(Sphere other) => center == other.center && radius == other.radius;
-    public override int GetHashCode() => center.GetHashCode() ^ radius.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) => "Center: " + center.ToString(provider)
-        + " Radius: " + radius.ToString(provider);
-    public string ToString(IFormatProvider provider) => "Center: " + center.ToString(provider)
-        + " Radius: " + radius.ToString(provider);
+    public virtual bool Equals(Sphere? other)
+    {
+        if (other is null) return false;
+        return center == other.center && radius == other.radius;
+    }
+    public override int GetHashCode() => base.GetHashCode();
 
-    public object Clone() => new Sphere(center, radius);
-
-    public int CompareTo(Sphere sphere) => Volume.CompareTo(sphere.Volume);
+    public int CompareTo(Sphere? other)
+    {
+        if (other is null) return -1;
+        return Volume.CompareTo(other.Volume);
+    }
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public int CompareTo(float volume) => Volume.CompareTo(volume);
 
     public bool Contains(Vert vert) => (center - vert).Magnitude <= radius;
 
     public Vert ClosestTo(Vert vert) => Contains(vert) ? vert : ((vert - center).Normalized * radius) + center;
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("Center = ");
+        builder.Append(builder);
+        builder.Append(", Radius = ");
+        builder.Append(radius);
+        return true;
+    }
 
     public static Sphere operator +(Sphere a, Sphere b) => new(a.center + b.center, a.radius + b.radius);
     public static Sphere operator +(Sphere a, Vert b) => new(a.center + b, a.radius);
@@ -103,16 +112,37 @@ public struct Sphere : ICloneable, IClosest<Vert>, IComparable<Sphere>, ICompara
     public static Sphere operator *(Sphere a, float b) => new(a.center * b, a.radius * b);
     public static Sphere operator /(Sphere a, Sphere b) => new(a.center * b.center, a.radius * b.radius);
     public static Sphere operator /(Sphere a, float b) => new(a.center * b, a.radius * b);
-    public static bool operator ==(Sphere a, Sphere b) => a.Equals(b);
-    public static bool operator !=(Sphere a, Sphere b) => !a.Equals(b);
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator ==(Sphere a, float b) => a.Equals(b);
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator !=(Sphere a, float b) => !a.Equals(b);
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator >(Sphere a, Sphere b) => a.CompareTo(b) > 0;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator <(Sphere a, Sphere b) => a.CompareTo(b) < 0;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator >(Sphere a, float b) => a.CompareTo(b) > 0;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator <(Sphere a, float b) => a.CompareTo(b) < 0;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator >=(Sphere a, Sphere b) => a > b || a == b;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator <=(Sphere a, Sphere b) => a < b || a == b;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator >=(Sphere a, float b) => a > b || a == b;
+    [Obsolete("This method is a bit ambiguous. You should instead compare " + nameof(radius) + "es directly. " +
+              "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator <=(Sphere a, float b) => a < b || a == b;
+
+    public static implicit operator Sphere((Vert center, float radius) val) =>
+        new(val.center, val.radius);
 }

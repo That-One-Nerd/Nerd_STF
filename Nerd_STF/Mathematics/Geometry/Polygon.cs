@@ -1,7 +1,7 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-[Obsolete("This struct is a garbage fire. This will be completely redesigned in v2.4.0")]
-public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdividable<Polygon>, ITriangulatable
+[Obsolete("This struct is a garbage fire. This will be completely redesigned in v2.5.0")]
+public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivide<Polygon>, ITriangulate
 {
     public Line[] Lines
     {
@@ -83,8 +83,8 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             while (true)
             {
                 Line? v = fill(i);
-                if (!v.HasValue) break;
-                lines.Add(v.Value);
+                if (v is null) break;
+                lines.Add(v);
             }
             this = new(lines.ToArray());
         }
@@ -192,24 +192,6 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             for (int i = 0; i < res.Length; i++) res[i] = Line.Lerp(lines[0][i], lines[1][i], t, clamp);
             return new(res);
         }
-    public static Polygon Max(params Polygon[] vals)
-        {
-            if (!CheckVerts(vals)) throw new DifferingVertCountException(nameof(vals), vals);
-            if (vals.Length < 1) return default;
-
-            Line[][] lines = new Line[vals.Length][];
-            for (int i = 0; i < vals.Length; i++) lines[i] = vals[i].Lines;
-
-            Line[] res = new Line[vals[0].Lines.Length];
-            for (int i = 0; i < res.Length; i++)
-            {
-                Line[] row = new Line[vals.Length];
-                for (int j = 0; j < vals[0].Lines.Length; j++) row[j] = vals[j].Lines[i];
-                res[i] = Line.Max(row);
-            }
-
-            return new(res);
-        }
     public static Polygon Median(params Polygon[] vals)
         {
             if (!CheckVerts(vals)) throw new DifferingVertCountException(nameof(vals), vals);
@@ -224,24 +206,6 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
                 Line[] row = new Line[vals.Length];
                 for (int j = 0; j < vals[0].Lines.Length; j++) row[j] = vals[j].Lines[i];
                 res[i] = Line.Median(row);
-            }
-
-            return new(res);
-        }
-    public static Polygon Min(params Polygon[] vals)
-        {
-            if (!CheckVerts(vals)) throw new DifferingVertCountException(nameof(vals), vals);
-            if (vals.Length < 1) return default;
-
-            Line[][] lines = new Line[vals.Length][];
-            for (int i = 0; i < vals.Length; i++) lines[i] = vals[i].Lines;
-
-            Line[] res = new Line[vals[0].Lines.Length];
-            for (int i = 0; i < res.Length; i++)
-            {
-                Line[] row = new Line[vals.Length];
-                for (int j = 0; j < vals[0].Lines.Length; j++) row[j] = vals[j].Lines[i];
-                res[i] = Line.Min(row);
             }
 
             return new(res);
@@ -266,19 +230,12 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
             return Lines == other.Lines;
         }
     public override int GetHashCode() => Lines.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider)
-        {
-            string s = "";
-            for (int i = 0; i < Lines.Length; i++) s += "L" + i + ": " + Lines[i].ToString(provider) + " ";
-            return s;
-        }
-    public string ToString(IFormatProvider provider)
-        {
-            string s = "";
-            for (int i = 0; i < Lines.Length; i++) s += "L" + i + ": " + Lines[i].ToString(provider) + " ";
-            return s;
-        }
+    public override string ToString()
+    {
+        string s = "";
+        for (int i = 0; i < Lines.Length; i++) s += "L" + i + ": " + Lines[i] + " ";
+        return s;
+    }
 
     public object Clone() => new Polygon(Lines);
 
@@ -375,7 +332,8 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Vert>, ISubdivid
                 }
             }
 
-            if (closest == null) throw new("Unknown error triangulating the polygon.");
+            if (closest == null)
+                throw new Nerd_STFException("Unknown error triangulating the polygon.");
 
             if (closest.Value.posB > closest.Value.posA)
                 closest = (closest.Value.posB, closest.Value.posA, closest.Value.line);

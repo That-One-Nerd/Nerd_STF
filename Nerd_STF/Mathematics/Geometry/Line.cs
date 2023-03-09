@@ -1,7 +1,11 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using Nerd_STF.Mathematics.Abstract;
 
-public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<Vert>, IEquatable<Line>,
-    IGroup<Vert>, ISubdividable<Line[]>
+namespace Nerd_STF.Mathematics.Geometry;
+
+public record class Line : IAbsolute<Line>, IAverage<Line>, ICeiling<Line>, IClamp<Line>, IClosestTo<Vert>,
+    IComparable<Line>, IContains<Vert>, IEquatable<Line>, IFloor<Line>, IFromTuple<Line, (Vert start, Vert end)>,
+    IGroup<Vert>, IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Line, float>, IMedian<Line>, IPresets3D<Line>,
+    IRound<Line>, ISplittable<Line, (Vert[] starts, Vert[] ends)>, ISubdivide<Line[]>
 {
     public static Line Back => new(Vert.Zero, Vert.Back);
     public static Line Down => new(Vert.Zero, Vert.Down);
@@ -56,6 +60,28 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
             }
         }
     }
+    public Vert this[Index index]
+    {
+        get => this[index.IsFromEnd ? 2 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 2 - index.Value : index.Value] = value;
+    }
+    public Vert[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            List<Vert> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Line Absolute(Line val) => new(Vert.Absolute(val.a), Vert.Absolute(val.b));
     public static Line Average(params Line[] vals)
@@ -74,16 +100,7 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
         (Vert[] starts, Vert[] ends) = SplitArray(vals);
         return new(Vert.Median(starts), Vert.Median(ends));
     }
-    public static Line Max(params Line[] vals)
-    {
-        (Vert[] starts, Vert[] ends) = SplitArray(vals);
-        return new(Vert.Max(starts), Vert.Max(ends));
-    }
-    public static Line Min(params Line[] vals)
-    {
-        (Vert[] starts, Vert[] ends) = SplitArray(vals);
-        return new(Vert.Min(starts), Vert.Min(ends));
-    }
+    public static Line Round(Line val) => new(Vert.Round(val.a), Vert.Round(val.b));
 
     public static (Vert[] starts, Vert[] ends) SplitArray(params Line[] lines)
     {
@@ -96,22 +113,20 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
         return (starts, ends);
     }
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Line? other)
     {
-        if (obj == null || obj.GetType() != typeof(Line)) return base.Equals(obj);
-        return Equals((Line)obj);
+        if (other is null) return false;
+        return a == other.a && b == other.b;
     }
-    public bool Equals(Line other) => a == other.a && b == other.b;
-    public override int GetHashCode() => a.GetHashCode() ^ b.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "A: " + a.ToString(provider) + " B: " + b.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "A: " + a.ToString(provider) + " B: " + b.ToString(provider);
+    public override int GetHashCode() => base.GetHashCode();
 
-    public object Clone() => new Line(a, b);
-
-    public int CompareTo(Line line) => Length.CompareTo(line.Length);
+    [Obsolete("This method is a bit ambiguous. You should instead compare " +
+        nameof(Length) + "s directly.")]
+    public int CompareTo(Line? line)
+    {
+        if (line is null) return -1;
+        return Length.CompareTo(line.Length);
+    }
 
     public bool Contains(Vert vert)
     {
@@ -173,6 +188,15 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public List<float> ToFloatList() => new() { a.position.x, a.position.y, a.position.z,
                                                 b.position.x, b.position.y, b.position.z };
 
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("A = ");
+        builder.Append(a);
+        builder.Append(", B = ");
+        builder.Append(b);
+        return true;
+    }
+
     public static Line operator +(Line a, Line b) => new(a.a + b.a, a.b + b.b);
     public static Line operator +(Line a, Vert b) => new(a.a + b, a.b + b);
     public static Line operator -(Line l) => new(-l.a, -l.b);
@@ -184,11 +208,17 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static Line operator /(Line a, Line b) => new(a.a / b.a, a.b / b.b);
     public static Line operator /(Line a, Vert b) => new(a.a / b, a.b / b);
     public static Line operator /(Line a, float b) => new(a.a / b, a.b / b);
-    public static bool operator ==(Line a, Line b) => a.Equals(b);
-    public static bool operator !=(Line a, Line b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Length) + "s directly.")]
     public static bool operator >(Line a, Line b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Length) + "s directly.")]
     public static bool operator <(Line a, Line b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Length) + "s directly.")]
     public static bool operator >=(Line a, Line b) => a > b || a == b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Length) + "s directly.")]
     public static bool operator <=(Line a, Line b) => a < b || a == b;
 
     public static implicit operator Line(Fill<Vert> fill) => new(fill);
@@ -196,4 +226,5 @@ public struct Line : ICloneable, IClosest<Vert>, IComparable<Line>, IContainer<V
     public static implicit operator Line(Fill<Int3> fill) => new(fill);
     public static implicit operator Line(Fill<float> fill) => new(fill);
     public static implicit operator Line(Fill<int> fill) => new(fill);
+    public static implicit operator Line((Vert start, Vert end) val) => new(val.start, val.end);
 }

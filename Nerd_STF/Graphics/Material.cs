@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Graphics;
+﻿using Nerd_STF.Graphics.Abstract;
+
+namespace Nerd_STF.Graphics;
 
 public struct Material : ICloneable, IEquatable<Material>
 {

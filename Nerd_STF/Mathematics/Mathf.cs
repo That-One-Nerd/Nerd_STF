@@ -105,8 +105,7 @@ public static class Mathf
 
     public static int[] Factors(int val)
     {
-        List<int> factors = new();
-        factors.Add(1);
+        List<int> factors = new() { 1 };
         for (int i = 2; i < val; i++) if (val % i == 0) factors.Add(i);
         factors.Add(val);
         return factors.ToArray();
@@ -144,14 +143,14 @@ public static class Mathf
         if (clamp) v = Clamp(v, Min(a, b), Max(a, b));
         return v;
     }
-    public static int Lerp(int a, int b, float value, bool clamp = true) => (int)Lerp((float)a, b, value, clamp);
+    public static int Lerp(int a, int b, float t, bool clamp = true) => (int)Lerp((float)a, b, t, clamp);
 
     public static Equation MakeEquation(Dictionary<float, float> vals) => delegate (float x)
     {
         if (vals.Count < 1) throw new UndefinedException();
         if (vals.Count == 1) return vals.Values.First();
 
-        if (vals.ContainsKey(x)) return vals[x];
+        if (vals.TryGetValue(x, out float value)) return value;
         float? min, max;
 
         if (x < (min = vals.Keys.Min()))
@@ -212,9 +211,9 @@ public static class Mathf
         foreach (int i in vals) val = i > val ? i : val;
         return val;
     }
-    public static T? Max<T>(params T[] vals) where T : IComparable<T>
+    public static T Max<T>(params T[] vals) where T : IComparable<T>
     {
-        if (vals.Length < 1) return default;
+        if (vals.Length < 1) return default!;
         T val = vals[0];
         foreach (T t in vals) val = t.CompareTo(val) > 0 ? t : val;
         return val;
@@ -254,9 +253,9 @@ public static class Mathf
         foreach (int i in vals) val = i < val ? i : val;
         return val;
     }
-    public static T? Min<T>(params T[] vals) where T : IComparable<T>
+    public static T Min<T>(params T[] vals) where T : IComparable<T>
     {
-        if (vals.Length < 1) return default;
+        if (vals.Length < 1) return default!;
         T val = vals[0];
         foreach (T t in vals) val = t.CompareTo(val) < 0 ? t : val;
         return val;
@@ -327,8 +326,7 @@ public static class Mathf
         if (pow == 1) return num;
         if (pow < 1) return 0;
         int val = 1;
-        int abs = Absolute(pow);
-        for (int i = 0; i < abs; i++) val = val * num % mod;
+        for (int i = 0; i < pow; i++) val = val * num % mod;
         return val;
     }
 

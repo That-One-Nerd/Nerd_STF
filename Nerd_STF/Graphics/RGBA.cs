@@ -1,6 +1,8 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct RGBA : IColorFloat, IEquatable<RGBA>
+public record struct RGBA : IAverage<RGBA>, IClamp<RGBA>, IColorFloat<RGBA>, IEquatable<RGBA>, IIndexAll<float>,
+    IIndexRangeAll<float>, ILerp<RGBA, float>, IMedian<RGBA>,
+    ISplittable<RGBA, (float[] Rs, float[] Gs, float[] Bs, float[] As)>
 {
     public static RGBA Black => new(0, 0, 0);
     public static RGBA Blue => new(0, 0, 1);
@@ -91,6 +93,28 @@ public struct RGBA : IColorFloat, IEquatable<RGBA>
             }
         }
     }
+    public float this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public float[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<float> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static RGBA Average(params RGBA[] vals)
     {
@@ -98,15 +122,11 @@ public struct RGBA : IColorFloat, IEquatable<RGBA>
         for (int i = 0; i < vals.Length; i++) val += vals[i];
         return val / vals.Length;
     }
-    public static RGBA Ceiling(RGBA val) =>
-        new(Mathf.Ceiling(val.R), Mathf.Ceiling(val.G), Mathf.Ceiling(val.B), Mathf.Ceiling(val.A));
     public static RGBA Clamp(RGBA val, RGBA min, RGBA max) =>
         new(Mathf.Clamp(val.R, min.R, max.R),
             Mathf.Clamp(val.G, min.G, max.G),
             Mathf.Clamp(val.B, min.B, max.B),
             Mathf.Clamp(val.A, min.A, max.A));
-    public static RGBA Floor(RGBA val) =>
-        new(Mathf.Floor(val.R), Mathf.Floor(val.G), Mathf.Floor(val.B), Mathf.Floor(val.A));
     public static RGBA Lerp(RGBA a, RGBA b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.R, b.R, t, clamp), Mathf.Lerp(a.G, b.G, t, clamp), Mathf.Lerp(a.B, b.B, t, clamp),
             Mathf.Lerp(a.A, b.A, t, clamp));
@@ -122,18 +142,6 @@ public struct RGBA : IColorFloat, IEquatable<RGBA>
         RGBA valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
-    public static RGBA Max(params RGBA[] vals)
-    {
-        (float[] Rs, float[] Gs, float[] Bs, float[] As) = SplitArray(vals);
-        return new(Mathf.Max(Rs), Mathf.Max(Gs), Mathf.Max(Bs), Mathf.Max(As));
-    }
-    public static RGBA Min(params RGBA[] vals)
-    {
-        (float[] Rs, float[] Gs, float[] Bs, float[] As) = SplitArray(vals);
-        return new(Mathf.Min(Rs), Mathf.Min(Gs), Mathf.Min(Bs), Mathf.Min(As));
-    }
-    public static RGBA Round(RGBA val) =>
-        new(Mathf.Round(val.R), Mathf.Round(val.G), Mathf.Round(val.B), Mathf.Round(val.A));
 
     public static (float[] Rs, float[] Gs, float[] Bs, float[] As) SplitArray(params RGBA[] vals)
     {
@@ -149,30 +157,9 @@ public struct RGBA : IColorFloat, IEquatable<RGBA>
         return (Rs, Gs, Bs, As);
     }
 
-    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToRGBA());
-    public bool Equals(IColorByte? col) => col != null && Equals(col.ToRGBA());
+    public bool Equals(IColor? col) => col != null && Equals(col.ToRGBA());
     public bool Equals(RGBA col) => A == 0 && col.A == 0 || R == col.R && G == col.G && B == col.B && A == col.A;
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null) return base.Equals(obj);
-        Type t = obj.GetType();
-        if (t == typeof(RGBA)) return Equals((RGBA)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
-        else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
-
-        return base.Equals(obj);
-    }
-    public override int GetHashCode() => R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode() ^ A.GetHashCode();
-    public string ToString(IFormatProvider provider) => "R: " + R.ToString(provider) + " G: " + G.ToString(provider) +
-        " B: " + B.ToString(provider) + " A: " + A.ToString(provider);
-    public string ToString(string? provider) => "R: " + R.ToString(provider) + " G: " + G.ToString(provider) +
-        " B: " + B.ToString(provider) + " A: " + A.ToString(provider);
-    public override string ToString() => ToString((string?)null);
+    public override int GetHashCode() => base.GetHashCode();
 
     public RGBA ToRGBA() => this;
     public CMYKA ToCMYKA()
@@ -223,9 +210,20 @@ public struct RGBA : IColorFloat, IEquatable<RGBA>
         yield return A;
     }
 
-    public object Clone() => new RGBA(R, G, B, A);
-
     public Vector3d ToVector() => ((Float3)this).ToVector();
+
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("R = ");
+        builder.Append(R);
+        builder.Append(", G = ");
+        builder.Append(G);
+        builder.Append(", B = ");
+        builder.Append(B);
+        builder.Append(", A = ");
+        builder.Append(A);
+        return true;
+    }
 
     public static RGBA operator +(RGBA a, RGBA b) => new(a.R + b.R, a.G + b.G, a.B + b.B, a.A + b.A);
     public static RGBA operator -(RGBA c) => new(1 - c.R, 1 - c.G, 1 - c.B, c.A != 1 ? 1 - c.A : 1);
@@ -234,25 +232,23 @@ public struct RGBA : IColorFloat, IEquatable<RGBA>
     public static RGBA operator *(RGBA a, float b) => new(a.R * b, a.G * b, a.B * b, a.A * b);
     public static RGBA operator /(RGBA a, RGBA b) => new(a.R / b.R, a.G / b.G, a.B / b.B, a.A / b.A);
     public static RGBA operator /(RGBA a, float b) => new(a.R / b, a.G / b, a.B / b, a.A / b);
-    public static bool operator ==(RGBA a, RGBA b) => a.Equals(b);
-    public static bool operator !=(RGBA a, RGBA b) => !a.Equals(b);
     public static bool operator ==(RGBA a, CMYKA b) => a.Equals(b);
-    public static bool operator !=(RGBA a, CMYKA b) => !a.Equals(b);
+    public static bool operator !=(RGBA a, CMYKA b) => a.Equals(b);
     public static bool operator ==(RGBA a, HSVA b) => a.Equals(b);
-    public static bool operator !=(RGBA a, HSVA b) => !a.Equals(b);
-    public static bool operator ==(RGBA a, RGBAByte b) => a.Equals((IColorByte?)b);
-    public static bool operator !=(RGBA a, RGBAByte b) => !a.Equals((IColorByte?)b);
-    public static bool operator ==(RGBA a, CMYKAByte b) => a.Equals((IColorByte?)b);
-    public static bool operator !=(RGBA a, CMYKAByte b) => !a.Equals((IColorByte?)b);
-    public static bool operator ==(RGBA a, HSVAByte b) => a.Equals((IColorByte?)b);
-    public static bool operator !=(RGBA a, HSVAByte b) => !a.Equals((IColorByte?)b);
+    public static bool operator !=(RGBA a, HSVA b) => a.Equals(b);
+    public static bool operator ==(RGBA a, CMYKAByte b) => a.Equals(b);
+    public static bool operator !=(RGBA a, CMYKAByte b) => a.Equals(b);
+    public static bool operator ==(RGBA a, HSVAByte b) => a.Equals(b);
+    public static bool operator !=(RGBA a, HSVAByte b) => a.Equals(b);
+    public static bool operator ==(RGBA a, RGBAByte b) => a.Equals(b);
+    public static bool operator !=(RGBA a, RGBAByte b) => a.Equals(b);
 
     public static implicit operator RGBA(Float3 val) => new(val.x, val.y, val.z);
     public static implicit operator RGBA(Float4 val) => new(val.x, val.y, val.z, val.w);
     public static implicit operator RGBA(CMYKA val) => val.ToRGBA();
     public static implicit operator RGBA(HSVA val) => val.ToRGBA();
-    public static implicit operator RGBA(RGBAByte val) => val.ToRGBA();
     public static implicit operator RGBA(CMYKAByte val) => val.ToRGBA();
     public static implicit operator RGBA(HSVAByte val) => val.ToRGBA();
+    public static implicit operator RGBA(RGBAByte val) => val.ToRGBA();
     public static implicit operator RGBA(Fill<float> val) => new(val);
 }

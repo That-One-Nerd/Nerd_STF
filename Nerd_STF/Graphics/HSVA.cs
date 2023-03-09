@@ -1,6 +1,8 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct HSVA : IColorFloat, IEquatable<HSVA>
+public record struct HSVA : IAverage<HSVA>, IClamp<HSVA>, IColorFloat<HSVA>, IColorPresets<HSVA>, IEquatable<HSVA>,
+    IIndexAll<float>, IIndexRangeAll<float>, ILerp<HSVA, float>, IMedian<HSVA>,
+    ISplittable<HSVA, (Angle[] Hs, float[] Ss, float[] Vs, float[] As)>
 {
     public static HSVA Black => new(Angle.Zero, 0, 0);
     public static HSVA Blue => new(new Angle(240), 1, 1);
@@ -74,23 +76,45 @@ public struct HSVA : IColorFloat, IEquatable<HSVA>
             switch (index)
             {
                 case 0:
-                    H = new(Mathf.Clamp(value, 0, 1), Angle.Type.Normalized);
+                    H = new(value, Angle.Type.Normalized);
                     break;
 
                 case 1:
-                    S = Mathf.Clamp(value, 0, 1);
+                    S = value;
                     break;
 
                 case 2:
-                    V = Mathf.Clamp(value, 0, 1);
+                    V = value;
                     break;
 
                 case 3:
-                    A = Mathf.Clamp(value, 0, 1);
+                    A = value;
                     break;
 
                 default: throw new IndexOutOfRangeException(nameof(index));
             }
+        }
+    }
+    public float this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public float[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<float> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
         }
     }
 
@@ -100,15 +124,11 @@ public struct HSVA : IColorFloat, IEquatable<HSVA>
         for (int i = 0; i < vals.Length; i++) val += vals[i];
         return val / vals.Length;
     }
-    public static HSVA Ceiling(HSVA val, Angle.Type type = Angle.Type.Degrees) => new(Angle.Ceiling(val.H, type),
-        Mathf.Ceiling(val.S), Mathf.Ceiling(val.V), Mathf.Ceiling(val.A));
     public static HSVA Clamp(HSVA val, HSVA min, HSVA max) =>
         new(Angle.Clamp(val.H, min.H, max.H),
             Mathf.Clamp(val.S, min.S, max.S),
             Mathf.Clamp(val.V, min.V, max.V),
             Mathf.Clamp(val.A, min.A, max.A));
-    public static HSVA Floor(HSVA val, Angle.Type type = Angle.Type.Degrees) => new(Angle.Floor(val.H, type),
-        Mathf.Floor(val.S), Mathf.Floor(val.V), Mathf.Floor(val.A));
     public static HSVA Lerp(HSVA a, HSVA b, float t, bool clamp = true) =>
         new(Angle.Lerp(a.H, b.H, t, clamp), Mathf.Lerp(a.S, b.S, t, clamp), Mathf.Lerp(a.V, b.V, t, clamp),
             Mathf.Lerp(a.A, b.A, t, clamp));
@@ -118,18 +138,6 @@ public struct HSVA : IColorFloat, IEquatable<HSVA>
         HSVA valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
-    public static HSVA Max(params HSVA[] vals)
-    {
-        (Angle[] Hs, float[] Ss, float[] Vs, float[] As) = SplitArray(vals);
-        return new(Angle.Max(Hs), Mathf.Max(Ss), Mathf.Max(Vs), Mathf.Max(As));
-    }
-    public static HSVA Min(params HSVA[] vals)
-    {
-        (Angle[] Hs, float[] Ss, float[] Vs, float[] As) = SplitArray(vals);
-        return new(Angle.Min(Hs), Mathf.Min(Ss), Mathf.Min(Vs), Mathf.Min(As));
-    }
-    public static HSVA Round(HSVA val, Angle.Type type = Angle.Type.Degrees) => new(Angle.Round(val.H, type),
-        Mathf.Round(val.S), Mathf.Round(val.V), Mathf.Round(val.A));
 
     public static (Angle[] Hs, float[] Ss, float[] Vs, float[] As) SplitArray(params HSVA[] vals)
     {
@@ -159,31 +167,10 @@ public struct HSVA : IColorFloat, IEquatable<HSVA>
         return (Hs, Ss, Vs, As);
     }
 
-    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToHSVA());
-    public bool Equals(IColorByte? col) => col != null && Equals(col.ToHSVA());
+    public bool Equals(IColor? col) => col != null && Equals(col.ToHSVA());
     public bool Equals(HSVA col) => S == 0 && col.S == 0 || V == 0 && col.V == 0 || A == 0 && col.A == 0
         || H == col.H && S == col.S && V == col.V && A == col.A;
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null) return base.Equals(obj);
-        Type t = obj.GetType();
-        if (t == typeof(HSVA)) return Equals((HSVA)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(RGBA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
-        else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
-
-        return base.Equals(obj);
-    }
-    public override int GetHashCode() => H.GetHashCode() ^ S.GetHashCode() ^ V.GetHashCode() ^ A.GetHashCode();
-    public string ToString(IFormatProvider provider) => "H: " + H.ToString(provider) + " S: " + S.ToString(provider)
-        + " V: " + V.ToString(provider) + " A: " + A.ToString(provider);
-    public string ToString(string? provider) => "H: " + H.ToString(provider) + " S: " + S.ToString(provider)
-        + " V: " + V.ToString(provider) + " A: " + A.ToString(provider);
-    public override string ToString() => ToString((string?)null);
+    public override int GetHashCode() => base.GetHashCode();
 
     public RGBA ToRGBA()
     {
@@ -222,32 +209,41 @@ public struct HSVA : IColorFloat, IEquatable<HSVA>
         yield return A;
     }
 
-    public object Clone() => new HSVA(H, S, V, A);
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("H = ");
+        builder.Append(H);
+        builder.Append(", S = ");
+        builder.Append(S);
+        builder.Append(", V = ");
+        builder.Append(V);
+        builder.Append(", A = ");
+        builder.Append(A);
+        return true;
+    }
 
     public static HSVA operator +(HSVA a, HSVA b) => new(a.H + b.H, a.S + b.S, a.V + b.V, a.A + b.A);
     public static HSVA operator -(HSVA c) => new(1 - c.H.Normalized, 1 - c.S, 1 - c.V, c.A != 1 ? 1 - c.A : 1);
     public static HSVA operator -(HSVA a, HSVA b) => new(a.H - b.H, a.S - b.S, a.V - b.V, a.A - b.A);
     public static HSVA operator *(HSVA a, float b) => new(a.H * b, a.S * b, a.V * b, a.A * b);
     public static HSVA operator /(HSVA a, float b) => new(a.H / b, a.S / b, a.V / b, a.A / b);
-    public static bool operator ==(HSVA a, RGBA b) => a.Equals(b);
-    public static bool operator !=(HSVA a, RGBA b) => !a.Equals(b);
     public static bool operator ==(HSVA a, CMYKA b) => a.Equals(b);
-    public static bool operator !=(HSVA a, CMYKA b) => !a.Equals(b);
-    public static bool operator ==(HSVA a, HSVA b) => a.Equals(b);
-    public static bool operator !=(HSVA a, HSVA b) => !a.Equals(b);
-    public static bool operator ==(HSVA a, RGBAByte b) => a.Equals((IColorByte?)b);
-    public static bool operator !=(HSVA a, RGBAByte b) => !a.Equals((IColorByte?)b);
-    public static bool operator ==(HSVA a, CMYKAByte b) => a.Equals((IColorByte?)b);
-    public static bool operator !=(HSVA a, CMYKAByte b) => !a.Equals((IColorByte?)b);
-    public static bool operator ==(HSVA a, HSVAByte b) => a.Equals((IColorByte?)b);
-    public static bool operator !=(HSVA a, HSVAByte b) => !a.Equals((IColorByte?)b);
+    public static bool operator !=(HSVA a, CMYKA b) => a.Equals(b);
+    public static bool operator ==(HSVA a, RGBA b) => a.Equals(b);
+    public static bool operator !=(HSVA a, RGBA b) => a.Equals(b);
+    public static bool operator ==(HSVA a, CMYKAByte b) => a.Equals(b);
+    public static bool operator !=(HSVA a, CMYKAByte b) => a.Equals(b);
+    public static bool operator ==(HSVA a, HSVAByte b) => a.Equals(b);
+    public static bool operator !=(HSVA a, HSVAByte b) => a.Equals(b);
+    public static bool operator ==(HSVA a, RGBAByte b) => a.Equals(b);
+    public static bool operator !=(HSVA a, RGBAByte b) => a.Equals(b);
 
     public static explicit operator HSVA(Float3 val) => new(val.x, val.y, val.z);
     public static explicit operator HSVA(Float4 val) => new(val.x, val.y, val.z, val.w);
     public static implicit operator HSVA(CMYKA val) => val.ToHSVA();
     public static implicit operator HSVA(RGBA val) => val.ToHSVA();
-    public static implicit operator HSVA(RGBAByte val) => val.ToHSVA();
     public static implicit operator HSVA(CMYKAByte val) => val.ToHSVA();
     public static implicit operator HSVA(HSVAByte val) => val.ToHSVA();
+    public static implicit operator HSVA(RGBAByte val) => val.ToHSVA();
     public static implicit operator HSVA(Fill<float> val) => new(val);
 }

@@ -1,9 +1,7 @@
-﻿using System.Runtime.Serialization;
-
-namespace Nerd_STF.Exceptions;
+﻿namespace Nerd_STF.Exceptions;
 
 [Serializable]
-public class NoInverseException : Exception
+public class NoInverseException : Nerd_STFException
 {
     public Matrix? Matrix;
 

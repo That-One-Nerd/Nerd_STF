@@ -1,6 +1,12 @@
-﻿namespace Nerd_STF.Mathematics;
+﻿using System.Data;
 
-public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int>
+namespace Nerd_STF.Mathematics;
+
+public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClampMagnitude<Int3, int>,
+    IComparable<Int3>, ICross<Int3>, IDivide<Int3>, IDot<Int3, int>, IEquatable<Int3>,
+    IFromTuple<Int3, (int x, int y, int z)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<Int3, float>,
+    IMathOperators<Int3>, IMax<Int3>, IMedian<Int3>, IMin<Int3>, IPresets3D<Int3>, IProduct<Int3>,
+    ISplittable<Int3, (int[] Xs, int[] Ys, int[] Zs)>, ISubtract<Int3>, ISum<Int3>
 {
     public static Int3 Back => new(0, 0, -1);
     public static Int3 Down => new(0, -1, 0);
@@ -60,6 +66,28 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
             }
         }
     }
+    public int this[Index index]
+    {
+        get => this[index.IsFromEnd ? 3 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 3 - index.Value : index.Value] = value;
+    }
+    public int[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
+            List<int> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Int3 Absolute(Int3 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z));
@@ -112,14 +140,14 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     {
         if (vals.Length < 1) return Zero;
         Int3 val = vals[0];
-        foreach (Int3 d in vals) val = d > val ? d : val;
+        foreach (Int3 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
         return val;
     }
     public static Int3 Min(params Int3[] vals)
     {
         if (vals.Length < 1) return Zero;
         Int3 val = vals[0];
-        foreach (Int3 d in vals) val = d < val ? d : val;
+        foreach (Int3 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
         return val;
     }
     public static Int3 Product(params Int3[] vals)
@@ -148,20 +176,13 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
         }
         return (Xs, Ys, Zs);
     }
+
+    [Obsolete("This method is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Int3 other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Int3)) return base.Equals(obj);
-        return Equals((Int3)obj);
-    }
     public bool Equals(Int3 other) => x == other.x && y == other.y && z == other.z;
-    public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider) + " Z: " + z.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider) + " Z: " + z.ToString(provider);
-    public object Clone() => new Int3(x, y, z);
+    public override int GetHashCode() => base.GetHashCode();
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<int> GetEnumerator()
     {
@@ -180,6 +201,17 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
 
     public Vector3d ToVector() => ((Float3)this).ToVector();
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("x = ");
+        builder.Append(x);
+        builder.Append(", y = ");
+        builder.Append(y);
+        builder.Append(", z = ");
+        builder.Append(z);
+        return true;
+    }
+
     public static Int3 operator +(Int3 a, Int3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);
     public static Int3 operator -(Int3 i) => new(-i.x, -i.y, -i.z);
     public static Int3 operator -(Int3 a, Int3 b) => new(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -192,11 +224,17 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static Int3 operator &(Int3 a, Int3 b) => new(a.x & b.x, a.y & b.y, a.z & b.z);
     public static Int3 operator |(Int3 a, Int3 b) => new(a.x | b.x, a.y | b.y, a.z | b.z);
     public static Int3 operator ^(Int3 a, Int3 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z);
-    public static bool operator ==(Int3 a, Int3 b) => a.Equals(b);
-    public static bool operator !=(Int3 a, Int3 b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Int3 a, Int3 b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Int3 a, Int3 b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Int3 a, Int3 b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Int3 a, Int3 b) => a == b || a < b;
 
     public static explicit operator Int3(Complex val) => new((int)val.u, (int)val.i, 0);
@@ -215,4 +253,6 @@ public struct Int3 : ICloneable, IComparable<Int3>, IEquatable<Int3>, IGroup<int
     public static explicit operator Int3(RGBAByte val) => new(val.R, val.G, val.B);
     public static explicit operator Int3(HSVAByte val) => new(val.H, val.S, val.V);
     public static implicit operator Int3(Fill<int> fill) => new(fill);
+    public static implicit operator Int3((int x, int y, int z) vals) =>
+        new(vals.x, vals.y, vals.z);
 }

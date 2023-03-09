@@ -1,6 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics;
 
-public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int>
+public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClampMagnitude<Int2, int>,
+    IComparable<Int2>, ICross<Int2, Int3>, IDivide<Int2>, IDot<Int2, int>, IEquatable<Int2>,
+    IFromTuple<Int2, (int x, int y)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<Int2, float>,
+    IMathOperators<Int2>, IMax<Int2>, IMedian<Int2>, IMin<Int2>, IPresets2D<Int2>, IProduct<Int2>,
+    ISplittable<Int2, (int[] Xs, int[] Ys)>, ISubtract<Int2>, ISum<Int2>
 {
     public static Int2 Down => new(0, -1);
     public static Int2 Left => new(-1, 0);
@@ -45,6 +49,28 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
 
                 default: throw new IndexOutOfRangeException(nameof(index));
             }
+        }
+    }
+    public int this[Index index]
+    {
+        get => this[index.IsFromEnd ? 2 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 2 - index.Value : index.Value] = value;
+    }
+    public int[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            List<int> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
         }
     }
 
@@ -92,14 +118,14 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     {
         if (vals.Length < 1) return Zero;
         Int2 val = vals[0];
-        foreach (Int2 d in vals) val = d > val ? d : val;
+        foreach (Int2 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
         return val;
     }
     public static Int2 Min(params Int2[] vals)
     {
         if (vals.Length < 1) return Zero;
         Int2 val = vals[0];
-        foreach (Int2 d in vals) val = d < val ? d : val;
+        foreach (Int2 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
         return val;
     }
     public static Int2 Product(params Int2[] vals)
@@ -128,21 +154,11 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
         return (Xs, Ys);
     }
 
+    [Obsolete("This method is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Int2 other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Int2)) return base.Equals(obj);
-        return Equals((Int2)obj);
-    }
     public bool Equals(Int2 other) => x == other.x && y == other.y;
-    public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider);
-
-    public object Clone() => new Int2(x, y);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<int> GetEnumerator()
@@ -161,6 +177,15 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
 
     public Vector2d ToVector() => ((Float2)this).ToVector();
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("x = ");
+        builder.Append(x);
+        builder.Append(", y = ");
+        builder.Append(y);
+        return true;
+    }
+
     public static Int2 operator +(Int2 a, Int2 b) => new(a.x + b.x, a.y + b.y);
     public static Int2 operator -(Int2 i) => new(-i.x, -i.y);
     public static Int2 operator -(Int2 a, Int2 b) => new(a.x - b.x, a.y - b.y);
@@ -173,11 +198,17 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     public static Int2 operator &(Int2 a, Int2 b) => new(a.x & b.x, a.y & b.y);
     public static Int2 operator |(Int2 a, Int2 b) => new(a.x | b.x, a.y | b.y);
     public static Int2 operator ^(Int2 a, Int2 b) => new(a.x ^ b.x, a.y ^ b.y);
-    public static bool operator ==(Int2 a, Int2 b) => a.Equals(b);
-    public static bool operator !=(Int2 a, Int2 b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Int2 a, Int2 b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Int2 a, Int2 b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Int2 a, Int2 b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Int2 a, Int2 b) => a == b || a < b;
 
     public static explicit operator Int2(Complex val) => new((int)val.u, (int)val.i);
@@ -191,4 +222,5 @@ public struct Int2 : ICloneable, IComparable<Int2>, IEquatable<Int2>, IGroup<int
     public static explicit operator Int2(Int4 val) => new(val.x, val.y);
     public static explicit operator Int2(Vert val) => new((int)val.position.x, (int)val.position.y);
     public static implicit operator Int2(Fill<int> fill) => new(fill);
+    public static implicit operator Int2((int x, int y) val) => new(val.x, val.y);
 }

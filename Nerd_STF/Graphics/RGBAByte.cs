@@ -1,6 +1,8 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
+public record struct RGBAByte : IAverage<RGBAByte>, IClamp<RGBAByte>, IColorByte<RGBAByte>, IColorPresets<RGBAByte>,
+    IEquatable<RGBAByte>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<RGBAByte, float>, IMedian<RGBAByte>,
+    ISplittable<RGBAByte, (byte[] Rs, byte[] Gs, byte[] Bs, byte[] As)>
 {
     public static RGBAByte Black => new(0, 0, 0);
     public static RGBAByte Blue => new(0, 0, 255);
@@ -15,7 +17,28 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public static RGBAByte White => new(255, 255, 255);
     public static RGBAByte Yellow => new(255, 255, 0);
 
-    public byte R, G, B, A;
+    public int R
+    {
+        get => p_r;
+        set => p_r = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int G
+    {
+        get => p_g;
+        set => p_g = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int B
+    {
+        get => p_b;
+        set => p_b = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int A
+    {
+        get => p_a;
+        set => p_a = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+
+    private byte p_r, p_g, p_b, p_a;
 
     public bool HasBlue => B > 0;
     public bool HasGreen => G > 0;
@@ -37,7 +60,7 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public RGBAByte(Fill<byte> fill) : this(fill(0), fill(1), fill(2), fill(3)) { }
     public RGBAByte(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3)) { }
 
-    public byte this[int index]
+    public int this[int index]
     {
         get => index switch
         {
@@ -71,6 +94,28 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
             }
         }
     }
+    public int this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public int[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<int> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static RGBAByte Average(params RGBAByte[] vals)
     {
@@ -83,7 +128,7 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
             Mathf.Clamp(val.G, min.G, max.G),
             Mathf.Clamp(val.B, min.B, max.B),
             Mathf.Clamp(val.A, min.A, max.A));
-    public static RGBAByte Lerp(RGBAByte a, RGBAByte b, byte t, bool clamp = true) =>
+    public static RGBAByte Lerp(RGBAByte a, RGBAByte b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.R, b.R, t, clamp), Mathf.Lerp(a.G, b.G, t, clamp), Mathf.Lerp(a.B, b.B, t, clamp),
             Mathf.Lerp(a.A, b.A, t, clamp));
     public static RGBAByte LerpSquared(RGBAByte a, RGBAByte b, byte t, bool clamp = true) =>
@@ -111,10 +156,10 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
                 Bs = new byte[vals.Length], As = new byte[vals.Length];
         for (int i = 0; i < vals.Length; i++)
         {
-            Rs[i] = vals[i].R;
-            Gs[i] = vals[i].G;
-            Bs[i] = vals[i].B;
-            As[i] = vals[i].A;
+            Rs[i] = vals[i].p_r;
+            Gs[i] = vals[i].p_g;
+            Bs[i] = vals[i].p_b;
+            As[i] = vals[i].p_a;
         }
         return (Rs, Gs, Bs, As);
     }
@@ -132,30 +177,9 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
         return (Rs, Gs, Bs, As);
     }
 
-    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToRGBAByte());
-    public bool Equals(IColorByte? col) => col != null && Equals(col.ToRGBAByte());
+    public bool Equals(IColor? col) => col != null && Equals(col.ToRGBAByte());
     public bool Equals(RGBAByte col) => A == 0 && col.A == 0 || R == col.R && G == col.G && B == col.B && A == col.A;
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null) return base.Equals(obj);
-        Type t = obj.GetType();
-        if (t == typeof(RGBAByte)) return Equals((RGBAByte)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
-        else if (t == typeof(RGBA)) return Equals((IColorByte)obj);
-        else if (t == typeof(CMYKAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
-
-        return base.Equals(obj);
-    }
-    public override int GetHashCode() => R.GetHashCode() ^ G.GetHashCode() ^ B.GetHashCode() ^ A.GetHashCode();
-    public string ToString(IFormatProvider provider) => "R: " + R.ToString(provider) + " G: " + G.ToString(provider) +
-        " B: " + B.ToString(provider) + " A: " + A.ToString(provider);
-    public string ToString(string? provider) => "R: " + R.ToString(provider) + " G: " + G.ToString(provider) +
-        " B: " + B.ToString(provider) + " A: " + A.ToString(provider);
-    public override string ToString() => ToString((string?)null);
+    public override int GetHashCode() => base.GetHashCode();
 
     public RGBA ToRGBA() => new(R / 255f, G / 255f, B / 255f, A / 255f);
     public CMYKA ToCMYKA() => ToRGBA().ToCMYKA();
@@ -165,26 +189,44 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public CMYKAByte ToCMYKAByte() => ToRGBA().ToCMYKAByte();
     public HSVAByte ToHSVAByte() => ToRGBA().ToHSVAByte();
 
-    public byte[] ToArray() => new[] { R, G, B, A };
+    public byte[] ToArray() => new[] { p_r, p_g, p_b, p_a };
+    public int[] ToArrayInt() => new[] { R, G, B, A };
     public Fill<byte> ToFill()
     {
-        HSVAByte @this = this;
+        RGBAByte @this = this;
+        return i => (byte)@this[i];
+    }
+    public Fill<int> ToFillInt()
+    {
+        RGBAByte @this = this;
         return i => @this[i];
     }
-    public List<byte> ToList() => new() { R, G, B, A };
+    public List<byte> ToList() => new() { p_r, p_g, p_b, p_a };
+    public List<int> ToListInt() => new() { R, G, B, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<byte> GetEnumerator()
     {
-        yield return R;
-        yield return G;
-        yield return B;
-        yield return A;
+        yield return p_r;
+        yield return p_g;
+        yield return p_b;
+        yield return p_a;
     }
 
-    public object Clone() => new RGBAByte(R, G, B, A);
-
     public Vector3d ToVector() => ((RGBA)this).ToVector();
+
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("R = ");
+        builder.Append(R);
+        builder.Append(", G = ");
+        builder.Append(G);
+        builder.Append(", B = ");
+        builder.Append(B);
+        builder.Append(", A = ");
+        builder.Append(A);
+        return true;
+    }
 
     public static RGBAByte operator +(RGBAByte a, RGBAByte b) => new(a.R + b.R, a.G + b.G, a.B + b.B, a.A + b.A);
     public static RGBAByte operator -(RGBAByte c) => new(255 - c.R, 255 - c.G, 255 - c.B, c.A != 255 ? 255 - c.A : 255);
@@ -195,18 +237,16 @@ public struct RGBAByte : IColorByte, IEquatable<RGBAByte>
     public static RGBAByte operator /(RGBAByte a, RGBAByte b) => new(a.R / b.R, a.G / b.G, a.B / b.B, a.A / b.A);
     public static RGBAByte operator /(RGBAByte a, int b) => new(a.R / b, a.G / b, a.B / b, a.A / b);
     public static RGBAByte operator /(RGBAByte a, float b) => (a.ToRGBA() / b).ToRGBAByte();
-    public static bool operator ==(RGBAByte a, RGBA b) => a.Equals((IColorFloat?)b);
-    public static bool operator !=(RGBAByte a, RGBA b) => !a.Equals((IColorFloat?)b);
-    public static bool operator ==(RGBAByte a, CMYKA b) => a.Equals((IColorFloat?)b);
-    public static bool operator !=(RGBAByte a, CMYKA b) => !a.Equals((IColorFloat?)b);
-    public static bool operator ==(RGBAByte a, HSVA b) => a.Equals((IColorFloat?)b);
-    public static bool operator !=(RGBAByte a, HSVA b) => !a.Equals((IColorFloat?)b);
-    public static bool operator ==(RGBAByte a, RGBAByte b) => a.Equals(b);
-    public static bool operator !=(RGBAByte a, RGBAByte b) => !a.Equals(b);
+    public static bool operator ==(RGBAByte a, CMYKA b) => a.Equals(b);
+    public static bool operator !=(RGBAByte a, CMYKA b) => a.Equals(b);
+    public static bool operator ==(RGBAByte a, HSVA b) => a.Equals(b);
+    public static bool operator !=(RGBAByte a, HSVA b) => a.Equals(b);
+    public static bool operator ==(RGBAByte a, RGBA b) => a.Equals(b);
+    public static bool operator !=(RGBAByte a, RGBA b) => a.Equals(b);
     public static bool operator ==(RGBAByte a, CMYKAByte b) => a.Equals(b);
-    public static bool operator !=(RGBAByte a, CMYKAByte b) => !a.Equals(b);
+    public static bool operator !=(RGBAByte a, CMYKAByte b) => a.Equals(b);
     public static bool operator ==(RGBAByte a, HSVAByte b) => a.Equals(b);
-    public static bool operator !=(RGBAByte a, HSVAByte b) => !a.Equals(b);
+    public static bool operator !=(RGBAByte a, HSVAByte b) => a.Equals(b);
 
     public static implicit operator RGBAByte(Int3 val) => new(val.x, val.y, val.z);
     public static implicit operator RGBAByte(Int4 val) => new(val.x, val.y, val.z, val.w);
