@@ -1,59 +1,57 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>Nerd_STF</RootNamespace>
     <AssemblyName>Nerd_STF</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>That_One_Nerd</Authors>
-    <Description>Nerd_STF is a C# library that runs on .Net 6.0, and contains added structures and classes I feel would help the default C# library package.</Description>
+    <Description>Nerd_STF is a general-purpose .NET library.</Description>
     <Copyright>Copyright (c) 2022 That_One_Nerd</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/That-One-Nerd/Nerd_STF</RepositoryUrl>
-    <AssemblyVersion>2.3.1</AssemblyVersion>
+    <AssemblyVersion>2.3.2</AssemblyVersion>
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers</PackageTags>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <Product>Nerd_STF</Product>
     <PackageId>Nerd_STF</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Logo Square.png</PackageIcon>
-    <PackageReleaseNotes>
-# Nerd_STF v2.3.1
+    <PackageReleaseNotes>A bunch of stuff has changed, hasn't it?
 
-***Everything has been tested and most things work!***
+This update was originally intended to be a support update. But among other problems, I don't want to maintain 3 slightly different versions of Nerd_STF at the same time. So I'm going to put the support update on hold for now. I won't delete my progress on it (I got about a quarter of the way done with support for .NET Standard 2.0. It's a big undertaking), I won't promise any completion date either.
 
-**WARNING:**
-All of the matrix classes have had all of their constructors' row and column variables swapped. You'll have to switch all your variables around.
-Sorry for the inconvenience :(.
+Instead, this update ended up being a quality-of-life update. I already finished this part of the update before I decided to cancel the support update. This update now has lots of support for the new .NET 7 features. I'm now using a bunch of static abstract interfaces. I also added range indexing to almost all of the types available. The color byte types now have int fields instead of byte fields because ints are much more common. The values are automatically clamped between 0 and 255 just in case. Basically all types are records now because records are really nice. Lastly, some stuff has been marked as deprecated and to be removed in a future release because they already, exist, are kind of useless, and/or are misleading. Most of the deprecated stuff will be removed in either 2.4.0 or 2.5.0.
 
-The `v2.3.1.x` updates go through every single field and method in Nerd_STF to make sure it works correctly.
-You see, up until now I haven't actually tested literally anything at all. Partly because I didn't have the tools to and partly because I was lazy. But now, it's guarenteed to work in most cases (unless I like don't pick up some bug, you know).
+Also, just want to note that despite the Vert`struct not being marked as deprecated, it will still be removed in 2.5.0. I didn't mark it because that would have created a bunch of warnings in my library. And I don't like warnings.
 
-Hi everyone! Everything has been checked now and most stuff works! Not everything, like the triangle and quadrilateral area stuff, but for the most part, it's all cool and good.
+One final note, I've changed the description of the library and I've changed a bunch of the assembly and compilation settings.
 
-I've just now remembered how bad the Polygon struct was. It's getting remade. The v2.4.0 update will be mostly geometry focused, so that'll be the best time to figure out how to fix this stuff. The new Polygon struct will be much better, trust me.
-
-But all the matrix structs work like charm now! I'm honestly suprised they worked as well as they did before (especially the dynamic matrix). They can now be relied on.
-
-Next up is the documentation update. Stay tuned!
-(This may be another update with beta parts, but I'm not sure yet. We'll see).
-
-*P.S. (NuGet only message): I didn't know I had the room to put the whole changelog here. I'll do that from now on.*
-</PackageReleaseNotes>
+Anyway, that's it for this update. The longest delay was just getting this project to other versions of .NET. Stay tuned for v2.4.0, the Equations and Numbers update!</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
     <PackAsTool>False</PackAsTool>
+    <Title>Nerd_STF</Title>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+    <AssemblyOriginatorKeyFile>C:\Users\kyley\Desktop\Misc Items\Private Keys\SNA\Nerd_STF.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>False</DelaySign>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <WarningLevel>9999</WarningLevel>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <WarningLevel>9999</WarningLevel>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Nerd_STF.Exceptions;
+﻿namespace Nerd_STF.Exceptions;
 
 [Serializable]
 public class DisconnectedLinesException : Nerd_STFException

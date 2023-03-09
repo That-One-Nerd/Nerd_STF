@@ -1,5 +1,7 @@
 # Useless Visual Studio stuff
+.vs/
 /Nerd_STF/.vs/
+/Nerd_STF/Nerd_STF.csproj.user
 *.sln
 
 # Build Stuff
@@ -14,6 +16,7 @@
 # Nuget
 /Nerd_STF/LICENSE
 *.nupkg
+*.snupkg
 
 # Personal
 /Nerd_STF/TODO.md

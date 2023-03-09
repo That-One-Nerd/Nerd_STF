@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
+public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
 {
     public static Matrix4x4 Identity => new(new[,]
     {
@@ -251,6 +251,48 @@ public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
         get => this[index.x, index.y];
         set => this[index.x, index.y] = value;
     }
+    public float this[Index r, Index c]
+    {
+        get
+        {
+            int row = r.IsFromEnd ? 4 - r.Value : r.Value,
+                col = c.IsFromEnd ? 4 - c.Value : c.Value;
+            return this[row, col];
+        }
+        set
+        {
+            int row = r.IsFromEnd ? 4 - r.Value : r.Value,
+                col = c.IsFromEnd ? 4 - c.Value : c.Value;
+            this[row, col] = value;
+        }
+    }
+    public float[,] this[Range rs, Range cs]
+    {
+        get
+        {
+            int rowStart = rs.Start.IsFromEnd ? 4 - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? 4 - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? 4 - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? 4 - cs.End.Value : cs.End.Value;
+
+            float[,] vals = new float[rowEnd - rowStart - 1, colEnd - colStart - 1];
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    vals[r, c] = this[r, c];
+            return vals;
+        }
+        set
+        {
+            int rowStart = rs.Start.IsFromEnd ? 4 - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? 4 - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? 4 - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? 4 - cs.End.Value : cs.End.Value;
+
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    this[r, c] = value[r, c];
+        }
+    }
 
     public static Matrix4x4 Absolute(Matrix4x4 val) =>
         new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2), Mathf.Absolute(val.r1c3), Mathf.Absolute(val.r1c4),
@@ -357,7 +399,7 @@ public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
     public Matrix4x4 Adjugate() => Cofactor().Transpose();
     public Matrix4x4 Cofactor()
     {
-        Matrix4x4 dets = new();
+        Matrix4x4 dets = Zero;
         Matrix3x3[,] minors = Minors();
         for (int r = 0; r < 4; r++) for (int c = 0; c < 4; c++) dets[r, c] = minors[r, c].Determinant();
         return dets ^ SignGrid;
@@ -368,10 +410,10 @@ public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
         return (r1c1 * minors[0, 0].Determinant()) - (r1c2 * minors[0, 1].Determinant()) +
                (r1c3 * minors[0, 2].Determinant()) - (r1c4 * minors[0, 3].Determinant());
     }
-    public Matrix4x4 Inverse()
+    public Matrix4x4? Inverse()
     {
         float d = Determinant();
-        if (d == 0) throw new NoInverseException();
+        if (d == 0) return null;
         return Adjugate() / d;
     }
     public Matrix3x3[,] Minors() => new Matrix3x3[,]
@@ -409,38 +451,20 @@ public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
         { r1c4, r2c4, r3c4, r4c4 }
     });
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Matrix4x4? other)
     {
-        if (obj == null || obj.GetType() != typeof(Matrix4x4)) return base.Equals(obj);
-        return Equals((Matrix4x4)obj);
+        if (other is null) return false;
+        return r1c1 == other.r1c1 && r1c2 == other.r1c2 && r1c3 == other.r1c3 && r1c4 == other.r1c4 &&
+               r2c1 == other.r2c1 && r2c2 == other.r2c2 && r2c3 == other.r2c3 && r2c4 == other.r2c4 &&
+               r3c1 == other.r3c1 && r3c2 == other.r3c2 && r3c3 == other.r3c3 && r3c4 == other.r3c4 &&
+               r4c1 == other.r4c1 && r4c2 == other.r4c2 && r4c3 == other.r4c3 && r4c4 == other.r4c4;
     }
-    public bool Equals(Matrix4x4 other) =>
-        r1c1 == other.r1c1 && r1c2 == other.r1c2 && r1c3 == other.r1c3 && r1c4 == other.r1c4 &&
-        r2c1 == other.r2c1 && r2c2 == other.r2c2 && r2c3 == other.r2c3 && r2c4 == other.r2c4 &&
-        r3c1 == other.r3c1 && r3c2 == other.r3c2 && r3c3 == other.r3c3 && r3c4 == other.r3c4 &&
-        r4c1 == other.r4c1 && r4c2 == other.r4c2 && r4c3 == other.r4c3 && r4c4 == other.r4c4;
-    public override int GetHashCode() =>
-        r1c1.GetHashCode() ^ r1c2.GetHashCode() ^ r1c3.GetHashCode() ^ r1c4.GetHashCode() ^
-        r2c1.GetHashCode() ^ r2c2.GetHashCode() ^ r2c3.GetHashCode() ^ r2c4.GetHashCode() ^
-        r3c1.GetHashCode() ^ r3c2.GetHashCode() ^ r3c3.GetHashCode() ^ r3c4.GetHashCode() ^
-        r4c1.GetHashCode() ^ r4c2.GetHashCode() ^ r4c3.GetHashCode() ^ r4c4.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        r1c1.ToString(provider) + " " + r1c2.ToString(provider) + " " + r1c3.ToString(provider) + " " +
-        r1c4.ToString(provider) + "\n" + r2c1.ToString(provider) + " " + r2c2.ToString(provider) + " " +
-        r2c3.ToString(provider) + " " + r2c4.ToString(provider) + "\n" + r3c1.ToString(provider) + " " +
-        r3c2.ToString(provider) + " " + r3c3.ToString(provider) + " " + r3c4.ToString(provider) + "\n" +
-        r4c1.ToString(provider) + " " + r4c2.ToString(provider) + " " + r4c3.ToString(provider) + " " +
-        r4c4.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        r1c1.ToString(provider) + " " + r1c2.ToString(provider) + " " + r1c3.ToString(provider) + " " +
-        r1c4.ToString(provider) + "\n" + r2c1.ToString(provider) + " " + r2c2.ToString(provider) + " " +
-        r2c3.ToString(provider) + " " + r2c4.ToString(provider) + "\n" + r3c1.ToString(provider) + " " +
-        r3c2.ToString(provider) + " " + r3c3.ToString(provider) + " " + r3c4.ToString(provider) + "\n" +
-        r4c1.ToString(provider) + " " + r4c2.ToString(provider) + " " + r4c3.ToString(provider) + " " +
-        r4c4.ToString(provider);
-
-    public object Clone() => new Matrix4x4(ToArray2D());
+    public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() =>
+        r1c1 + " " + r1c2 + " " + r1c3 + " " + r1c4 + "\n" +
+        r2c1 + " " + r2c2 + " " + r2c3 + " " + r2c4 + "\n" +
+        r3c1 + " " + r3c2 + " " + r3c3 + " " + r3c4 + "\n" +
+        r4c1 + " " + r4c2 + " " + r4c3 + " " + r4c4;
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -496,7 +520,7 @@ public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
             a.r2c1 + b.r2c1, a.r2c2 + b.r2c2, a.r2c3 + b.r2c3, a.r2c4 + b.r2c4,
             a.r3c1 + b.r3c1, a.r3c2 + b.r3c2, a.r3c3 + b.r3c3, a.r3c4 + b.r3c4,
             a.r4c1 + b.r4c1, a.r4c2 + b.r4c2, a.r4c3 + b.r4c3, a.r4c4 + b.r4c4);
-    public static Matrix4x4 operator -(Matrix4x4 m) => m.Inverse();
+    public static Matrix4x4? operator -(Matrix4x4 m) => m.Inverse();
     public static Matrix4x4 operator -(Matrix4x4 a, Matrix4x4 b) =>
         new(a.r1c1 - b.r1c1, a.r1c2 - b.r1c2, a.r1c3 - b.r1c3, a.r1c4 - b.r1c4,
             a.r2c1 - b.r2c1, a.r2c2 - b.r2c2, a.r2c3 - b.r2c3, a.r2c4 - b.r2c4,
@@ -524,15 +548,18 @@ public struct Matrix4x4 : IMatrix<Matrix4x4, Matrix3x3>
             a.r2c1 / b, a.r2c2 / b, a.r2c3 / b, a.r2c4 / b,
             a.r3c1 / b, a.r3c2 / b, a.r3c3 / b, a.r3c4 / b,
             a.r4c1 / b, a.r4c2 / b, a.r4c3 / b, a.r4c4 / b);
-    public static Matrix4x4 operator /(Matrix4x4 a, Matrix4x4 b) => a * b.Inverse();
+    public static Matrix4x4 operator /(Matrix4x4 a, Matrix4x4 b)
+    {
+        Matrix4x4? bInv = b.Inverse();
+        if (bInv is null) throw new NoInverseException(b);
+        return a * bInv;
+    }
     public static Float4 operator /(Matrix4x4 a, Float4 b) => (Matrix)a / b;
     public static Matrix4x4 operator ^(Matrix4x4 a, Matrix4x4 b) => // Single number multiplication
         new(a.r1c1 * b.r1c1, a.r1c2 * b.r1c2, a.r1c3 * b.r1c3, a.r1c4 * b.r1c4,
             a.r2c1 * b.r2c1, a.r2c2 * b.r2c2, a.r2c3 * b.r2c3, a.r2c4 * b.r2c4,
             a.r3c1 * b.r3c1, a.r3c2 * b.r3c2, a.r3c3 * b.r3c3, a.r3c4 * b.r3c4,
             a.r4c1 * b.r4c1, a.r4c2 * b.r4c2, a.r4c3 * b.r4c3, a.r4c4 * b.r4c4);
-    public static bool operator ==(Matrix4x4 a, Matrix4x4 b) => a.Equals(b);
-    public static bool operator !=(Matrix4x4 a, Matrix4x4 b) => !a.Equals(b);
 
     public static explicit operator Matrix4x4(Matrix m)
     {

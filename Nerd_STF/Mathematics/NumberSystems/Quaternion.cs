@@ -1,12 +1,23 @@
 ﻿namespace Nerd_STF.Mathematics.NumberSystems;
 
-public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quaternion>, IGroup<float>
+public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<Quaternion>, IAverage<Quaternion>,
+    ICeiling<Quaternion>, IClamp<Quaternion>, IClampMagnitude<Quaternion, float>, IComparable<Quaternion>,
+    IDivide<Quaternion>, IDot<Quaternion, float>, IEquatable<Quaternion>, IFloor<Quaternion>, IGroup<float>,
+    IIndexAll<float>, IIndexRangeAll<float>, ILerp<Quaternion, float>, IMax<Quaternion>, IMedian<Quaternion>,
+    IMin<Quaternion>, IPresets4D<Quaternion>, IProduct<Quaternion>, IRound<Quaternion>,
+    ISplittable<Quaternion, (float[] Us, float[] Is, float[] Js, float[] Ks)>, ISum<Quaternion>
 {
     public static Quaternion Back => new(0, 0, -1, 0);
     public static Quaternion Down => new(0, -1, 0, 0);
+    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
+              "This field will be removed in v2.4.0.", false)]
     public static Quaternion Far => new(0, 0, 0, 1);
     public static Quaternion Forward => new(0, 0, 1, 0);
+    public static Quaternion HighW => new(0, 0, 0, 1);
     public static Quaternion Left => new(-1, 0, 0, 0);
+    public static Quaternion LowW => new(0, 0, 0, -1);
+    [Obsolete("Field has been replaced by " + nameof(LowW) + ", because it has a better name. " +
+              "This field will be removed in v2.4.0.", false)]
     public static Quaternion Near => new(0, 0, 0, -1);
     public static Quaternion Right => new(1, 0, 0, 0);
     public static Quaternion Up => new(0, 1, 0, 0);
@@ -30,19 +41,15 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
         }
     }
 
-    public float u, i, j, k;
+    public float u = u;
+    public float i = i;
+    public float j = j;
+    public float k = k;
 
     public Quaternion(float all) : this(all, all, all, all) { }
     public Quaternion(float i, float j, float k) : this(0, i, j, k) { }
     public Quaternion(Float3 ijk) : this(0, ijk.x, ijk.y, ijk.z) { }
     public Quaternion(float u, Float3 ijk) : this(u, ijk.x, ijk.y, ijk.z) { }
-    public Quaternion(float u, float i, float j, float k)
-    {
-        this.u = u;
-        this.i = i;
-        this.j = j;
-        this.k = k;
-    }
     public Quaternion(Fill<float> fill) : this(fill(0), fill(1), fill(2)) { }
     public Quaternion(Fill<int> fill) : this(fill(0), fill(1), fill(2)) { }
 
@@ -78,6 +85,28 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
 
                 default: throw new IndexOutOfRangeException(nameof(index));
             }
+        }
+    }
+    public float this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public float[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<float> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
         }
     }
 
@@ -187,24 +216,8 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
     }
 
     public int CompareTo(Quaternion other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Quaternion)) return base.Equals(obj);
-        return Equals((Quaternion)obj);
-    }
     public bool Equals(Quaternion other) => u == other.u && i == other.i && j == other.j && k == other.k;
-    public override int GetHashCode() => u.GetHashCode() ^ i.GetHashCode() ^ j.GetHashCode() ^ k.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) => u.ToString(provider)
-        + (i >= 0 ? " + " : " - ") + Mathf.Absolute(i).ToString(provider) + "i"
-        + (j >= 0 ? " + " : " - ") + Mathf.Absolute(j).ToString(provider) + "j"
-        + (k >= 0 ? " + " : " - ") + Mathf.Absolute(k).ToString(provider) + "k";
-    public string ToString(IFormatProvider provider) => u.ToString(provider)
-        + (i >= 0 ? " + " : " - ") + Mathf.Absolute(i).ToString(provider) + "i"
-        + (j >= 0 ? " + " : " - ") + Mathf.Absolute(j).ToString(provider) + "j"
-        + (k >= 0 ? " + " : " - ") + Mathf.Absolute(k).ToString(provider) + "k";
-
-    public object Clone() => new Quaternion(u, i, j, k);
+    public override int GetHashCode() => base.GetHashCode();
 
     public Angle GetAngle() => Mathf.ArcCos(u) * 2;
     public Float3 GetAxis() => IJK.Normalized;
@@ -275,8 +288,23 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
     }
     public List<float> ToList() => new() { u, i, j, k };
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(u);
+        builder.Append(i >= 0 ? " + " : " - ");
+        builder.Append(Mathf.Absolute(i));
+        builder.Append('i');
+        builder.Append(j >= 0 ? " + " : " - ");
+        builder.Append(Mathf.Absolute(j));
+        builder.Append('j');
+        builder.Append(k >= 0 ? " + " : " - ");
+        builder.Append('k');
+        builder.Append(Mathf.Absolute(k));
+        return true;
+    }
+
     public static Quaternion operator +(Quaternion a, Quaternion b) => new(a.u + b.u, a.i + b.i, a.j + b.j, a.k + b.k);
-    public static Quaternion operator -(Quaternion q) => new(q.u, q.i, q.j, q.k);
+    public static Quaternion operator -(Quaternion q) => new(-q.u, -q.i, -q.j, -q.k);
     public static Quaternion operator -(Quaternion a, Quaternion b) => new(a.u - b.u, a.i - b.i, a.j - b.j, a.k - b.k);
     public static Quaternion operator *(Quaternion x, Quaternion y)
     {
@@ -295,11 +323,17 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
     public static Quaternion operator /(Quaternion a, Matrix b) => (Quaternion)((Matrix)a / b);
     public static Quaternion operator /(Quaternion a, Float3 b) => a / new Quaternion(b);
     public static Quaternion operator ~(Quaternion v) => v.Conjugate;
-    public static bool operator ==(Quaternion a, Quaternion b) => a.Equals(b);
-    public static bool operator !=(Quaternion a, Quaternion b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Quaternion a, Quaternion b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Quaternion a, Quaternion b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Quaternion a, Quaternion b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Quaternion a, Quaternion b) => a == b || a < b;
 
     public static implicit operator Quaternion(Complex val) => new(val.u, val.i, 0, 0);
@@ -314,4 +348,6 @@ public struct Quaternion : ICloneable, IComparable<Quaternion>, IEquatable<Quate
     public static implicit operator Quaternion(Vert val) => new(val);
     public static implicit operator Quaternion(Fill<float> fill) => new(fill);
     public static implicit operator Quaternion(Fill<int> fill) => new(fill);
+    public static implicit operator Quaternion((float u, float i, float j, float k) val) =>
+        new(val.u, val.i, val.j, val.k);
 }

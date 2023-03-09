@@ -1,6 +1,10 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using System.Net.Security;
 
-public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
+namespace Nerd_STF.Mathematics.Geometry;
+
+public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling<Triangle>, IClamp<Triangle>,
+    IEquatable<Triangle>, IFloor<Triangle>, IFromTuple<Triangle, (Vert a, Vert b, Vert c)>, IGroup<Vert>,
+    IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Triangle, float>, IRound<Triangle>, IShape2D<float>
 {
     public Vert A
     {
@@ -142,6 +146,28 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
             }
         }
     }
+    public Vert this[Index index]
+    {
+        get => this[index.IsFromEnd ? 3 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 3 - index.Value : index.Value] = value;
+    }
+    public Vert[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
+            List<Vert> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Triangle Absolute(Triangle val) =>
         new(Vert.Absolute(val.A), Vert.Absolute(val.B), Vert.Absolute(val.C));
@@ -173,6 +199,8 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
         (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
         return new(Vert.Min(As), Vert.Min(Bs), Vert.Min(Cs));
     }
+    public static Triangle Round(Triangle val) =>
+        new(Vert.Round(val.A), Vert.Round(val.B), Vert.Round(val.C));
 
     public static (Vert[] As, Vert[] Bs, Vert[] Cs) SplitVertArray(params Triangle[] tris)
     {
@@ -217,20 +245,12 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     }
     public static List<float> ToFloatListAll(params Triangle[] tris) => new(ToFloatArrayAll(tris));
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Triangle? other)
     {
-        if (obj == null || obj.GetType() != typeof(Triangle)) return base.Equals(obj);
-        return Equals((Triangle)obj);
+        if (other is null) return false;
+        return A == other.A && B == other.B && C == other.C;
     }
-    public bool Equals(Triangle other) => A == other.A && B == other.B && C == other.C;
-    public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode() ^ C.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "A: " + A.ToString(provider) + " B: " + B.ToString(provider) + " C: " + C.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "A: " + A.ToString(provider) + " B: " + B.ToString(provider) + " C: " + C.ToString(provider);
-
-    public object Clone() => new Triangle(A, B, C);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<Vert> GetEnumerator()
@@ -254,6 +274,18 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public List<float> ToFloatList() => new() { A.position.x, A.position.y, A.position.z,
                                                 B.position.x, B.position.y, B.position.z,
                                                 C.position.x, C.position.y, C.position.z };
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("A = ");
+        builder.Append(A);
+        builder.Append(", B = ");
+        builder.Append(B);
+        builder.Append(", C = ");
+        builder.Append(C);
+        return true;
+    }
+
     public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);
     public static Triangle operator +(Triangle a, Vert b) => new(a.A + b, a.B + b, a.C + b);
     public static Triangle operator -(Triangle t) => new(-t.A, -t.B, -t.C);
@@ -265,8 +297,6 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public static Triangle operator /(Triangle a, Triangle b) => new(a.A / b.A, a.B / b.B, a.C / b.C);
     public static Triangle operator /(Triangle a, Vert b) => new(a.A / b, a.B / b, a.C / b);
     public static Triangle operator /(Triangle a, float b) => new(a.A / b, a.B / b, a.C / b);
-    public static bool operator ==(Triangle a, Triangle b) => a.Equals(b);
-    public static bool operator !=(Triangle a, Triangle b) => !a.Equals(b);
 
     public static implicit operator Triangle(Fill<Vert> fill) => new(fill);
     public static implicit operator Triangle(Fill<Float3> fill) => new(fill);
@@ -274,4 +304,6 @@ public struct Triangle : ICloneable, IEquatable<Triangle>, IGroup<Vert>
     public static implicit operator Triangle(Fill<Line> fill) => new(fill);
     public static implicit operator Triangle(Fill<float> fill) => new(fill);
     public static implicit operator Triangle(Fill<int> fill) => new(fill);
+    public static implicit operator Triangle((Vert a, Vert b, Vert c) val) =>
+        new(val.a, val.b, val.c);
 }

@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
+public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
 {
     public static Matrix3x3 Identity => new(new[,]
     {
@@ -180,6 +180,48 @@ public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
         get => this[index.x, index.y];
         set => this[index.x, index.y] = value;
     }
+    public float this[Index r, Index c]
+    {
+        get
+        {
+            int row = r.IsFromEnd ? 3 - r.Value : r.Value,
+                col = c.IsFromEnd ? 3 - c.Value : c.Value;
+            return this[row, col];
+        }
+        set
+        {
+            int row = r.IsFromEnd ? 3 - r.Value : r.Value,
+                col = c.IsFromEnd ? 3 - c.Value : c.Value;
+            this[row, col] = value;
+        }
+    }
+    public float[,] this[Range rs, Range cs]
+    {
+        get
+        {
+            int rowStart = rs.Start.IsFromEnd ? 3 - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? 3 - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? 3 - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? 3 - cs.End.Value : cs.End.Value;
+
+            float[,] vals = new float[rowEnd - rowStart - 1, colEnd - colStart - 1];
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    vals[r, c] = this[r, c];
+            return vals;
+        }
+        set
+        {
+            int rowStart = rs.Start.IsFromEnd ? 3 - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? 3 - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? 3 - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? 3 - cs.End.Value : cs.End.Value;
+
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    this[r, c] = value[r, c];
+        }
+    }
 
     public static Matrix3x3 Absolute(Matrix3x3 val) =>
         new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2), Mathf.Absolute(val.r1c3),
@@ -264,7 +306,7 @@ public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
     public Matrix3x3 Adjugate() => Cofactor().Transpose();
     public Matrix3x3 Cofactor()
     {
-        Matrix3x3 dets = new();
+        Matrix3x3 dets = Zero;
         Matrix2x2[,] minors = Minors();
         for (int r = 0; r < 3; r++) for (int c = 0; c < 3; c++) dets[r, c] = minors[r, c].Determinant();
         return dets ^ SignGrid;
@@ -275,10 +317,10 @@ public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
         return (r1c1 * minors[0, 0].Determinant()) - (r1c2 * minors[0, 1].Determinant())
              + (r1c3 * minors[0, 2].Determinant());
     }
-    public Matrix3x3 Inverse()
+    public Matrix3x3? Inverse()
     {
         float d = Determinant();
-        if (d == 0) throw new NoInverseException();
+        if (d == 0) return null;
         return Adjugate() / d;
     }
     public Matrix2x2[,] Minors() => new Matrix2x2[,]
@@ -294,30 +336,18 @@ public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
         { r1c3, r2c3, r3c3 }
     });
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Matrix3x3? other)
     {
-        if (obj == null || obj.GetType() != typeof(Matrix3x3)) return base.Equals(obj);
-        return Equals((Matrix3x3)obj);
+        if (other is null) return false;
+        return r1c1 == other.r1c1 && r1c2 == other.r1c2 && r1c3 == other.r1c3 &&
+               r2c1 == other.r2c1 && r2c2 == other.r2c2 && r2c3 == other.r2c3 &&
+               r3c1 == other.r3c1 && r3c2 == other.r3c2 && r3c3 == other.r3c3;
     }
-    public bool Equals(Matrix3x3 other) =>
-        r1c1 == other.r1c1 && r1c2 == other.r1c2 && r1c3 == other.r1c3 &&
-        r2c1 == other.r2c1 && r2c2 == other.r2c2 && r2c3 == other.r2c3 &&
-        r3c1 == other.r3c1 && r3c2 == other.r3c2 && r3c3 == other.r3c3;
-    public override int GetHashCode() =>
-        r1c1.GetHashCode() ^ r1c2.GetHashCode() ^ r1c3.GetHashCode() ^
-        r2c1.GetHashCode() ^ r2c2.GetHashCode() ^ r2c3.GetHashCode() ^
-        r3c1.GetHashCode() ^ r3c2.GetHashCode() ^ r3c3.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        r1c1.ToString(provider) + " " + r1c2.ToString(provider) + " " + r1c3.ToString(provider) + "\n" +
-        r2c1.ToString(provider) + " " + r2c2.ToString(provider) + " " + r2c3.ToString(provider) + "\n" +
-        r3c1.ToString(provider) + " " + r3c2.ToString(provider) + " " + r3c3.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        r1c1.ToString(provider) + " " + r1c2.ToString(provider) + " " + r1c3.ToString(provider) + "\n" +
-        r2c1.ToString(provider) + " " + r2c2.ToString(provider) + " " + r2c3.ToString(provider) + "\n" +
-        r3c1.ToString(provider) + " " + r3c2.ToString(provider) + " " + r3c3.ToString(provider);
-
-    public object Clone() => new Matrix3x3(ToArray2D());
+    public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() =>
+        r1c1 + " " + r1c2 + " " + r1c3 + "\n" +
+        r2c1 + " " + r2c2 + " " + r2c3 + "\n" +
+        r3c1 + " " + r3c2 + " " + r3c3;
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -352,7 +382,7 @@ public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
         new(a.r1c1 + b.r1c1, a.r1c2 + b.r1c2, a.r1c3 + b.r1c3,
             a.r2c1 + b.r2c1, a.r2c2 + b.r2c2, a.r2c3 + b.r2c3,
             a.r3c1 + b.r3c1, a.r3c2 + b.r3c2, a.r3c3 + b.r3c3);
-    public static Matrix3x3 operator -(Matrix3x3 m) => m.Inverse();
+    public static Matrix3x3? operator -(Matrix3x3 m) => m.Inverse();
     public static Matrix3x3 operator -(Matrix3x3 a, Matrix3x3 b) =>
         new(a.r1c1 - b.r1c1, a.r1c2 - b.r1c2, a.r1c3 - b.r1c3,
             a.r2c1 - b.r2c1, a.r2c2 - b.r2c2, a.r2c3 - b.r2c3,
@@ -372,14 +402,17 @@ public struct Matrix3x3 : IMatrix<Matrix3x3, Matrix2x2>
         new(a.r1c1 / b, a.r1c2 / b, a.r1c3 / b,
             a.r2c1 / b, a.r2c2 / b, a.r2c3 / b,
             a.r3c1 / b, a.r3c2 / b, a.r3c3 / b);
-    public static Matrix3x3 operator /(Matrix3x3 a, Matrix3x3 b) => a * b.Inverse();
+    public static Matrix3x3 operator /(Matrix3x3 a, Matrix3x3 b)
+    {
+        Matrix3x3? bInv = b.Inverse();
+        if (bInv is null) throw new NoInverseException(b);
+        return a * bInv;
+    }
     public static Float3 operator /(Matrix3x3 a, Float3 b) => (Matrix)a / b;
     public static Matrix3x3 operator ^(Matrix3x3 a, Matrix3x3 b) => // Single number multiplication
         new(a.r1c1 * b.r1c1, a.r1c2 * b.r1c2, a.r1c3 * b.r1c3,
             a.r2c1 * b.r2c1, a.r2c2 * b.r2c2, a.r2c3 * b.r2c3,
             a.r3c1 * b.r3c1, a.r3c2 * b.r3c2, a.r3c3 * b.r3c3);
-    public static bool operator ==(Matrix3x3 a, Matrix3x3 b) => a.Equals(b);
-    public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !a.Equals(b);
 
     public static explicit operator Matrix3x3(Matrix m)
     {

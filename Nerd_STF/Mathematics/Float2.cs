@@ -1,6 +1,12 @@
 ﻿namespace Nerd_STF.Mathematics;
 
-public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGroup<float>
+public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Float2, Int2>,
+    IClamp<Float2>, IClampMagnitude<Float2, float>, IComparable<Float2>,
+    ICross<Float2, Float3>, IDivide<Float2>, IDot<Float2, float>, IEquatable<Float2>,
+    IFloor<Float2, Int2>, IFromTuple<Float2, (float x, float y)>, IGroup<float>,
+    ILerp<Float2, float>, IMathOperators<Float2>, IMax<Float2>, IMedian<Float2>, IMin<Float2>,
+    IIndexAll<float>, IIndexRangeAll<float>, IPresets2D<Float2>, IProduct<Float2>, IRound<Float2, Int2>,
+    ISplittable<Float2, (float[] Xs, float[] Ys)>, ISubtract<Float2>, ISum<Float2>
 {
     public static Float2 Down => new(0, -1);
     public static Float2 Left => new(-1, 0);
@@ -16,14 +22,13 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public float x, y;
 
     public Float2(float all) : this(all, all) { }
+    public Float2(Fill<float> fill) : this(fill(0), fill(1)) { }
+    public Float2(Fill<int> fill) : this(fill(0), fill(1)) { }
     public Float2(float x, float y)
     {
         this.x = x;
         this.y = y;
     }
-    public Float2(Fill<float> fill) : this(fill(0), fill(1)) { }
-    public Float2(Fill<int> fill) : this(fill(0), fill(1)) { }
-
     public float this[int index]
     {
         get => index switch
@@ -48,11 +53,33 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
             }
         }
     }
+    public float this[Index index]
+    {
+        get => this[index.IsFromEnd ? 2 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 2 - index.Value : index.Value] = value;
+    }
+    public float[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            List<float> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Float2 Absolute(Float2 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y));
     public static Float2 Average(params Float2[] vals) => Sum(vals) / vals.Length;
-    public static Float2 Ceiling(Float2 val) =>
+    public static Int2 Ceiling(Float2 val) =>
         new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y));
     public static Float2 Clamp(Float2 val, Float2 min, Float2 max) =>
         new(Mathf.Clamp(val.x, min.x, max.x),
@@ -83,7 +110,7 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         }
         return x + y;
     }
-    public static Float2 Floor(Float2 val) =>
+    public static Int2 Floor(Float2 val) =>
         new(Mathf.Floor(val.x), Mathf.Floor(val.y));
     public static Float2 Lerp(Float2 a, Float2 b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp));
@@ -97,14 +124,14 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     {
         if (vals.Length < 1) return Zero;
         Float2 val = vals[0];
-        foreach (Float2 f in vals) val = f > val ? f : val;
+        foreach (Float2 f in vals) val = f.Magnitude > val.Magnitude ? f : val;
         return val;
     }
     public static Float2 Min(params Float2[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float2 val = vals[0];
-        foreach (Float2 f in vals) val = f < val ? f : val;
+        foreach (Float2 f in vals) val = f.Magnitude < val.Magnitude ? f : val;
         return val;
     }
     public static Float2 Product(params Float2[] vals)
@@ -114,8 +141,8 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         foreach (Float2 f in vals) val *= f;
         return val;
     }
-    public static Float2 Round(Float2 val) =>
-        new(Mathf.Round(val.x), Mathf.Round(val.y));
+    public static Int2 Round(Float2 val) =>
+        new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y));
     public static Float2 Subtract(Float2 num, params Float2[] vals) => num - Sum(vals);
     public static Float2 Sum(params Float2[] vals)
     {
@@ -135,21 +162,11 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
         return (Xs, Ys);
     }
 
+    [Obsolete("This method is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Float2 other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Float2)) return base.Equals(obj);
-        return Equals((Float2)obj);
-    }
     public bool Equals(Float2 other) => x == other.x && y == other.y;
-    public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider);
-
-    public object Clone() => new Float2(x, y);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -168,6 +185,15 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
 
     public Vector2d ToVector() => new(Mathf.ArcTan(y / x), Magnitude);
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("x = ");
+        builder.Append(x);
+        builder.Append(", y = ");
+        builder.Append(y);
+        return true;
+    }
+
     public static Float2 operator +(Float2 a, Float2 b) => new(a.x + b.x, a.y + b.y);
     public static Float2 operator -(Float2 d) => new(-d.x, -d.y);
     public static Float2 operator -(Float2 a, Float2 b) => new(a.x - b.x, a.y - b.y);
@@ -178,11 +204,17 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public static Float2 operator /(Float2 a, Float2 b) => new(a.x / b.x, a.y / b.y);
     public static Float2 operator /(Float2 a, float b) => new(a.x / b, a.y / b);
     public static Float2 operator /(Float2 a, Matrix b) => (Float2)((Matrix)a / b);
-    public static bool operator ==(Float2 a, Float2 b) => a.Equals(b);
-    public static bool operator !=(Float2 a, Float2 b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Float2 a, Float2 b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Float2 a, Float2 b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Float2 a, Float2 b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Float2 a, Float2 b) => a == b || a < b;
 
     public static implicit operator Float2(Complex val) => new(val.u, val.i);
@@ -197,4 +229,5 @@ public struct Float2 : ICloneable, IComparable<Float2>, IEquatable<Float2>, IGro
     public static explicit operator Float2(Vert val) => new(val.position.x, val.position.y);
     public static implicit operator Float2(Fill<float> fill) => new(fill);
     public static implicit operator Float2(Fill<int> fill) => new(fill);
+    public static implicit operator Float2((float x, float y) val) => new(val.x, val.y);
 }

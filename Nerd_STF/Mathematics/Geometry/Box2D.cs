@@ -1,6 +1,8 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
+public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, IClamp<Box2D>, IContains<Vert>,
+    IEquatable<Box2D>, IFloor<Box2D>, ILerp<Box2D, float>, IMedian<Box2D>, IRound<Box2D>, IShape2D<float>,
+    ISplittable<Box2D, (Vert[] centers, Float2[] sizes)>
 {
     public static Box2D Unit => new(Vert.Zero, Float2.One);
 
@@ -10,7 +12,7 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         set
         {
             Vert diff = center - value;
-            size = (Float2)diff.position * 2;
+            size = (Float2)diff.position * 2f;
         }
     }
     public Vert MinVert
@@ -19,7 +21,7 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         set
         {
             Vert diff = center + value;
-            size = (Float2)diff.position * 2;
+            size = (Float2)diff.position * 2f;
         }
     }
 
@@ -60,16 +62,8 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         (Vert[] verts, Float2[] sizes) = SplitArray(vals);
         return new(Vert.Median(verts), Float2.Median(sizes));
     }
-    public static Box2D Max(params Box2D[] vals)
-    {
-        (Vert[] verts, Float2[] sizes) = SplitArray(vals);
-        return new(Vert.Max(verts), Float2.Max(sizes));
-    }
-    public static Box2D Min(params Box2D[] vals)
-    {
-        (Vert[] verts, Float2[] sizes) = SplitArray(vals);
-        return new(Vert.Min(verts), Float2.Min(sizes));
-    }
+    public static Box2D Round(Box2D val) => new(Vert.Round(val.center), Float2.Round(val.size));
+
     public static (Vert[] centers, Float2[] sizes) SplitArray(params Box2D[] vals)
     {
         Vert[] centers = new Vert[vals.Length];
@@ -84,18 +78,12 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         return (centers, sizes);
     }
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Box2D? other)
     {
-        if (obj == null || obj.GetType() != typeof(Box2D)) return base.Equals(obj);
-        return Equals((Box2D)obj);
+        if (other is null) return false;
+        return center == other.center && size == other.size;
     }
-    public bool Equals(Box2D other) => center == other.center && size == other.size;
-    public override int GetHashCode() => center.GetHashCode() ^ size.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "Min: " + MinVert.ToString(provider) + " Max: " + MaxVert.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "Min: " + MinVert.ToString(provider) + " Max: " + MaxVert.ToString(provider);
+    public override int GetHashCode() => base.GetHashCode();
 
     public bool Contains(Vert vert)
     {
@@ -103,7 +91,14 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
         return diff.x <= size.x && diff.y <= size.y;
     }
 
-    public object Clone() => new Box2D(center, size);
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("Min = ");
+        builder.Append(MinVert);
+        builder.Append(", Max = ");
+        builder.Append(MaxVert);
+        return true;
+    }
 
     public static Box2D operator +(Box2D a, Vert b) => new(a.center + b, a.size);
     public static Box2D operator +(Box2D a, Float2 b) => new(a.center, a.size + b);
@@ -114,8 +109,6 @@ public struct Box2D : ICloneable, IContainer<Vert>, IEquatable<Box2D>
     public static Box2D operator *(Box2D a, Float2 b) => new(a.center, a.size * b);
     public static Box2D operator /(Box2D a, float b) => new(a.center / b, a.size / b);
     public static Box2D operator /(Box2D a, Float2 b) => new(a.center, a.size / b);
-    public static bool operator ==(Box2D a, Box2D b) => a.Equals(b);
-    public static bool operator !=(Box2D a, Box2D b) => !a.Equals(b);
 
     public static implicit operator Box2D(Fill<float> fill) => new(fill);
     public static explicit operator Box2D(Box3D box) => new(box.center, (Float2)box.size);

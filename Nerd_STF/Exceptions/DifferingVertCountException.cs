@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace Nerd_STF.Exceptions;
+﻿namespace Nerd_STF.Exceptions;
 
 [Serializable]
 [Obsolete("The Polygon struct is a garbage fire, and will be fixed in v2.4.0", false)]

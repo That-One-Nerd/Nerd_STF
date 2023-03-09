@@ -1,6 +1,13 @@
 ﻿namespace Nerd_STF.Mathematics;
 
-public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGroup<float>
+public record struct Float4 : IAbsolute<Float4>,
+    IAverage<Float4>, ICeiling<Float4, Int4>, IClamp<Float4>, IClampMagnitude<Float4, float>,
+    IComparable<Float4>, IDivide<Float4>, IDot<Float4, float>, IEquatable<Float4>,
+    IFloor<Float4, Int4>, IFromTuple<Float4, (float x, float y, float z, float w)>,
+    IGroup<float>, IIndexAll<float>, IIndexRangeAll<float>, ILerp<Float4, float>, IMathOperators<Float4>,
+    IMax<Float4>, IMedian<Float4>, IMin<Float4>, IPresets4D<Float4>, IProduct<Float4>, IRound<Float4, Int4>,
+    ISplittable<Float4, (float[] Xs, float[] Ys, float[] Zs, float[] Ws)>, ISubtract<Float4>,
+    ISum<Float4>
 {
     public static Float4 Back => new(0, 0, -1, 0);
     public static Float4 Down => new(0, -1, 0, 0);
@@ -84,11 +91,33 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
             }
         }
     }
+    public float this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public float[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<float> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Float4 Absolute(Float4 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z), Mathf.Absolute(val.w));
     public static Float4 Average(params Float4[] vals) => Sum(vals) / vals.Length;
-    public static Float4 Ceiling(Float4 val) =>
+    public static Int4 Ceiling(Float4 val) =>
         new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y), Mathf.Ceiling(val.z), Mathf.Ceiling(val.w));
     public static Float4 Clamp(Float4 val, Float4 min, Float4 max) =>
         new(Mathf.Clamp(val.x, min.x, max.x),
@@ -121,7 +150,7 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         }
         return x + y + z;
     }
-    public static Float4 Floor(Float4 val) =>
+    public static Int4 Floor(Float4 val) =>
         new(Mathf.Floor(val.x), Mathf.Floor(val.y), Mathf.Floor(val.z), Mathf.Floor(val.w));
     public static Float4 Lerp(Float4 a, Float4 b, float t, bool clamp = true) =>
         new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp),
@@ -136,18 +165,19 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     {
         if (vals.Length < 1) return Zero;
         Float4 val = vals[0];
-        foreach (Float4 d in vals) val = d > val ? d : val;
+        foreach (Float4 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
         return val;
     }
     public static Float4 Min(params Float4[] vals)
     {
         if (vals.Length < 1) return Zero;
         Float4 val = vals[0];
-        foreach (Float4 d in vals) val = d < val ? d : val;
+        foreach (Float4 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
         return val;
     }
-    public static Float4 Round(Float4 val) =>
-        new(Mathf.Round(val.x), Mathf.Round(val.y), Mathf.Round(val.z), Mathf.Round(val.w));
+    public static Int4 Round(Float4 val) =>
+        new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y), Mathf.RoundInt(val.z),
+            Mathf.RoundInt(val.w));
     public static Float4 Product(params Float4[] vals)
     {
         if (vals.Length < 1) return Zero;
@@ -177,23 +207,11 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
         return (Xs, Ys, Zs, Ws);
     }
 
+    [Obsolete("This method is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Float4 other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Float4)) return base.Equals(obj);
-        return Equals((Float4)obj);
-    }
     public bool Equals(Float4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
-    public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode() ^ w.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider) + " Z: " + z.ToString(provider)
-        + " W: " + w.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider) + " Z: " + z.ToString(provider)
-        + " W: " + w.ToString(provider);
-
-    public object Clone() => new Float4(x, y, z, w);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -212,6 +230,19 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     }
     public List<float> ToList() => new() { x, y, z, w };
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("x = ");
+        builder.Append(x);
+        builder.Append(", y = ");
+        builder.Append(y);
+        builder.Append(", z = ");
+        builder.Append(z);
+        builder.Append(", w = ");
+        builder.Append(w);
+        return true;
+    }
+
     public static Float4 operator +(Float4 a, Float4 b) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
     public static Float4 operator -(Float4 d) => new(-d.x, -d.y, -d.z, -d.w);
     public static Float4 operator -(Float4 a, Float4 b) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
@@ -221,11 +252,17 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static Float4 operator /(Float4 a, Float4 b) => new(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
     public static Float4 operator /(Float4 a, float b) => new(a.x / b, a.y / b, a.z / b, a.w / b);
     public static Float4 operator /(Float4 a, Matrix b) => (Float4)((Matrix)a / b);
-    public static bool operator ==(Float4 a, Float4 b) => a.Equals(b);
-    public static bool operator !=(Float4 a, Float4 b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Float4 a, Float4 b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Float4 a, Float4 b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Float4 a, Float4 b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Float4 a, Float4 b) => a == b || a < b;
 
     public static implicit operator Float4(Complex val) => new(val.u, val.i, 0, 0);
@@ -246,4 +283,6 @@ public struct Float4 : ICloneable, IComparable<Float4>, IEquatable<Float4>, IGro
     public static implicit operator Float4(HSVAByte val) => (Float4)val.ToHSVA();
     public static implicit operator Float4(Fill<float> fill) => new(fill);
     public static implicit operator Float4(Fill<int> fill) => new(fill);
+    public static implicit operator Float4((float x, float y, float z, float w) vals) =>
+        new(vals.x, vals.y, vals.z, vals.w);
 }

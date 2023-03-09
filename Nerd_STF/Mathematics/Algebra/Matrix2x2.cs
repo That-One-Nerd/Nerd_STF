@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public struct Matrix2x2 : IMatrix<Matrix2x2>
+public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
 {
     public static Matrix2x2 Identity => new(new[,]
     {
@@ -116,6 +116,48 @@ public struct Matrix2x2 : IMatrix<Matrix2x2>
         get => this[index.x, index.y];
         set => this[index.x, index.y] = value;
     }
+    public float this[Index r, Index c]
+    {
+        get
+        {
+            int row = r.IsFromEnd ? 2 - r.Value : r.Value,
+                col = c.IsFromEnd ? 2 - c.Value : c.Value;
+            return this[row, col];
+        }
+        set
+        {
+            int row = r.IsFromEnd ? 2 - r.Value : r.Value,
+                col = c.IsFromEnd ? 2 - c.Value : c.Value;
+            this[row, col] = value;
+        }
+    }
+    public float[,] this[Range rs, Range cs]
+    {
+        get
+        {
+            int rowStart = rs.Start.IsFromEnd ? 2 - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? 2 - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? 2 - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? 2 - cs.End.Value : cs.End.Value;
+
+            float[,] vals = new float[rowEnd - rowStart - 1, colEnd - colStart - 1];
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    vals[r, c] = this[r, c];
+            return vals;
+        }
+        set
+        {
+            int rowStart = rs.Start.IsFromEnd ? 2 - rs.Start.Value : rs.Start.Value,
+                rowEnd = rs.End.IsFromEnd ? 2 - rs.End.Value : rs.End.Value,
+                colStart = cs.Start.IsFromEnd ? 2 - cs.Start.Value : cs.Start.Value,
+                colEnd = cs.End.IsFromEnd ? 2 - cs.End.Value : cs.End.Value;
+
+            for (int r = rowStart; r < rowEnd; r++)
+                for (int c = colStart; c < colEnd; c++)
+                    this[r, c] = value[r, c];
+        }
+    }
 
     public static Matrix2x2 Absolute(Matrix2x2 val) => new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2),
         Mathf.Absolute(val.r2c1), Mathf.Absolute(val.r2c2));
@@ -187,10 +229,10 @@ public struct Matrix2x2 : IMatrix<Matrix2x2>
         return swapped ^ SignGrid;
     }
     public float Determinant() => r1c1 * r2c2 - r1c2 * r2c1;
-    public Matrix2x2 Inverse()
+    public Matrix2x2? Inverse()
     {
         float d = Determinant();
-        if (d == 0) throw new NoInverseException();
+        if (d == 0) return null;
         return Transpose().Adjugate() / d;
     }
     public Matrix2x2 Transpose() => new(new[,]
@@ -199,22 +241,13 @@ public struct Matrix2x2 : IMatrix<Matrix2x2>
         { r1c2, r2c2 }
     });
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Matrix2x2? other)
     {
-        if (obj == null || obj.GetType() != typeof(Matrix2x2)) return base.Equals(obj);
-        return Equals((Matrix2x2)obj);
+        if (other is null) return false;
+        return r1c1 == other.r1c1 && r1c2 == other.r1c2 && r2c1 == other.r2c1 && r2c2 == other.r2c2;
     }
-    public bool Equals(Matrix2x2 other) => r1c1 == other.r1c1 && r1c2 == other.r1c2
-        && r2c1 == other.r2c1 && r2c2 == other.r2c2;
-    public override int GetHashCode() => r1c1.GetHashCode() ^ r1c2.GetHashCode()
-        ^ r2c1.GetHashCode() ^ r2c2.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) => r1c1.ToString(provider) + " " + r1c2.ToString(provider) + "\n"
-        + r2c1.ToString(provider) + " " + r2c2.ToString(provider);
-    public string ToString(IFormatProvider provider) => r1c1.ToString(provider) + " " + r1c2.ToString(provider) + "\n"
-        + r2c1.ToString(provider) + " " + r2c2.ToString(provider);
-
-    public object Clone() => new Matrix2x2(ToArray2D());
+    public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() => r1c1 + " " + r1c2 + "\n" + r2c1 + " " + r2c2;
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -252,12 +285,15 @@ public struct Matrix2x2 : IMatrix<Matrix2x2>
     });
     public static Float2 operator *(Matrix2x2 a, Float2 b) => (Matrix)a * b;
     public static Matrix2x2 operator /(Matrix2x2 a, float b) => new(a.r1c1 / b, a.r1c2 / b, a.r2c1 / b, a.r2c2 / b);
-    public static Matrix2x2 operator /(Matrix2x2 a, Matrix2x2 b) => a * b.Inverse();
+    public static Matrix2x2 operator /(Matrix2x2 a, Matrix2x2 b)
+    {
+        Matrix2x2? bInv = b.Inverse();
+        if (bInv is null) throw new NoInverseException(b);
+        return a * bInv;
+    }
     public static Float2 operator /(Matrix2x2 a, Float2 b) => (Matrix)a / b;
     public static Matrix2x2 operator ^(Matrix2x2 a, Matrix2x2 b) => // Single number multiplication.
         new(a.r1c1 * b.r1c1, a.r1c2 * b.r1c2, a.r2c1 * b.r2c1, a.r2c2 * b.r2c2);
-    public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => a.Equals(b);
-    public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !a.Equals(b);
 
     public static explicit operator Matrix2x2(Matrix m)
     {

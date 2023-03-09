@@ -1,11 +1,13 @@
-﻿namespace Nerd_STF.Mathematics.Algebra;
+﻿namespace Nerd_STF.Mathematics.Abstract;
 
-public interface IMatrix<T> : ICloneable, IEnumerable, IEquatable<T>, IGroup2D<float>
+public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>, IDivide<T>,
+    IEquatable<T>, IFloor<T>, IGroup2D<float>, ILerp<T, float>, IProduct<T>, IRound<T>,
+    ISubtract<T>, ISum<T>
     where T : IMatrix<T>
 {
     public T Adjugate();
     public float Determinant();
-    public T Inverse();
+    public T? Inverse();
     public T Transpose();
 }
 

@@ -1,8 +1,14 @@
 ﻿namespace Nerd_STF.Mathematics;
 
-public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int>
+public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClampMagnitude<Int4, int>,
+    IComparable<Int4>, IDivide<Int4>, IDot<Int4, int>, IEquatable<Int4>,
+    IFromTuple<Int4, (int x, int y, int z, int w)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>,
+    ILerp<Int4, float>, IMathOperators<Int4>, IMax<Int4>, IMedian<Int4>, IMin<Int4>, IPresets4D<Int4>,
+    IProduct<Int4>, ISplittable<Int4, (int[] Xs, int[] Ys, int[] Zs, int[] Ws)>, ISubtract<Int4>, ISum<Int4>
 {
     public static Int4 Back => new(0, 0, -1, 0);
+    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
+        "This field will be removed in v2.4.0.", false)]
     public static Int4 Deep => new(0, 0, 0, -1);
     public static Int4 Down => new(0, -1, 0, 0);
     [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
@@ -81,6 +87,28 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
             }
         }
     }
+    public int this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public int[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<int> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Int4 Absolute(Int4 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z), Mathf.Absolute(val.w));
@@ -129,14 +157,14 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     {
         if (vals.Length < 1) return Zero;
         Int4 val = vals[0];
-        foreach (Int4 d in vals) val = d > val ? d : val;
+        foreach (Int4 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
         return val;
     }
     public static Int4 Min(params Int4[] vals)
     {
         if (vals.Length < 1) return Zero;
         Int4 val = vals[0];
-        foreach (Int4 d in vals) val = d < val ? d : val;
+        foreach (Int4 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
         return val;
     }
     public static Int4 Product(params Int4[] vals)
@@ -168,23 +196,11 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
         return (Xs, Ys, Zs, Ws);
     }
 
+    [Obsolete("This method is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Int4 other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Int4)) return base.Equals(obj);
-        return Equals((Int4)obj);
-    }
     public bool Equals(Int4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
-    public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode() ^ w.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider) + " Z: " + z.ToString(provider)
-        + " W: " + w.ToString(provider);
-    public string ToString(IFormatProvider provider) =>
-        "X: " + x.ToString(provider) + " Y: " + y.ToString(provider) + " Z: " + z.ToString(provider)
-        + " W: " + w.ToString(provider);
-
-    public object Clone() => new Int4(x, y, z, w);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<int> GetEnumerator()
@@ -203,6 +219,19 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     }
     public List<int> ToList() => new() { x, y, z, w };
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("x = ");
+        builder.Append(x);
+        builder.Append(", y = ");
+        builder.Append(y);
+        builder.Append(", z = ");
+        builder.Append(z);
+        builder.Append(", w = ");
+        builder.Append(w);
+        return true;
+    }
+
     public static Int4 operator +(Int4 a, Int4 b) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
     public static Int4 operator -(Int4 d) => new(-d.x, -d.y, -d.z, -d.w);
     public static Int4 operator -(Int4 a, Int4 b) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
@@ -215,11 +244,17 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static Int4 operator &(Int4 a, Int4 b) => new(a.x & b.x, a.y & b.y, a.z & b.z, a.w & b.w);
     public static Int4 operator |(Int4 a, Int4 b) => new(a.x | b.x, a.y | b.y, a.z | b.z, a.w | b.w);
     public static Int4 operator ^(Int4 a, Int4 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w);
-    public static bool operator ==(Int4 a, Int4 b) => a.Equals(b);
-    public static bool operator !=(Int4 a, Int4 b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Int4 a, Int4 b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Int4 a, Int4 b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Int4 a, Int4 b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Int4 a, Int4 b) => a == b || a < b;
 
     public static explicit operator Int4(Complex val) => new((int)val.u, (int)val.i, 0, 0);
@@ -240,4 +275,6 @@ public struct Int4 : ICloneable, IComparable<Int4>, IEquatable<Int4>, IGroup<int
     public static explicit operator Int4(CMYKAByte val) => new(val.C, val.M, val.Y, val.K);
     public static implicit operator Int4(HSVAByte val) => new(val.H, val.S, val.V, val.A);
     public static implicit operator Int4(Fill<int> fill) => new(fill);
+    public static implicit operator Int4((int x, int y, int z, int w) vals) =>
+        new(vals.x, vals.y, vals.z, vals.w);
 }

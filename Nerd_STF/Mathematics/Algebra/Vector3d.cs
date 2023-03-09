@@ -1,6 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
+public record struct Vector3d : IAbsolute<Vector3d>, IAverage<Vector3d>, IClampMagnitude<Vector3d, float>,
+    IComparable<Vector3d>, ICross<Vector3d>, IDot<Vector3d, float>, IEquatable<Vector3d>,
+    IFromTuple<Vector3d, (Angle yaw, Angle pitch, float mag)>, IIndexAll<Angle>, IIndexRangeAll<Angle>,
+    ILerp<Vector3d, float>, IMagnitude<float>, IMax<Vector3d>, IMedian<Vector3d>, IMin<Vector3d>,
+    IPresets3D<Vector3d>, ISubtract<Vector3d>, ISum<Vector3d>
 {
     public static Vector3d Back => new(Angle.Zero, Angle.Up);
     public static Vector3d Down => new(Angle.Down, Angle.Zero);
@@ -11,6 +15,12 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
 
     public static Vector3d One => new(Angle.Zero);
     public static Vector3d Zero => new(Angle.Zero, 0);
+
+    public float Magnitude
+    {
+        get => magnitude;
+        set => magnitude = value;
+    }
 
     public Vector3d Inverse => new(-yaw, -pitch, magnitude);
     public Vector3d Normalized => new(yaw, pitch, 1);
@@ -54,6 +64,28 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
 
                 default: throw new IndexOutOfRangeException(nameof(index));
             }
+        }
+    }
+    public Angle this[Index index]
+    {
+        get => this[index.IsFromEnd ? 2 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 2 - index.Value : index.Value] = value;
+    }
+    public Angle[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            List<Angle> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
         }
     }
 
@@ -123,38 +155,27 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
         return val;
     }
 
-    public static (Angle[] Thetas, Angle[] Phis, float[] Mags) SplitArray(params Vector3d[] vals)
+    public static (Angle[] yaws, Angle[] pitches, float[] mags) SplitArray(params Vector3d[] vals)
     {
-        Angle[] yaws = new Angle[vals.Length], pitchs = new Angle[vals.Length];
+        Angle[] yaws = new Angle[vals.Length], pitches = new Angle[vals.Length];
         float[] mags = new float[vals.Length];
         for (int i = 0; i < vals.Length; i++)
         {
             yaws[i] = vals[i].yaw;
-            pitchs[i] = vals[i].pitch;
+            pitches[i] = vals[i].pitch;
             mags[i] = vals[i].magnitude;
         }
-        return (yaws, pitchs, mags);
+        return (yaws, pitches, mags);
     }
 
     public int CompareTo(Vector3d other) => magnitude.CompareTo(other.magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Vector3d)) return base.Equals(obj);
-        return Equals((Vector3d)obj);
-    }
     public bool Equals(Vector3d other) => yaw == other.yaw && pitch == other.pitch
         && magnitude == other.magnitude;
-    public override int GetHashCode() => yaw.GetHashCode() ^ pitch.GetHashCode() ^ magnitude.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(Angle.Type outputType) => ToString((string?)null, outputType);
-    public string ToString(string? provider, Angle.Type outputType = Angle.Type.Degrees) =>
-        "Mag: " + magnitude.ToString(provider) + " Yaw: " + yaw.ToString(provider, outputType) +
-        " Pitch: " + pitch.ToString(provider, outputType);
-    public string ToString(IFormatProvider provider, Angle.Type outputType = Angle.Type.Degrees) =>
-        "Mag: " + magnitude.ToString(provider) + " Yaw: " + yaw.ToString(provider, outputType) +
-        " Pitch: " + pitch.ToString(provider, outputType);
-
-    public object Clone() => new Vector3d(yaw, pitch, magnitude);
+    public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() => ToString(Angle.Type.Degrees);
+    public string ToString(Angle.Type outputType) =>
+        nameof(Vector3d) + " { Mag = " + magnitude + ", Yaw = " + yaw.ToString(outputType) +
+        ", Pitch = " + pitch.ToString(outputType) + " }";
 
     public Float3 ToXYZ() => new Float3(Mathf.Sin(pitch) * Mathf.Sin(yaw),
                                         Mathf.Cos(yaw),
@@ -169,8 +190,6 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
     public static Vector3d operator *(Vector3d a, Matrix b) => (Vector3d)((Matrix)a * b);
     public static Vector3d operator /(Vector3d a, float b) => new(a.yaw, a.pitch, a.magnitude / b);
     public static Vector3d operator /(Vector3d a, Matrix b) => (Vector3d)((Matrix)a / b);
-    public static bool operator ==(Vector3d a, Vector3d b) => a.Equals(b);
-    public static bool operator !=(Vector3d a, Vector3d b) => !a.Equals(b);
     public static bool operator >(Vector3d a, Vector3d b) => a.CompareTo(b) > 0;
     public static bool operator <(Vector3d a, Vector3d b) => a.CompareTo(b) < 0;
     public static bool operator >=(Vector3d a, Vector3d b) => a == b || a > b;
@@ -184,4 +203,6 @@ public struct Vector3d : ICloneable, IComparable<Vector3d>, IEquatable<Vector3d>
     public static explicit operator Vector3d(Matrix m) => ((Float3)m).ToVector();
     public static explicit operator Vector3d(Vert val) => val.ToVector();
     public static implicit operator Vector3d(Vector2d v) => new(v.theta, Angle.Zero, v.magnitude);
+    public static implicit operator Vector3d((Angle yaw, Angle pitch, float mag) val) =>
+        new(val.yaw, val.pitch, val.mag);
 }

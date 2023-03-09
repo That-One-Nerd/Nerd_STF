@@ -1,6 +1,8 @@
 ﻿namespace Nerd_STF.Mathematics;
 
-public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
+public struct Angle : IAbsolute<Angle>, IAverage<Angle>, IClamp<Angle>, ICloneable,
+    IComparable<Angle>, IEquatable<Angle>, ILerp<Angle, float>, IMax<Angle>, IMedian<Angle>,
+    IMin<Angle>, IPresets2D<Angle>
 {
     public static Angle Down => new(270);
     public static Angle Left => new(180);
@@ -84,17 +86,7 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public static float[] SplitArray(Type outputType, params Angle[] vals)
     {
         float[] res = new float[vals.Length];
-        for (int i = 0; i < vals.Length; i++)
-        {
-            res[i] = outputType switch
-            {
-                Type.Degrees => vals[i].Degrees,
-                Type.Gradians => vals[i].Gradians,
-                Type.Normalized => vals[i].Normalized,
-                Type.Radians => vals[i].Radians,
-                _ => throw new ArgumentException("Unknown type.", nameof(outputType)),
-            };
-        }
+        for (int i = 0; i < vals.Length; i++) res[i] = vals[i].ValueFromType(outputType);
         return res;
     }
 
@@ -106,22 +98,13 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     }
     public bool Equals(Angle other) => p_deg == other.p_deg;
     public override int GetHashCode() => Degrees.GetHashCode() ^ Gradians.GetHashCode() ^ Radians.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(Type outputType) => ToString((string?)null, outputType);
-    public string ToString(string? provider, Type outputType = Type.Degrees) => outputType switch
+    public override string ToString() => ToString(Type.Degrees);
+    public string ToString(Type outputType) => outputType switch
     {
-        Type.Degrees => p_deg.ToString(provider) + "°",
-        Type.Gradians => Gradians.ToString(provider) + "grad",
-        Type.Normalized => Normalized.ToString(provider) + "%",
-        Type.Radians => Radians.ToString(provider) + "rad",
-        _ => throw new ArgumentException("Unknown type.", nameof(outputType)),
-    };
-    public string ToString(IFormatProvider provider, Type outputType = Type.Degrees) => outputType switch
-    {
-        Type.Degrees => p_deg.ToString(provider) + "°",
-        Type.Gradians => Gradians.ToString(provider) + "grad",
-        Type.Normalized => Normalized.ToString(provider) + "%",
-        Type.Radians => Radians.ToString(provider) + "rad",
+        Type.Degrees => p_deg + "°",
+        Type.Gradians => Gradians + "grad",
+        Type.Normalized => Normalized + "%",
+        Type.Radians => Radians + "rad",
         _ => throw new ArgumentException("Unknown type.", nameof(outputType)),
     };
 
@@ -133,7 +116,7 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
         Type.Gradians => Gradians,
         Type.Normalized => Normalized,
         Type.Radians => Radians,
-        _ => throw new ArgumentException("Unknown type.", nameof(type)),
+        _ => throw new ArgumentException("Unknown type.", nameof(type))
     };
 
     public static Angle operator +(Angle a, Angle b) => new(a.p_deg + b.p_deg);
@@ -147,6 +130,8 @@ public struct Angle : ICloneable, IComparable<Angle>, IEquatable<Angle>
     public static bool operator <(Angle a, Angle b) => a.CompareTo(b) < 0;
     public static bool operator >=(Angle a, Angle b) => a == b || a > b;
     public static bool operator <=(Angle a, Angle b) => a == b || a < b;
+
+    public static implicit operator Angle((float val, Type type) obj) => new(obj.val, obj.type);
 
     public enum Type
     {

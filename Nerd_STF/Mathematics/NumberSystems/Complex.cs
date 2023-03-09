@@ -1,6 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics.NumberSystems;
 
-public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, IGroup<float>
+public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Complex>, ICeiling<Complex>,
+    IClampMagnitude<Complex, float>, IComparable<Complex>, IDivide<Complex>, IDot<Complex, float>,
+    IEquatable<Complex>, IFloor<Complex>, IGroup<float>, IIndexAll<float>, IIndexRangeAll<float>,
+    ILerp<Complex, float>, IMax<Complex>, IMedian<Complex>, IMin<Complex>, IPresets2D<Complex>, IProduct<Complex>,
+    IRound<Complex>, ISplittable<Complex, (float[] Us, float[] Is)>, ISum<Complex>
 {
     public static Complex Down => new(0, -1);
     public static Complex Left => new(-1, 0);
@@ -15,14 +19,10 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public float Magnitude => Mathf.Sqrt(u * u + i * i);
     public Complex Normalized => this * Mathf.InverseSqrt(u * u + i * i);
 
-    public float u, i;
+    public float u = u;
+    public float i = i;
 
     public Complex(float all) : this(all, all) { }
-    public Complex(float u, float i)
-    {
-        this.u = u;
-        this.i = i;
-    }
     public Complex(Fill<float> fill) : this(fill(0), fill(1)) { }
     public Complex(Fill<int> fill) : this(fill(0), fill(1)) { }
 
@@ -48,6 +48,28 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
 
                 default: throw new IndexOutOfRangeException(nameof(index));
             }
+        }
+    }
+    public float this[Index index]
+    {
+        get => this[index.IsFromEnd ? 2 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 2 - index.Value : index.Value] = value;
+    }
+    public float[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            List<float> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
         }
     }
 
@@ -129,20 +151,8 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public Angle GetAngle() => Mathf.ArcTan(i / u);
 
     public int CompareTo(Complex other) => Magnitude.CompareTo(other.Magnitude);
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null || obj.GetType() != typeof(Complex)) return base.Equals(obj);
-        return Equals((Complex)obj);
-    }
     public bool Equals(Complex other) => u == other.u && i == other.i;
-    public override int GetHashCode() => u.GetHashCode() ^ i.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) =>
-        u.ToString(provider) + (i >= 0 ? " + " : " - ") + Mathf.Absolute(i).ToString(provider) + "i";
-    public string ToString(IFormatProvider provider) =>
-        u.ToString(provider) + (i >= 0 ? " + " : " - ") + Mathf.Absolute(i).ToString(provider) + "i";
-
-    public object Clone() => new Complex(u, i);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<float> GetEnumerator()
@@ -161,6 +171,15 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
 
     public Vector2d ToVector() => ((Float2)this).ToVector();
 
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(u);
+        builder.Append(i >= 0 ? " + " : " - ");
+        builder.Append(Mathf.Absolute(i));
+        builder.Append('i');
+        return true;
+    }
+
     public static Complex operator +(Complex a, Complex b) => new(a.u + b.u, a.i + b.i);
     public static Complex operator -(Complex c) => new(-c.u, -c.i);
     public static Complex operator -(Complex a, Complex b) => new(a.u - b.u, a.i - b.i);
@@ -171,11 +190,17 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public static Complex operator /(Complex a, float b) => new(a.u / b, a.i / b);
     public static Complex operator /(Complex a, Matrix b) => (Complex)((Matrix)a / b);
     public static Complex operator ~(Complex v) => v.Conjugate;
-    public static bool operator ==(Complex a, Complex b) => a.Equals(b);
-    public static bool operator !=(Complex a, Complex b) => !a.Equals(b);
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator >(Complex a, Complex b) => a.CompareTo(b) > 0;
+    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
+        nameof(Magnitude) + "s directly.")]
     public static bool operator <(Complex a, Complex b) => a.CompareTo(b) < 0;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator >=(Complex a, Complex b) => a == b || a > b;
+    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
+        "You should instead compare " + nameof(Magnitude) + "s directly.")]
     public static bool operator <=(Complex a, Complex b) => a == b || a < b;
 
     public static explicit operator Complex(Quaternion val) => new(val.u, val.i);
@@ -190,4 +215,5 @@ public struct Complex : ICloneable, IComparable<Complex>, IEquatable<Complex>, I
     public static explicit operator Complex(Vert val) => new(val.position.x, val.position.y);
     public static implicit operator Complex(Fill<float> fill) => new(fill);
     public static implicit operator Complex(Fill<int> fill) => new(fill);
+    public static implicit operator Complex((float u, float i) val) => new(val.u, val.i);
 }

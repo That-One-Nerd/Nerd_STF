@@ -50,6 +50,8 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
         Float3.Max(ToFloat3Array(vals));
     public static Vert Min(params Vert[] vals) =>
         Float3.Min(ToFloat3Array(vals));
+    public static Vert Round(Vert val) =>
+        Float3.Round(val);
 
     public static Float3[] ToFloat3Array(params Vert[] vals)
     {
@@ -66,9 +68,7 @@ public struct Vert : ICloneable, IEquatable<Vert>, IGroup<float>
     }
     public bool Equals(Vert other) => position == other.position;
     public override int GetHashCode() => position.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) => position.ToString(provider);
-    public string ToString(IFormatProvider provider) => position.ToString(provider);
+    public override string ToString() => position.ToString();
 
     public object Clone() => new Vert(position);
 

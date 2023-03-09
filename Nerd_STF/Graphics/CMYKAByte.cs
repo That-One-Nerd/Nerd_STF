@@ -1,21 +1,50 @@
 ﻿namespace Nerd_STF.Graphics;
 
-public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
+public record struct CMYKAByte : IAverage<CMYKAByte>, IClamp<CMYKAByte>, IColorByte<CMYKAByte>,
+    IColorPresets<CMYKAByte>, IEquatable<CMYKAByte>, IIndexAll<int>, IIndexRangeAll<int>,
+    ILerp<CMYKAByte, float>, IMedian<CMYKAByte>,
+    ISplittable<CMYKAByte, (byte[] Cs, byte[] Ms, byte[] Ys, byte[] Ks, byte[] As)>
 {
-    public static CMYKA Black => new(0, 0, 0, 255);
-    public static CMYKA Blue => new(255, 255, 0, 0);
-    public static CMYKA Clear => new(0, 0, 0, 0, 0);
-    public static CMYKA Cyan => new(255, 0, 0, 0);
-    public static CMYKA Gray => new(0, 0, 0, 127);
-    public static CMYKA Green => new(255, 0, 255, 0);
-    public static CMYKA Magenta => new(0, 255, 0, 0);
-    public static CMYKA Orange => new(0, 127, 255, 0);
-    public static CMYKA Purple => new(127, 255, 0, 0);
-    public static CMYKA Red => new(0, 255, 255, 0);
-    public static CMYKA White => new(0, 0, 0, 0);
-    public static CMYKA Yellow => new(0, 0, 255, 0);
+    public static CMYKAByte Black => new(0, 0, 0, 255);
+    public static CMYKAByte Blue => new(255, 255, 0, 0);
+    public static CMYKAByte Clear => new(0, 0, 0, 0, 0);
+    public static CMYKAByte Cyan => new(255, 0, 0, 0);
+    public static CMYKAByte Gray => new(0, 0, 0, 127);
+    public static CMYKAByte Green => new(255, 0, 255, 0);
+    public static CMYKAByte Magenta => new(0, 255, 0, 0);
+    public static CMYKAByte Orange => new(0, 127, 255, 0);
+    public static CMYKAByte Purple => new(127, 255, 0, 0);
+    public static CMYKAByte Red => new(0, 255, 255, 0);
+    public static CMYKAByte White => new(0, 0, 0, 0);
+    public static CMYKAByte Yellow => new(0, 0, 255, 0);
 
-    public byte C, M, Y, K, A;
+    public int C
+    {
+        get => p_c;
+        set => p_c = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int M
+    {
+        get => p_m;
+        set => p_m = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int Y
+    {
+        get => p_y;
+        set => p_y = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int K
+    {
+        get => p_k;
+        set => p_k = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+    public int A
+    {
+        get => p_a;
+        set => p_a = (byte)Mathf.Clamp(value, byte.MinValue, byte.MaxValue);
+    }
+
+    private byte p_c, p_m, p_y, p_k, p_a;
 
     public bool HasCyan => C > 0;
     public bool HasMagenta => M > 0;
@@ -30,16 +59,16 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
     public CMYKAByte(int c, int m, int y, int k) : this(c, m, y, k, 255) { }
     public CMYKAByte(int c, int m, int y, int k, int a)
     {
-        C = (byte)Mathf.Clamp(c, 0, 255);
-        M = (byte)Mathf.Clamp(m, 0, 255);
-        Y = (byte)Mathf.Clamp(y, 0, 255);
-        K = (byte)Mathf.Clamp(k, 0, 255);
-        A = (byte)Mathf.Clamp(a, 0, 255);
+        p_c = (byte)Mathf.Clamp(c, 0, 255);
+        p_m = (byte)Mathf.Clamp(m, 0, 255);
+        p_y = (byte)Mathf.Clamp(y, 0, 255);
+        p_k = (byte)Mathf.Clamp(k, 0, 255);
+        p_a = (byte)Mathf.Clamp(a, 0, 255);
     }
     public CMYKAByte(Fill<byte> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4)) { }
     public CMYKAByte(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4)) { }
 
-    public byte this[int index]
+    public int this[int index]
     {
         get => index switch
         {
@@ -78,6 +107,28 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
             }
         }
     }
+    public int this[Index index]
+    {
+        get => this[index.IsFromEnd ? 5 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 5 - index.Value : index.Value] = value;
+    }
+    public int[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 5 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 5 - range.End.Value : range.End.Value;
+            List<int> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 5 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 5 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static CMYKAByte Average(params CMYKAByte[] vals)
     {
@@ -101,16 +152,6 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
         CMYKAByte valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
-    public static CMYKAByte Max(params CMYKAByte[] vals)
-    {
-        (int[] Cs, int[] Ms, int[] Ys, int[] Ks, int[] As) = SplitArrayInt(vals);
-        return new(Mathf.Max(Cs), Mathf.Max(Ms), Mathf.Max(Ys), Mathf.Max(Ks), Mathf.Max(As));
-    }
-    public static CMYKAByte Min(params CMYKAByte[] vals)
-    {
-        (int[] Cs, int[] Ms, int[] Ys, int[] Ks, int[] As) = SplitArrayInt(vals);
-        return new(Mathf.Min(Cs), Mathf.Min(Ms), Mathf.Min(Ys), Mathf.Min(Ks), Mathf.Min(As));
-    }
 
     public static (byte[] Cs, byte[] Ms, byte[] Ys, byte[] Ks, byte[] As) SplitArray(params CMYKAByte[] vals)
     {
@@ -119,11 +160,11 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
                As = new byte[vals.Length];
         for (int i = 0; i < vals.Length; i++)
         {
-            Cs[i] = vals[i].C;
-            Ms[i] = vals[i].M;
-            Ys[i] = vals[i].Y;
-            Ks[i] = vals[i].K;
-            As[i] = vals[i].A;
+            Cs[i] = vals[i].p_c;
+            Ms[i] = vals[i].p_m;
+            Ys[i] = vals[i].p_y;
+            Ks[i] = vals[i].p_k;
+            As[i] = vals[i].p_a;
         }
         return (Cs, Ms, Ys, Ks, As);
     }
@@ -143,34 +184,10 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
         return (Cs, Ms, Ys, Ks, As);
     }
 
-    public bool Equals(IColorFloat? col) => col != null && Equals(col.ToCMYKAByte());
-    public bool Equals(IColorByte? col) => col != null && Equals(col.ToCMYKAByte());
     public bool Equals(CMYKAByte col) => A == 0 && col.A == 0 || K == 1 && col.K == 255 || C == col.C && M == col.M
        && Y == col.Y && K == col.K && A == col.A;
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        if (obj == null) return base.Equals(obj);
-        Type t = obj.GetType();
-        if (t == typeof(CMYKAByte)) return Equals((CMYKAByte)obj);
-        else if (t == typeof(RGBA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(HSVA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(IColorFloat)) return Equals((IColorFloat)obj);
-        else if (t == typeof(RGBAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(CMYKA)) return Equals((IColorFloat)obj);
-        else if (t == typeof(HSVAByte)) return Equals((IColorByte)obj);
-        else if (t == typeof(IColorByte)) return Equals((IColorByte)obj);
-
-        return base.Equals(obj);
-    }
-    public override int GetHashCode() => C.GetHashCode() ^ M.GetHashCode() ^ Y.GetHashCode()
-        ^ K.GetHashCode() ^ A.GetHashCode();
-    public string ToString(IFormatProvider provider) => "C: " + C.ToString(provider)
-        + " M: " + M.ToString(provider) + " Y: " + Y.ToString(provider)
-        + " K: " + K.ToString(provider) + " A: " + A.ToString(provider);
-    public string ToString(string? provider) => "C: " + C.ToString(provider)
-        + " M: " + M.ToString(provider) + " Y: " + Y.ToString(provider)
-        + " K: " + K.ToString(provider) + " A: " + A.ToString(provider);
-    public override string ToString() => ToString((string?)null);
+    public bool Equals(IColor? col) => col != null && Equals(col.ToCMYKAByte());
+    public override int GetHashCode() => base.GetHashCode();
 
     public RGBA ToRGBA() => ToCMYKA().ToRGBA();
     public CMYKA ToCMYKA() => new(C / 255f, M / 255f, Y / 255f, K / 255f, A / 255f);
@@ -180,25 +197,45 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
     public CMYKAByte ToCMYKAByte() => this;
     public HSVAByte ToHSVAByte() => ToCMYKA().ToHSVAByte();
 
-    public byte[] ToArray() => new[] { C, M, Y, K, A };
+    public byte[] ToArray() => new[] { p_c, p_m, p_y, p_k, p_a };
+    public int[] ToArrayInt() => new[] { C, M, Y, K, A };
     public Fill<byte> ToFill()
+    {
+        CMYKAByte @this = this;
+        return i => (byte)@this[i];
+    }
+    public Fill<int> ToFillInt()
     {
         CMYKAByte @this = this;
         return i => @this[i];
     }
-    public List<byte> ToList() => new() { C, M, Y, K, A };
+    public List<byte> ToList() => new() { p_c, p_m, p_y, p_k, p_a };
+    public List<int> ToListInt() => new() { C, M, Y, K, A };
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<byte> GetEnumerator()
     {
-        yield return C;
-        yield return M;
-        yield return Y;
-        yield return K;
-        yield return A;
+        yield return p_c;
+        yield return p_m;
+        yield return p_y;
+        yield return p_k;
+        yield return p_a;
     }
 
-    public object Clone() => new CMYKAByte(C, M, Y, K, A);
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("C = ");
+        builder.Append(C);
+        builder.Append(", M = ");
+        builder.Append(M);
+        builder.Append(", Y = ");
+        builder.Append(Y);
+        builder.Append(", K = ");
+        builder.Append(K);
+        builder.Append(", A = ");
+        builder.Append(A);
+        return true;
+    }
 
     public static CMYKAByte operator +(CMYKAByte a, CMYKAByte b) =>
         new(a.C + b.C, a.M + b.M, a.Y + b.Y, a.K + b.K, a.A + b.A);
@@ -216,26 +253,24 @@ public struct CMYKAByte : IColorByte, IEquatable<CMYKAByte>
     public static CMYKAByte operator /(CMYKAByte a, int b) =>
         new(a.C / b, a.M / b, a.Y / b, a.K / b, a.A / b);
     public static CMYKAByte operator /(CMYKAByte a, float b) => (a.ToCMYKA() / b).ToCMYKAByte();
-    public static bool operator ==(CMYKAByte a, RGBA b) => a.Equals((IColorFloat?)b);
-    public static bool operator !=(CMYKAByte a, RGBA b) => !a.Equals((IColorFloat?)b);
-    public static bool operator ==(CMYKAByte a, CMYKA b) => a.Equals((IColorFloat?)b);
-    public static bool operator !=(CMYKAByte a, CMYKA b) => !a.Equals((IColorFloat?)b);
-    public static bool operator ==(CMYKAByte a, HSVA b) => a.Equals((IColorFloat?)b);
-    public static bool operator !=(CMYKAByte a, HSVA b) => !a.Equals((IColorFloat?)b);
-    public static bool operator ==(CMYKAByte a, RGBAByte b) => a.Equals(b);
-    public static bool operator !=(CMYKAByte a, RGBAByte b) => !a.Equals(b);
-    public static bool operator ==(CMYKAByte a, CMYKAByte b) => a.Equals(b);
-    public static bool operator !=(CMYKAByte a, CMYKAByte b) => !a.Equals(b);
+    public static bool operator ==(CMYKAByte a, CMYKA b) => a.Equals(b);
+    public static bool operator !=(CMYKAByte a, CMYKA b) => a.Equals(b);
+    public static bool operator ==(CMYKAByte a, HSVA b) => a.Equals(b);
+    public static bool operator !=(CMYKAByte a, HSVA b) => a.Equals(b);
+    public static bool operator ==(CMYKAByte a, RGBA b) => a.Equals(b);
+    public static bool operator !=(CMYKAByte a, RGBA b) => a.Equals(b);
     public static bool operator ==(CMYKAByte a, HSVAByte b) => a.Equals(b);
-    public static bool operator !=(CMYKAByte a, HSVAByte b) => !a.Equals(b);
+    public static bool operator !=(CMYKAByte a, HSVAByte b) => a.Equals(b);
+    public static bool operator ==(CMYKAByte a, RGBAByte b) => a.Equals(b);
+    public static bool operator !=(CMYKAByte a, RGBAByte b) => a.Equals(b);
 
     public static explicit operator CMYKAByte(Int3 val) => new(val.x, val.y, val.z, 0);
     public static implicit operator CMYKAByte(Int4 val) => new(val.x, val.y, val.z, val.w);
-    public static implicit operator CMYKAByte(RGBA val) => val.ToCMYKAByte();
     public static implicit operator CMYKAByte(HSVA val) => val.ToCMYKAByte();
-    public static implicit operator CMYKAByte(RGBAByte val) => val.ToCMYKAByte();
+    public static implicit operator CMYKAByte(RGBA val) => val.ToCMYKAByte();
     public static implicit operator CMYKAByte(CMYKA val) => val.ToCMYKAByte();
     public static implicit operator CMYKAByte(HSVAByte val) => val.ToCMYKAByte();
+    public static implicit operator CMYKAByte(RGBAByte val) => val.ToCMYKAByte();
     public static implicit operator CMYKAByte(Fill<byte> val) => new(val);
     public static implicit operator CMYKAByte(Fill<int> val) => new(val);
 }

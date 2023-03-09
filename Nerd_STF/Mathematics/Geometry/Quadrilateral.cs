@@ -1,6 +1,9 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert>, ITriangulatable
+public record class Quadrilateral : IAbsolute<Quadrilateral>, IAverage<Quadrilateral>, ICeiling<Quadrilateral>,
+    IClamp<Quadrilateral>, IEquatable<Quadrilateral>, IFloor<Quadrilateral>,
+    IFromTuple<Quadrilateral, (Vert a, Vert b, Vert c, Vert d)>, IGroup<Vert>, IIndexAll<Vert>, IIndexRangeAll<Vert>,
+    ILerp<Quadrilateral, float>, IRound<Quadrilateral>, IShape2D<float>, ITriangulate
 {
     public Vert A
     {
@@ -179,6 +182,28 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
             }
         }
     }
+    public Vert this[Index index]
+    {
+        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
+        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
+    }
+    public Vert[] this[Range range]
+    {
+        get
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            List<Vert> res = new();
+            for (int i = start; i < end; i++) res.Add(this[i]);
+            return res.ToArray();
+        }
+        set
+        {
+            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
+            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
+            for (int i = start; i < end; i++) this[i] = value[i];
+        }
+    }
 
     public static Quadrilateral Absolute(Quadrilateral val) =>
         new(Vert.Absolute(val.A), Vert.Absolute(val.B), Vert.Absolute(val.C), Vert.Absolute(val.D));
@@ -212,6 +237,8 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
         (Vert[] As, Vert[] Bs, Vert[] Cs, Vert[] Ds) = SplitVertArray(vals);
         return new(Vert.Min(As), Vert.Min(Bs), Vert.Min(Cs), Vert.Min(Ds));
     }
+    public static Quadrilateral Round(Quadrilateral val) =>
+        new(Vert.Round(val.A), Vert.Round(val.B), Vert.Round(val.C), Vert.Round(val.D));
 
     public static (Vert[] As, Vert[] Bs, Vert[] Cs, Vert[] Ds) SplitVertArray(params Quadrilateral[] quads)
     {
@@ -265,20 +292,12 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     }
     public static List<float> ToFloatListAll(params Quadrilateral[] quads) => new(ToFloatArrayAll(quads));
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public virtual bool Equals(Quadrilateral? other)
     {
-        if (obj == null || obj.GetType() != typeof(Quadrilateral)) return base.Equals(obj);
-        return Equals((Quadrilateral)obj);
+        if (other is null) return false;
+        return A == other.A && B == other.B && C == other.C && D == other.D;
     }
-    public bool Equals(Quadrilateral other) => A == other.A && B == other.B && C == other.C && D == other.D;
-    public override int GetHashCode() => A.GetHashCode() ^ B.GetHashCode() ^ C.GetHashCode() ^ D.GetHashCode();
-    public override string ToString() => ToString((string?)null);
-    public string ToString(string? provider) => "A: " + A.ToString(provider) + " B: " + B.ToString(provider)
-        + " C: " + C.ToString(provider) + " D: " + D.ToString(provider);
-    public string ToString(IFormatProvider provider) => "A: " + A.ToString(provider) + " B: "
-        + B.ToString(provider) + " C: " + C.ToString(provider) + " D: " + D.ToString(provider);
-
-    public object Clone() => new Quadrilateral(A, B, C, D);
+    public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public IEnumerator<Vert> GetEnumerator()
@@ -309,6 +328,19 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     public Triangle[] Triangulate() => new Line(A, C).Length > new Line(B, D).Length ?
         new Triangle[] { new(A, B, C), new(C, D, A) } : new Triangle[] { new(B, C, D), new(D, A, B) };
 
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append("A = ");
+        builder.Append(A);
+        builder.Append(", B = ");
+        builder.Append(B);
+        builder.Append(", C = ");
+        builder.Append(C);
+        builder.Append(", D = ");
+        builder.Append(D);
+        return true;
+    }
+
     public static Quadrilateral operator +(Quadrilateral a, Quadrilateral b) => new(a.A + b.A, a.B + b.B,
                                                                                     a.C + b.C, a.D + b.D);
     public static Quadrilateral operator +(Quadrilateral a, Vert b) => new(a.A + b, a.B + b, a.C + b, a.D + b);
@@ -324,8 +356,6 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
                                                                                     a.C / b.C, a.D / b.D);
     public static Quadrilateral operator /(Quadrilateral a, Vert b) => new(a.A / b, a.B / b, a.C / b, a.D / b);
     public static Quadrilateral operator /(Quadrilateral a, float b) => new(a.A / b, a.B / b, a.C / b, a.D / b);
-    public static bool operator ==(Quadrilateral a, Quadrilateral b) => a.Equals(b);
-    public static bool operator !=(Quadrilateral a, Quadrilateral b) => !a.Equals(b);
 
     public static implicit operator Quadrilateral(Fill<Vert> fill) => new(fill);
     public static implicit operator Quadrilateral(Fill<Float3> fill) => new(fill);
@@ -333,4 +363,6 @@ public struct Quadrilateral : ICloneable, IEquatable<Quadrilateral>, IGroup<Vert
     public static implicit operator Quadrilateral(Fill<Line> fill) => new(fill);
     public static implicit operator Quadrilateral(Fill<float> fill) => new(fill);
     public static implicit operator Quadrilateral(Fill<int> fill) => new(fill);
+    public static implicit operator Quadrilateral((Vert a, Vert b, Vert c, Vert d) val) =>
+        new(val.a, val.b, val.c, val.d);
 }
