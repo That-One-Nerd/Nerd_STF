@@ -28,7 +28,7 @@ internal static class RationalHelper
 
         do
         {
-            result = new(min.Numerator + max.Numerator, min.Denominator + max.Denominator, false);
+            result = new(min.numerator + max.numerator, min.denominator + max.denominator, false);
             resultValue = result.GetValue();
 
             if (remainder == resultValue) break;
@@ -40,7 +40,9 @@ internal static class RationalHelper
         }
         while (Mathf.Absolute(resultValue - value) > tolerance);
 
-        result.Numerator += additional * result.Denominator;
+        if (additional != 0)
+            result = new(result.numerator + additional * result.denominator, result.denominator);
+
         return result;
     }
 }
