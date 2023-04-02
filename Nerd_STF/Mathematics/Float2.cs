@@ -5,7 +5,7 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
     ICross<Float2, Float3>, IDivide<Float2>, IDot<Float2, float>, IEquatable<Float2>,
     IFloor<Float2, Int2>, IFromTuple<Float2, (float x, float y)>, IGroup<float>,
     ILerp<Float2, float>, IMathOperators<Float2>, IMax<Float2>, IMedian<Float2>, IMin<Float2>,
-    IIndexAll<float>, IIndexRangeAll<float>, IPresets2D<Float2>, IProduct<Float2>, IRound<Float2, Int2>,
+    IIndexAll<float>, IIndexRangeAll<float>, IPresets2d<Float2>, IProduct<Float2>, IRound<Float2, Int2>,
     ISplittable<Float2, (float[] Xs, float[] Ys)>, ISubtract<Float2>, ISum<Float2>
 {
     public static Float2 Down => new(0, -1);
@@ -162,8 +162,6 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
         return (Xs, Ys);
     }
 
-    [Obsolete("This method is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Float2 other) => Magnitude.CompareTo(other.Magnitude);
     public bool Equals(Float2 other) => x == other.x && y == other.y;
     public override int GetHashCode() => base.GetHashCode();
@@ -204,18 +202,6 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
     public static Float2 operator /(Float2 a, Float2 b) => new(a.x / b.x, a.y / b.y);
     public static Float2 operator /(Float2 a, float b) => new(a.x / b, a.y / b);
     public static Float2 operator /(Float2 a, Matrix b) => (Float2)((Matrix)a / b);
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Float2 a, Float2 b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Float2 a, Float2 b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Float2 a, Float2 b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Float2 a, Float2 b) => a == b || a < b;
 
     public static implicit operator Float2(Complex val) => new(val.u, val.i);
     public static explicit operator Float2(Quaternion val) => new(val.u, val.i);

@@ -3,7 +3,7 @@
 public record class Quadrilateral : IAbsolute<Quadrilateral>, IAverage<Quadrilateral>, ICeiling<Quadrilateral>,
     IClamp<Quadrilateral>, IEquatable<Quadrilateral>, IFloor<Quadrilateral>,
     IFromTuple<Quadrilateral, (Vert a, Vert b, Vert c, Vert d)>, IGroup<Vert>, IIndexAll<Vert>, IIndexRangeAll<Vert>,
-    ILerp<Quadrilateral, float>, IRound<Quadrilateral>, IShape2D<float>, ITriangulate
+    ILerp<Quadrilateral, float>, IRound<Quadrilateral>, IShape2d<float>, ITriangulate
 {
     public Vert A
     {

@@ -2,10 +2,11 @@
 
 public static class Equations
 {
-    public static readonly Fill<int> SgnFill = i => i % 2 == 0 ? 1 : -1;
+    public static Equation CosWave => Mathf.Cos;
+    public static Equation SinWave => Mathf.Sin;
+    public static Equation SawWave => x => x % 1;
+    public static Equation SquareWave => x => x % 2 < 1 ? 1 : 0;
 
-    public static readonly Equation CosWave = x => Mathf.Cos(x);
-    public static readonly Equation SinWave = x => Mathf.Sin(x);
-    public static readonly Equation SawWave = x => x % 1;
-    public static readonly Equation SquareWave = x => x % 2 < 1 ? 1 : 0;
+    public static Equation FlatLine => x => 0;
+    public static Equation XLine => x => x;
 }

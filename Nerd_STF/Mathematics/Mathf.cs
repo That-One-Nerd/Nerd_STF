@@ -44,6 +44,8 @@ public static class Mathf
     public static float Binomial(int n, int total, float successRate) =>
         Combinations(total, n) * Power(successRate, n) * Power(1 - successRate, total - n);
 
+    public static float Cbrt(float value) => SolveNewton(x => x * x * x - value, 1);
+
     public static int Ceiling(float val)
     {
         float mod = val % 1;
@@ -135,6 +137,13 @@ public static class Mathf
 
     public static float InverseSqrt(float val) => 1 / Sqrt(val);
 
+    public static bool IsPrime(int num, PrimeCheckMethod method = PrimeCheckMethod.Classic) =>
+        method switch
+        {
+            PrimeCheckMethod.Classic => MathfHelper.IsPrimeClassic(num),
+            _ => throw new ArgumentException("Unknown prime check method.", nameof(method))
+        };
+
     public static int LeastCommonMultiple(params int[] vals) => Product(vals) / GreatestCommonFactor(vals);
 
     public static float Lerp(float a, float b, float t, bool clamp = true)
@@ -144,6 +153,12 @@ public static class Mathf
         return v;
     }
     public static int Lerp(int a, int b, float t, bool clamp = true) => (int)Lerp((float)a, b, t, clamp);
+    public static Equation Lerp(float a, float b, Equation t, bool clamp = true) =>
+        x => Lerp(a, b, t(x), clamp);
+    public static Equation Lerp(Equation a, Equation b, float t, bool clamp = true) =>
+        x => Lerp(a(x), b(x), t, clamp);
+    public static Equation Lerp(Equation a, Equation b, Equation t, bool clamp = true) =>
+        x => Lerp(a(x), b(x), t(x), clamp);
 
     public static Equation MakeEquation(Dictionary<float, float> vals) => delegate (float x)
     {
@@ -280,6 +295,20 @@ public static class Mathf
     // nPr (n = total, r = size)
     public static int Permutations(int total, int size) => Factorial(total) / Factorial(total - size);
 
+    public static int[] PrimeFactors(int num)
+    {
+        List<int> factors = new();
+        for (int i = 2; i <= num; i++)
+        {
+            while (num % i == 0)
+            {
+                factors.Add(i);
+                num /= i;
+            }
+        }
+        return factors.ToArray();
+    }
+
     public static float Product(params float[] vals)
     {
         if (vals.Length < 1) return 0;
@@ -339,6 +368,16 @@ public static class Mathf
     public static float Sec(Angle angle) => Sec(angle.Radians);
     public static float Sec(float radians) => 1 / Cos(radians);
 
+    public static T[] SharedItems<T>(params T[][] arrays) where T : IEquatable<T>
+    {
+        if (arrays.Length < 1) return Array.Empty<T>();
+
+        IEnumerable<T> results = arrays[0];
+        foreach (T[] array in arrays) results = results.Where(x => array.Any(y => y.Equals(x)));
+
+        return UniqueItems(results.ToArray());
+    }
+
     public static float Sin(Angle angle) => Sin(angle.Radians);
     public static float Sin(float radians)
     {
@@ -361,7 +400,70 @@ public static class Mathf
             + (j * x * x * x * x * x * x * x * x * x);
     }
 
-    public static float Sqrt(float value) => Root(value, 2);
+    public static float SolveBisection(Equation equ, float initialA, float initialB, float tolerance = 1e-5f,
+        int maxIterations = 1000)
+    {
+        if (equ(initialA) == 0) return initialA;
+        else if (equ(initialB) == 0) return initialB;
+
+        float guessA = initialA, guessB = initialB, guessMid;
+
+        if (Math.Sign(equ(guessA)) == Math.Sign(equ(guessB)))
+        {
+            // Guess doesn't contain a zero (or isn't continuous). Return NaN.
+            return float.NaN;
+        }
+
+        int iterations = 0;
+        do
+        {
+            guessMid = (guessA + guessB) / 2;
+            float valMid = equ(guessMid);
+
+            if (valMid == 0) return guessMid;
+
+            if (Math.Sign(equ(guessA)) != Math.Sign(valMid)) guessB = guessMid;
+            else guessA = guessMid;
+
+            iterations++;
+            if (iterations > maxIterations)
+            {
+                // Result isn't good enough. Return NaN.
+                return float.NaN;
+            }
+        }
+        while ((guessB - guessA) > tolerance);
+
+        return guessMid;
+    }
+    public static float SolveEquation(Equation equ, float initial, float tolerance = 1e-5f,
+        float step = Calculus.DefaultStep, int maxIterations = 1000) =>
+        SolveNewton(equ, initial, tolerance, step, maxIterations);
+    public static float SolveNewton(Equation equ, float initial, float tolerance = 1e-5f,
+        float step = Calculus.DefaultStep, int maxIterations = 1000)
+    {
+        if (equ(initial) == 0) return initial;
+
+        float lastResult = initial, result;
+        int iterations = 0;
+        do
+        {
+            result = lastResult - (equ(lastResult) / Calculus.GetDerivativeAtPoint(equ, lastResult, step));
+            lastResult = result;
+
+            iterations++;
+            if (iterations > maxIterations)
+            {
+                // Result isn't good enough. Return NaN.
+                return float.NaN;
+            }
+        }
+        while (Absolute(equ(result)) > tolerance);
+
+        return result;
+    }
+
+    public static float Sqrt(float value) => SolveNewton(x => x * x - value, 1);
 
     public static float Subtract(float num, params float[] vals) => num - Sum(vals);
     public static int Subtract(int num, params int[] vals) => num - Sum(vals);

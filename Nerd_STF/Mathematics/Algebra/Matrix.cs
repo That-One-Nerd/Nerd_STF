@@ -20,7 +20,7 @@ public class Matrix : IMatrix<Matrix, Matrix>
         return m;
     }
     public static Matrix One(Int2 size) => new(size, 1);
-    public static Matrix SignGrid(Int2 size) => new(size, Equations.SgnFill);
+    public static Matrix SignGrid(Int2 size) => new(size, Fills.SignFill);
     public static Matrix Zero(Int2 size) => new(size);
 
     public bool HasMinors => Size.x > 1 && Size.y > 1;
@@ -85,13 +85,13 @@ public class Matrix : IMatrix<Matrix, Matrix>
         array = new float[size.x, size.y];
         for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals[r, c];
     }
-    public Matrix(Int2 size, Fill2D<float> vals)
+    public Matrix(Int2 size, Fill2d<float> vals)
     {
         Size = size;
         array = new float[size.x, size.y];
         for (int r = 0; r < size.x; r++) for (int c = 0; c < size.y; c++) array[r, c] = vals(r, c);
     }
-    public Matrix(Int2 size, Fill2D<int> vals)
+    public Matrix(Int2 size, Fill2d<int> vals)
     {
         Size = size;
         array = new float[size.x, size.y];
@@ -188,7 +188,7 @@ public class Matrix : IMatrix<Matrix, Matrix>
         return val;
     }
 
-    public void Apply(Modifier2D modifier)
+    public void Apply(Modifier2d modifier)
     {
         for (int r = 0; r < Size.x; r++) for (int c = 0; c < Size.y; c++)
                 array[r, c] = modifier(new(r, c), array[r, c]);
@@ -310,7 +310,7 @@ public class Matrix : IMatrix<Matrix, Matrix>
     public float[] ToArray() => array.Flatten(new(Size.y, Size.x));
     public float[,] ToArray2D() => array;
     public Fill<float> ToFill() => ToFillExtension.ToFill(this);
-    public Fill2D<float> ToFill2D()
+    public Fill2d<float> ToFill2D()
     {
         Matrix @this = this;
         return (x, y) => @this[x, y];

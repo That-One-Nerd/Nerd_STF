@@ -5,22 +5,16 @@ public record struct Float4 : IAbsolute<Float4>,
     IComparable<Float4>, IDivide<Float4>, IDot<Float4, float>, IEquatable<Float4>,
     IFloor<Float4, Int4>, IFromTuple<Float4, (float x, float y, float z, float w)>,
     IGroup<float>, IIndexAll<float>, IIndexRangeAll<float>, ILerp<Float4, float>, IMathOperators<Float4>,
-    IMax<Float4>, IMedian<Float4>, IMin<Float4>, IPresets4D<Float4>, IProduct<Float4>, IRound<Float4, Int4>,
+    IMax<Float4>, IMedian<Float4>, IMin<Float4>, IPresets4d<Float4>, IProduct<Float4>, IRound<Float4, Int4>,
     ISplittable<Float4, (float[] Xs, float[] Ys, float[] Zs, float[] Ws)>, ISubtract<Float4>,
     ISum<Float4>
 {
     public static Float4 Back => new(0, 0, -1, 0);
     public static Float4 Down => new(0, -1, 0, 0);
-    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
-              "This field will be removed in v2.4.0.", false)]
-    public static Float4 Far => new(0, 0, 0, 1);
     public static Float4 Forward => new(0, 0, 1, 0);
     public static Float4 HighW => new(0, 0, 0, 1);
     public static Float4 Left => new(-1, 0, 0, 0);
     public static Float4 LowW => new(0, 0, 0, -1);
-    [Obsolete("Field has been replaced by " + nameof(LowW) + ", because it has a better name. " +
-              "This field will be removed in v2.4.0.", false)]
-    public static Float4 Near => new(0, 0, 0, -1);
     public static Float4 Right => new(1, 0, 0, 0);
     public static Float4 Up => new(0, 1, 0, 0);
 
@@ -207,8 +201,6 @@ public record struct Float4 : IAbsolute<Float4>,
         return (Xs, Ys, Zs, Ws);
     }
 
-    [Obsolete("This method is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Float4 other) => Magnitude.CompareTo(other.Magnitude);
     public bool Equals(Float4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
     public override int GetHashCode() => base.GetHashCode();
@@ -252,18 +244,6 @@ public record struct Float4 : IAbsolute<Float4>,
     public static Float4 operator /(Float4 a, Float4 b) => new(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
     public static Float4 operator /(Float4 a, float b) => new(a.x / b, a.y / b, a.z / b, a.w / b);
     public static Float4 operator /(Float4 a, Matrix b) => (Float4)((Matrix)a / b);
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Float4 a, Float4 b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Float4 a, Float4 b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Float4 a, Float4 b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Float4 a, Float4 b) => a == b || a < b;
 
     public static implicit operator Float4(Complex val) => new(val.u, val.i, 0, 0);
     public static implicit operator Float4(Quaternion val) => new(val.u, val.i, val.j, val.k);

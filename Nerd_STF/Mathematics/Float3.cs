@@ -7,7 +7,7 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
     ICross<Float3>, IDivide<Float3>, IDot<Float3, float>, IEquatable<Float3>,
     IFloor<Float3, Int3>, IFromTuple<Float3, (float x, float y, float z)>, IGroup<float>,
     IIndexAll<float>, IIndexRangeAll<float>, ILerp<Float3, float>, IMathOperators<Float3>, IMax<Float3>,
-    IMedian<Float3>, IMin<Float3>, IPresets3D<Float3>, IProduct<Float3>, IRound<Float3, Int3>,
+    IMedian<Float3>, IMin<Float3>, IPresets3d<Float3>, IProduct<Float3>, IRound<Float3, Int3>,
     ISplittable<Float3, (float[] Xs, float[] Ys, float[] Zs)>, ISubtract<Float3>, ISum<Float3>
 {
     public static Float3 Back => new(0, 0, -1);
@@ -186,8 +186,6 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
         return (Xs, Ys, Zs);
     }
 
-    [Obsolete("This method is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Float3 other) => Magnitude.CompareTo(other.Magnitude);
     public bool Equals(Float3 other) => x == other.x && y == other.y && z == other.z;
     public override int GetHashCode() => base.GetHashCode();
@@ -238,18 +236,6 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
     public static Float3 operator /(Float3 a, Float3 b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
     public static Float3 operator /(Float3 a, float b) => new(a.x / b, a.y / b, a.z / b);
     public static Float3 operator /(Float3 a, Matrix b) => (Float3)((Matrix)a / b);
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Float3 a, Float3 b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Float3 a, Float3 b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Float3 a, Float3 b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Float3 a, Float3 b) => a == b || a < b;
 
     public static implicit operator Float3(Complex val) => new(val.u, val.i, 0);
     public static explicit operator Float3(Quaternion val) => new(val.u, val.i, val.j);

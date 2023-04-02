@@ -3,7 +3,7 @@
 public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Complex>, ICeiling<Complex>,
     IClampMagnitude<Complex, float>, IComparable<Complex>, IDivide<Complex>, IDot<Complex, float>,
     IEquatable<Complex>, IFloor<Complex>, IGroup<float>, IIndexAll<float>, IIndexRangeAll<float>,
-    ILerp<Complex, float>, IMax<Complex>, IMedian<Complex>, IMin<Complex>, IPresets2D<Complex>, IProduct<Complex>,
+    ILerp<Complex, float>, IMax<Complex>, IMedian<Complex>, IMin<Complex>, IPresets2d<Complex>, IProduct<Complex>,
     IRound<Complex>, ISplittable<Complex, (float[] Us, float[] Is)>, ISum<Complex>
 {
     public static Complex Down => new(0, -1);
@@ -190,18 +190,6 @@ public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Co
     public static Complex operator /(Complex a, float b) => new(a.u / b, a.i / b);
     public static Complex operator /(Complex a, Matrix b) => (Complex)((Matrix)a / b);
     public static Complex operator ~(Complex v) => v.Conjugate;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Complex a, Complex b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Complex a, Complex b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Complex a, Complex b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Complex a, Complex b) => a == b || a < b;
 
     public static explicit operator Complex(Quaternion val) => new(val.u, val.i);
     public static implicit operator Complex(Float2 val) => new(val.x, val.y);

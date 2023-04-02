@@ -4,21 +4,15 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
     ICeiling<Quaternion>, IClamp<Quaternion>, IClampMagnitude<Quaternion, float>, IComparable<Quaternion>,
     IDivide<Quaternion>, IDot<Quaternion, float>, IEquatable<Quaternion>, IFloor<Quaternion>, IGroup<float>,
     IIndexAll<float>, IIndexRangeAll<float>, ILerp<Quaternion, float>, IMax<Quaternion>, IMedian<Quaternion>,
-    IMin<Quaternion>, IPresets4D<Quaternion>, IProduct<Quaternion>, IRound<Quaternion>,
+    IMin<Quaternion>, IPresets4d<Quaternion>, IProduct<Quaternion>, IRound<Quaternion>,
     ISplittable<Quaternion, (float[] Us, float[] Is, float[] Js, float[] Ks)>, ISum<Quaternion>
 {
     public static Quaternion Back => new(0, 0, -1, 0);
     public static Quaternion Down => new(0, -1, 0, 0);
-    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
-              "This field will be removed in v2.4.0.", false)]
-    public static Quaternion Far => new(0, 0, 0, 1);
     public static Quaternion Forward => new(0, 0, 1, 0);
     public static Quaternion HighW => new(0, 0, 0, 1);
     public static Quaternion Left => new(-1, 0, 0, 0);
     public static Quaternion LowW => new(0, 0, 0, -1);
-    [Obsolete("Field has been replaced by " + nameof(LowW) + ", because it has a better name. " +
-              "This field will be removed in v2.4.0.", false)]
-    public static Quaternion Near => new(0, 0, 0, -1);
     public static Quaternion Right => new(1, 0, 0, 0);
     public static Quaternion Up => new(0, 1, 0, 0);
 
@@ -323,18 +317,6 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
     public static Quaternion operator /(Quaternion a, Matrix b) => (Quaternion)((Matrix)a / b);
     public static Quaternion operator /(Quaternion a, Float3 b) => a / new Quaternion(b);
     public static Quaternion operator ~(Quaternion v) => v.Conjugate;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Quaternion a, Quaternion b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Quaternion a, Quaternion b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Quaternion a, Quaternion b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Quaternion a, Quaternion b) => a == b || a < b;
 
     public static implicit operator Quaternion(Complex val) => new(val.u, val.i, 0, 0);
     public static implicit operator Quaternion(Int2 val) => new(val);

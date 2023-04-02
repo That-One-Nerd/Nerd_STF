@@ -2,7 +2,7 @@
 
 public record class Box3D : IAbsolute<Box3D>, IAverage<Box3D>, ICeiling<Box3D>, IClamp<Box3D>,
     IContains<Vert>, IEquatable<Box3D>, IFloor<Box3D>, ILerp<Box3D, float>, IMedian<Box3D>,
-    IRound<Box3D>, IShape3D<float>, ISplittable<Box3D, (Vert[] centers, Float3[] sizes)>
+    IRound<Box3D>, IShape3d<float>, ISplittable<Box3D, (Vert[] centers, Float3[] sizes)>
 {
     public static Box3D Unit => new(Vert.Zero, Float3.One);
 

@@ -5,7 +5,7 @@ namespace Nerd_STF.Mathematics;
 public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClampMagnitude<Int3, int>,
     IComparable<Int3>, ICross<Int3>, IDivide<Int3>, IDot<Int3, int>, IEquatable<Int3>,
     IFromTuple<Int3, (int x, int y, int z)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<Int3, float>,
-    IMathOperators<Int3>, IMax<Int3>, IMedian<Int3>, IMin<Int3>, IPresets3D<Int3>, IProduct<Int3>,
+    IMathOperators<Int3>, IMax<Int3>, IMedian<Int3>, IMin<Int3>, IPresets3d<Int3>, IProduct<Int3>,
     ISplittable<Int3, (int[] Xs, int[] Ys, int[] Zs)>, ISubtract<Int3>, ISum<Int3>
 {
     public static Int3 Back => new(0, 0, -1);
@@ -177,8 +177,6 @@ public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClam
         return (Xs, Ys, Zs);
     }
 
-    [Obsolete("This method is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Int3 other) => Magnitude.CompareTo(other.Magnitude);
     public bool Equals(Int3 other) => x == other.x && y == other.y && z == other.z;
     public override int GetHashCode() => base.GetHashCode();
@@ -224,18 +222,6 @@ public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClam
     public static Int3 operator &(Int3 a, Int3 b) => new(a.x & b.x, a.y & b.y, a.z & b.z);
     public static Int3 operator |(Int3 a, Int3 b) => new(a.x | b.x, a.y | b.y, a.z | b.z);
     public static Int3 operator ^(Int3 a, Int3 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z);
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Int3 a, Int3 b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Int3 a, Int3 b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Int3 a, Int3 b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Int3 a, Int3 b) => a == b || a < b;
 
     public static explicit operator Int3(Complex val) => new((int)val.u, (int)val.i, 0);
     public static explicit operator Int3(Quaternion val) => new((int)val.u, (int)val.i, (int)val.j);

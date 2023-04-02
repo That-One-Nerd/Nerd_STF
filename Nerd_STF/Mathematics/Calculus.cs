@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics;
+﻿using System.Linq.Expressions;
+
+namespace Nerd_STF.Mathematics;
 
 public static class Calculus
 {
@@ -7,7 +9,7 @@ public static class Calculus
     public static Equation GetDerivative(Equation equ, float step = DefaultStep) =>
         x => GetDerivativeAtPoint(equ, x, step);
     public static float GetDerivativeAtPoint(Equation equ, float x, float step = DefaultStep) =>
-        (equ(x + DefaultStep) - equ(x)) / step;
+        (equ(x + step) - equ(x)) / step;
 
     public static float GetIntegral(Equation equ, float lowerBound, float upperBound, float step = DefaultStep)
     {

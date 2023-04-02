@@ -4,7 +4,7 @@ namespace Nerd_STF.Mathematics.Geometry;
 
 public record class Line : IAbsolute<Line>, IAverage<Line>, ICeiling<Line>, IClamp<Line>, IClosestTo<Vert>,
     IComparable<Line>, IContains<Vert>, IEquatable<Line>, IFloor<Line>, IFromTuple<Line, (Vert start, Vert end)>,
-    IGroup<Vert>, IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Line, float>, IMedian<Line>, IPresets3D<Line>,
+    IGroup<Vert>, IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Line, float>, IMedian<Line>, IPresets3d<Line>,
     IRound<Line>, ISplittable<Line, (Vert[] starts, Vert[] ends)>, ISubdivide<Line[]>
 {
     public static Line Back => new(Vert.Zero, Vert.Back);

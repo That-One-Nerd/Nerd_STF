@@ -2,7 +2,7 @@
 
 public struct Angle : IAbsolute<Angle>, IAverage<Angle>, IClamp<Angle>, ICloneable,
     IComparable<Angle>, IEquatable<Angle>, ILerp<Angle, float>, IMax<Angle>, IMedian<Angle>,
-    IMin<Angle>, IPresets2D<Angle>
+    IMin<Angle>, IPresets2d<Angle>
 {
     public static Angle Down => new(270);
     public static Angle Left => new(180);
