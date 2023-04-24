@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace Nerd_STF.Mathematics;
+﻿namespace Nerd_STF.Mathematics;
 
 public readonly struct BigInteger/* : IAbsolute<BigInteger>, IAverage<BigInteger>, IClamp<BigInteger>,
     IComparable<BigInteger>, IComparable<byte>, IComparable<sbyte>, IComparable<short>, IComparable<ushort>,
@@ -15,6 +13,10 @@ public readonly struct BigInteger/* : IAbsolute<BigInteger>, IAverage<BigInteger
     public static BigInteger One => new(false, new byte[] { 1 });
     public static BigInteger Zero => new(false, Array.Empty<byte>());
 
+    public bool IsNegative => p_sign;
+    public bool IsPositive => !p_sign;
+
+    public int Length => p_data.Length;
     public int Sign => p_sign ? -1 : 1;
 
     private readonly byte[] p_data;
@@ -111,10 +113,9 @@ public readonly struct BigInteger/* : IAbsolute<BigInteger>, IAverage<BigInteger
     public int CompareTo(decimal other) => CompareTo((BigInteger)other);
     public int CompareTo(BigInteger other)
     {
-        int compare = p_sign.CompareTo(other.p_sign);
-        if (compare != 0) return compare;
+        if (p_sign ^ other.p_sign) return p_sign ? -1 : 1;
 
-        compare = p_data.Length.CompareTo(other.p_data);
+        int compare = p_data.Length.CompareTo(other.p_data.Length);
         if (compare != 0) return compare;
 
         for (int i = p_data.Length - 1; i >= 0; i--)
@@ -168,11 +169,36 @@ public readonly struct BigInteger/* : IAbsolute<BigInteger>, IAverage<BigInteger
         Array.Copy(p_data, data, Mathf.Min(p_data.Length, bytes));
         return data;
     }
+
+    private int CompareAbs(BigInteger other)
+    {
+        // TODO: replace with a slightly generalized public method.
+
+        int compare = p_data.Length.CompareTo(other.p_data.Length);
+        if (compare != 0) return compare;
+
+        for (int i = p_data.Length - 1; i >= 0; i--)
+        {
+            compare = p_data[i].CompareTo(other.p_data[i]);
+            if (compare != 0) return compare;
+        }
+
+        return 0;
+    }
     private byte[] TrimmedData()
     {
         int start = 0;
         while (start < p_data.Length && p_data[start] == 0) start++;
         return p_data.Skip(start).ToArray();
+    }
+
+    public static BigInteger Absolute(BigInteger val) => new(false, val.p_data);
+    public static BigInteger Max(params BigInteger[] vals)
+    {
+        if (vals.Length < 1) return Zero;
+        BigInteger val = vals[0];
+        foreach (BigInteger b in vals) val = b > val ? b : val;
+        return val;
     }
 
     public static bool operator ==(BigInteger a, BigInteger b) => a.Equals(b);
@@ -206,4 +232,40 @@ public readonly struct BigInteger/* : IAbsolute<BigInteger>, IAverage<BigInteger
     public static explicit operator float(BigInteger val) => val.ToInt32();
     public static explicit operator double(BigInteger val) => val.ToInt64();
     public static explicit operator decimal(BigInteger val) => val.ToInt64();
+
+    public static BigInteger operator +(BigInteger a, BigInteger b)
+    {
+        // Add padding to integer data to keep lists the same size.
+        int desiredLength = Mathf.Max(a.Length, b.Length) + 1;
+
+        List<byte> dataA = new(a.p_data),
+                   dataB = new(b.p_data),
+                   dataC = new();
+
+        while (dataA.Count < desiredLength) dataA.Add(0x00);
+        while (dataB.Count < desiredLength) dataB.Add(0x00);
+
+        // Add the data of A and B from left to right. Roll over remainders.
+        sbyte remainder = 0;
+        byte result;
+        for (int i = 0; i < desiredLength - 1; i++)
+        {
+            short sum = (short)(dataA[i] * a.Sign + dataB[i] * b.Sign + remainder);
+            remainder = (sbyte)(sum >> 8);
+            result = (byte)(sum & 0xFF);
+            dataC.Add(result);
+        }
+        dataC.Add((byte)Math.Abs(remainder)); // Add the remainder for the last addition.
+
+        bool sign;
+        if (!(a.p_sign ^ b.p_sign)) sign = a.p_sign;
+        else
+        {
+            bool aBigger = Absolute(a) > Absolute(b);
+            if (aBigger) sign = a.p_sign;
+            else sign = b.p_sign;
+        }
+
+        return new(sign, dataC.ToArray());
+    }
 }
