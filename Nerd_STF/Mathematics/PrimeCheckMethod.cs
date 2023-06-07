@@ -2,5 +2,6 @@
 
 public enum PrimeCheckMethod
 {
-    Classic
+    Classic,
+    MillerRabin
 }

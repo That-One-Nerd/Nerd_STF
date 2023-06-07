@@ -141,6 +141,7 @@ public static class Mathf
         method switch
         {
             PrimeCheckMethod.Classic => MathfHelper.IsPrimeClassic(num),
+            PrimeCheckMethod.MillerRabin => MathfHelper.IsPrimeMillerRabin(num),
             _ => throw new ArgumentException("Unknown prime check method.", nameof(method))
         };
 
@@ -356,6 +357,14 @@ public static class Mathf
         if (pow < 1) return 0;
         int val = 1;
         for (int i = 0; i < pow; i++) val = val * num % mod;
+        return val;
+    }
+    public static long PowerMod(long num, long pow, long mod)
+    {
+        if (pow == 1) return num;
+        if (pow < 1) return 0;
+        long val = 1;
+        for (long i = 0; i < pow; i++) val = val * num % mod;
         return val;
     }
 

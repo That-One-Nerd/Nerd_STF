@@ -150,6 +150,7 @@
             + Lerp(Equation, Equation, float, bool)
             + Lerp(Equation, Equation, Equation, bool)
             + PrimeFactors(int)
+            + PowerMod(long, long, long)
             + SharedItems<T>(T[][])
             + SolveBisection(Equation, float, float, float, float, int)
             + SolveEquation(Equation, float, float, float, int)
