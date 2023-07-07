@@ -77,6 +77,7 @@
             + ZScore(Equation, Equation, Equation)
             + InvokeMethod(Equation, MethodInfo, object?[]?)
             + InvokeMathMethod(Equation, string, object?[]?)
+        + StringExtension
     + Helpers
         + CordicHelper
         + MathfHelper
