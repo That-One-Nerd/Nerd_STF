@@ -17,6 +17,12 @@
             + ArcSec(Equation)
             + ArcSin(Equation)
             + ArcTan(Equation)
+            + ArcCosh(Equation)
+            + ArcCoth(Equation)
+            + ArcCsch(Equation)
+            + ArcSech(Equation)
+            + ArcSinh(Equation)
+            + ArcTanh(Equation)
             + Average(Equation, float, float, float)
             + Average(Equation, Equation, Equation, float)
             + Binomial(Equation, int, float)
@@ -28,14 +34,18 @@
             + Combinations(Equation, int)
             + Combinations(Equation, Equation)
             + Cos(Equation)
+            + Cosh(Equation)
             + Cot(Equation)
+            + Coth(Equation)
             + Csc(Equation)
+            + Csch(Equation)
             + Divide(Equation, float[])
             + Divide(Equation, Equation[])
             + Factorial(Equation)
             + Floor(Equation)
             + GetValues(Equation, float, float, float)
             + InverseSqrt(Equation)
+            + Log(Equation, float)
             + Max(Equation, float, float, float)
             + Min(Equation, float, float, float)
             + Permutations(Equation, int)
@@ -48,7 +58,9 @@
             + Root(Equation, Equation)
             + Round(Equation)
             + Sec(Equation)
+            + Sech(Equation)
             + Sin(Equation)
+            + Sinh(Equation)
             + SolveBisection(Equation, float, float, float, float, int)
             + SolveEquation(Equation, float, float, float, int)
             + SolveNewton(Equation, float, float, float, int)
@@ -58,6 +70,7 @@
             + Sum(Equation, float[])
             + Sum(Equation, Equation[])
             + Tan(Equation)
+            + Tanh(Equation)
             + ZScore(Equation, float[])
             + ZScore(Equation, Equation[])
             + ZScore(Equation, float, float)
@@ -65,8 +78,10 @@
             + InvokeMethod(Equation, MethodInfo, object?[]?)
             + InvokeMathMethod(Equation, string, object?[]?)
     + Helpers
+        + CordicHelper
         + MathfHelper
         + RationalHelper
+        + UnsafeHelper
     * Mathematics
         * Abstract
             = Renamed `IPresets1D<T>` to `IPresets1d<T>`
@@ -144,18 +159,34 @@
             - operator >=(Int4, Int4)
             - operator <=(Int4, Int4)
         * Mathf
+            + ArcCosh(float)
+            + ArcCoth(float)
+            + ArcCsch(float)
+            + ArcSech(float)
+            + ArcSinh(float)
+            + ArcTanh(float)
+            + ArcTanh2(float, float)
             + Cbrt(float)
+            + Cosh(float)
+            + Coth(float)
+            + Csch(float)
             + IsPrime(int, PrimeCheckMethod)
             + Lerp(float, float, Equation, bool)
             + Lerp(Equation, Equation, float, bool)
             + Lerp(Equation, Equation, Equation, bool)
+            + Log(float, float)
             + PrimeFactors(int)
             + PowerMod(long, long, long)
+            + Sech(float)
+            + Sinh(float)
             + SharedItems<T>(T[][])
             + SolveBisection(Equation, float, float, float, float, int)
             + SolveEquation(Equation, float, float, float, int)
             + SolveNewton(Equation, float, float, float, int)
-            = Improved the `Sqrt` method by using a solution finder.
+            + Tanh(float)
+            = Improved the `Sqrt(float)` method by using a solution finder
+            = The `ArcSin(float)` method now uses a solution finder rather than the base math library
+            = The `Power(float, float)` method now utilizes a custom CORDIC implementation rather than the base math library
         + PrimeCheckMethod
         + Equation2d
         + Rational
@@ -174,4 +205,5 @@
     = Renamed `Modifier2D` to `IModifier2d`
     = Renamed `Modifier2D<T>` to `IModifier2d<T>`
     = Renamed `Modifier2D<IT, VT>` to `IModifier2d<IT, VT>`
+= Made `Nerd_STF` allow unsafe code blocks
 ```

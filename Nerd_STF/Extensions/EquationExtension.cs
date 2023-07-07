@@ -27,6 +27,13 @@ public static class EquationExtension
     public static Equation ArcSin(this Equation equ) => x => Mathf.ArcSin(equ(x)).Radians;
     public static Equation ArcTan(this Equation equ) => x => Mathf.ArcTan(equ(x)).Radians;
 
+    public static Equation ArcCosh(this Equation equ) => x => Mathf.ArcCosh(equ(x));
+    public static Equation ArcCoth(this Equation equ) => x => Mathf.ArcCoth(equ(x));
+    public static Equation ArcCsch(this Equation equ) => x => Mathf.ArcCsch(equ(x));
+    public static Equation ArcSech(this Equation equ) => x => Mathf.ArcSech(equ(x));
+    public static Equation ArcSinh(this Equation equ) => x => Mathf.ArcSinh(equ(x));
+    public static Equation ArcTanh(this Equation equ) => x => Mathf.ArcTanh(equ(x));
+
     public static float Average(this Equation equ, float min, float max, float step = Calculus.DefaultStep) =>
         Mathf.Average(equ, min, max, step);
     public static Equation Average(this Equation equ, Equation min, Equation max, float step = Calculus.DefaultStep) =>
@@ -54,6 +61,10 @@ public static class EquationExtension
     public static Equation Cot(this Equation equ) => x => Mathf.Cot(equ(x));
     public static Equation Csc(this Equation equ) => x => Mathf.Csc(equ(x));
 
+    public static Equation Cosh(this Equation equ) => x => Mathf.Cosh(equ(x));
+    public static Equation Coth(this Equation equ) => x => Mathf.Coth(equ(x));
+    public static Equation Csch(this Equation equ) => x => Mathf.Csch(equ(x));
+
     public static Equation Divide(this Equation equ, params float[] dividends) =>
         x => Mathf.Divide(equ(x), dividends);
     public static Equation Divide(this Equation equ, params Equation[] dividends) => delegate (float x)
@@ -71,6 +82,8 @@ public static class EquationExtension
         float step = Calculus.DefaultStep) => Mathf.GetValues(equ, min, max, step);
 
     public static Equation InverseSqrt(this Equation equ) => x => Mathf.InverseSqrt(equ(x));
+
+    public static Equation Log(this Equation equ, float @base) => x => Mathf.Log(@base, equ(x));
 
     public static float Max(this Equation equ, float min, float max, float step = Calculus.DefaultStep) =>
         Mathf.Max(equ, min, max, step);
@@ -107,6 +120,9 @@ public static class EquationExtension
 
     public static Equation Sec(this Equation equ) => x => Mathf.Sec(equ(x));
     public static Equation Sin(this Equation equ) => x => Mathf.Sin(equ(x));
+
+    public static Equation Sech(this Equation equ) => x => Mathf.Sech(equ(x));
+    public static Equation Sinh(this Equation equ) => x => Mathf.Sinh(equ(x));
 
     public static float SolveBisection(this Equation equ, float initialA, float initialB, float tolerance = 1e-5f,
         int maxIterations = 1000) =>
@@ -145,6 +161,8 @@ public static class EquationExtension
     };
 
     public static Equation Tan(this Equation equ) => x => Mathf.Tan(equ(x));
+
+    public static Equation Tanh(this Equation equ) => x => Mathf.Tanh(equ(x));
 
     public static Equation ZScore(this Equation equ, params float[] vals) => x => Mathf.ZScore(equ(x), vals);
     public static Equation ZScore(this Equation equ, params Equation[] vals) => delegate (float x)

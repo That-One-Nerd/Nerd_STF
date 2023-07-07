@@ -19,18 +19,27 @@ public static class Mathf
     }
 
     public static Angle ArcCos(float value) => ArcSin(-value) + Angle.Quarter;
-
     public static Angle ArcCot(float value) => ArcCos(value / Sqrt(1 + value * value));
-
     public static Angle ArcCsc(float value) => ArcSin(1 / value);
-
     public static Angle ArcSec(float value) => ArcCos(1 / value);
-
-    // Maybe one day I'll have a polynomial for this, but the RMSE for an order 10 polynomial is only 0.00876.
-    public static Angle ArcSin(float value) => new((float)Math.Asin(value), Angle.Type.Radians);
-    
+    public static Angle ArcSin(float value)
+    {
+        if (value > 1 || value < -1) throw new ArgumentOutOfRangeException(nameof(value));
+        return (SolveNewton(x => Sin(x) - value, 0), Angle.Type.Degrees);
+    }    
     public static Angle ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
     public static Angle ArcTan2(float a, float b) => ArcTan(a / b);
+
+    // I would've much rather used CORDIC for these inverses,
+    // but I can't think of an intuitive way to do it, so I'll
+    // hold off for now.
+    public static float ArcCosh(float value) => Log(Constants.E, value + Sqrt(value * value - 1));
+    public static float ArcCoth(float value) => Log(Constants.E, (1 + value) / (value - 1)) / 2;
+    public static float ArcCsch(float value) => Log(Constants.E, (1 + Sqrt(1 + value * value)) / value);
+    public static float ArcSech(float value) => Log(Constants.E, (1 + Sqrt(1 - value * value)) / value);
+    public static float ArcSinh(float value) => Log(Constants.E, value + Sqrt(value * value + 1));
+    public static float ArcTanh(float value) => Log(Constants.E, (1 + value) / (1 - value)) / 2;
+    public static float ArcTanh2(float a, float b) => ArcTanh(a / b);
 
     public static float Average(Equation equ, float min, float max, float step = Calculus.DefaultStep)
     {
@@ -69,11 +78,22 @@ public static class Mathf
     public static float Cos(Angle angle) => Cos(angle.Radians);
     public static float Cos(float radians) => Sin(radians + Constants.HalfPi);
 
+    public static float Cosh(float value)
+    {
+        if (value == 0) return 1;
+        else if (value < 0) return Cosh(-value);
+        else return CordicHelper.CalculateHyperTrig(value, 16).cosh;
+    }
+
     public static float Cot(Angle angle) => Cot(angle.Radians);
     public static float Cot(float radians) => Cos(radians) / Sin(radians);
 
+    public static float Coth(float value) => 1 / Tanh(value);
+
     public static float Csc(Angle angle) => Csc(angle.Radians);
     public static float Csc(float radians) => 1 / Sin(radians);
+
+    public static float Csch(float value) => 1 / Sinh(value);
 
     public static float Divide(float val, params float[] dividends) => val / Product(dividends);
     public static int Divide(int val, params int[] dividends) => val / Product(dividends);
@@ -160,6 +180,13 @@ public static class Mathf
         x => Lerp(a(x), b(x), t, clamp);
     public static Equation Lerp(Equation a, Equation b, Equation t, bool clamp = true) =>
         x => Lerp(a(x), b(x), t(x), clamp);
+
+    public static float Log(float @base, float val)
+    {
+        if (val <= 0) throw new ArgumentOutOfRangeException(nameof(val));
+        else if (val < 1) return -Log(@base, 1 / val);
+        else return CordicHelper.LogAnyBase(@base, val, 16, 16);
+    }
 
     public static Equation MakeEquation(Dictionary<float, float> vals) => delegate (float x)
     {
@@ -331,7 +358,12 @@ public static class Mathf
         return total;
     }
 
-    public static float Power(float num, float pow) => (float)Math.Pow(num, pow);
+    public static float Power(float num, float pow)
+    {
+        if (pow == 0) return 1;
+        else if (pow < 0) return 1 / Power(num, -pow);
+        else return CordicHelper.ExpAnyBase(num, pow, 16, 16);
+    }
     public static float Power(float num, int pow)
     {
         if (pow <= 0) return 0;
@@ -377,6 +409,8 @@ public static class Mathf
     public static float Sec(Angle angle) => Sec(angle.Radians);
     public static float Sec(float radians) => 1 / Cos(radians);
 
+    public static float Sech(float value) => 1 / Cosh(value);
+
     public static T[] SharedItems<T>(params T[][] arrays) where T : IEquatable<T>
     {
         if (arrays.Length < 1) return Array.Empty<T>();
@@ -407,6 +441,13 @@ public static class Mathf
             a + (b * x) + (c * x * x) + (d * x * x * x) + (e * x * x * x * x) + (f * x * x * x * x * x)
             + (g * x * x * x * x * x * x) + (h * x * x * x * x * x * x * x) + (i * x * x * x * x * x * x * x * x)
             + (j * x * x * x * x * x * x * x * x * x);
+    }
+
+    public static float Sinh(float value)
+    {
+        if (value == 0) return 0;
+        else if (value < 0) return -Sinh(-value);
+        else return CordicHelper.CalculateHyperTrig(value, 16).sinh;
     }
 
     public static float SolveBisection(Equation equ, float initialA, float initialB, float tolerance = 1e-5f,
@@ -501,6 +542,19 @@ public static class Mathf
 
     public static float Tan(Angle angle) => Tan(angle.Radians);
     public static float Tan(float radians) => Sin(radians) / Cos(radians);
+
+    public static float Tanh(float value)
+    {
+        float cosh, sinh;
+        if (value < 0)
+        {
+            (cosh, sinh) = CordicHelper.CalculateHyperTrig(-value, 16);
+            sinh = -sinh;
+        }
+        else (cosh, sinh) = CordicHelper.CalculateHyperTrig(value, 16);
+
+        return cosh / sinh;
+    }
 
     public static T[] UniqueItems<T>(params T[] vals) where T : IEquatable<T>
     {

@@ -40,6 +40,7 @@ Anyway, that's it for this update. The longest delay was just getting this proje
     <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
     <AssemblyOriginatorKeyFile>C:\Users\kyley\Desktop\Misc Items\Private Keys\SNA\Nerd_STF.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
