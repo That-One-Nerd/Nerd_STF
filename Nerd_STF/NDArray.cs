@@ -39,8 +39,6 @@ public class NDArray<T> : IEnumerable<T>, IEquatable<NDArray<T>>
         Array.Fill(sizes, allLengths);
 
         arr = new T[Mathf.Product(sizes)];
-
-        Console.WriteLine("Gay ass balls");
     }
     public NDArray(int[] lengths)
     {
