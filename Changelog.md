@@ -43,7 +43,13 @@
             + Divide(Equation, Equation[])
             + Factorial(Equation)
             + Floor(Equation)
+            + GetDerivative(Equation, float)
+            + GetDerivativeAtPoint(Equation, float, float)
+            + GetIntegral(Equation, float, float, float)
+            + GetDynamicIntegral(Equation, Equation, Equation, float)
+            + GetTaylorSeries(Equation, float, int, float)
             + GetValues(Equation, float, float, float)
+            + GradientDescent(Equation, float, float, int, float)
             + InverseSqrt(Equation)
             + Log(Equation, float)
             + Max(Equation, float, float, float)
@@ -118,7 +124,9 @@
                 = Replaced a `readonly` term with a generating field in `SgnFill`
                 = Moved `SgnFill` to `Fills` and renamed it to `SignFill`
         * Calculus
+            + GetTaylorSeries(Equation, float, int, float)
             = Fixed a blunder in `GetDerivativeAtPoint(Equation, float, float)`
+            = Renamed the `stepCount` parameter in `GradientDescent(Equation, float, float, float, float)` to "iterations" and changed its type from `float` to `int`
         * Float2
             - Removed the `Obsolete` attribute from `CompareTo(Float2)`
             - operator >(Float2, Float2)

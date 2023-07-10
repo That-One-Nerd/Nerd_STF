@@ -78,8 +78,25 @@ public static class EquationExtension
 
     public static Equation Floor(this Equation equ) => x => Mathf.Floor(equ(x));
 
+    public static Equation GetDerivative(this Equation equ, float step = Calculus.DefaultStep) =>
+        Calculus.GetDerivative(equ, step);
+    public static float GetDerivativeAtPoint(this Equation equ, float x, float step = Calculus.DefaultStep) =>
+        Calculus.GetDerivativeAtPoint(equ, x, step);
+
+    public static float GetIntegral(this Equation equ, float lowerBound, float upperBound,
+        float step = Calculus.DefaultStep) => Calculus.GetIntegral(equ, lowerBound, upperBound, step);
+
+    public static Equation GetDynamicIntegral(this Equation equ, Equation lowerBound,
+        Equation upperBound, float step = Calculus.DefaultStep) => Calculus.GetDynamicIntegral(equ, lowerBound, upperBound, step);
+
+    public static Equation GetTaylorSeries(this Equation equ, float referenceX, int iterations = 4, float step = 0.01f) =>
+        Calculus.GetTaylorSeries(equ, referenceX, iterations, step);
+
     public static Dictionary<float, float> GetValues(this Equation equ, float min, float max,
         float step = Calculus.DefaultStep) => Mathf.GetValues(equ, min, max, step);
+
+    public static float GradientDescent(this Equation equ, float initial, float rate, int iterations = 1000,
+        float step = Calculus.DefaultStep) => Calculus.GradientDescent(equ, initial, rate, iterations, step);
 
     public static Equation InverseSqrt(this Equation equ) => x => Mathf.InverseSqrt(equ(x));
 
