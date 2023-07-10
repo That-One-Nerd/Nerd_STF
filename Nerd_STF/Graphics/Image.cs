@@ -29,7 +29,7 @@ public class Image : ICloneable, IEnumerable<IColor>, IEquatable<Image>
         Size = new(width, height);
         for (int y = 0; y < height; y++) for (int x = 0; x < width; x++) Pixels[x, y] = fill(y * width + x);
     }
-    public Image(int width, int height, Fill2D<IColor> fill)
+    public Image(int width, int height, Fill2d<IColor> fill)
     {
         Pixels = new IColor[width, height];
         Size = new(width, height);
@@ -39,7 +39,7 @@ public class Image : ICloneable, IEnumerable<IColor>, IEquatable<Image>
     public Image(Int2 size, IColor[] cols) : this(size.x, size.y, cols) { }
     public Image(Int2 size, IColor[,] cols) : this(size.x, size.y, cols) { }
     public Image(Int2 size, Fill<IColor> fill) : this(size.x, size.y, fill) { }
-    public Image(Int2 size, Fill2D<IColor> fill) : this(size.x, size.y, fill) { }
+    public Image(Int2 size, Fill2d<IColor> fill) : this(size.x, size.y, fill) { }
 
     public IColor this[int indexX, int indexY]
     {

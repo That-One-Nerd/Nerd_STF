@@ -1,7 +1,7 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
 public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, IClamp<Box2D>, IContains<Vert>,
-    IEquatable<Box2D>, IFloor<Box2D>, ILerp<Box2D, float>, IMedian<Box2D>, IRound<Box2D>, IShape2D<float>,
+    IEquatable<Box2D>, IFloor<Box2D>, ILerp<Box2D, float>, IMedian<Box2D>, IRound<Box2D>, IShape2d<float>,
     ISplittable<Box2D, (Vert[] centers, Float2[] sizes)>
 {
     public static Box2D Unit => new(Vert.Zero, Float2.One);

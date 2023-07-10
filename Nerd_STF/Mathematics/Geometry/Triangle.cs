@@ -4,7 +4,7 @@ namespace Nerd_STF.Mathematics.Geometry;
 
 public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling<Triangle>, IClamp<Triangle>,
     IEquatable<Triangle>, IFloor<Triangle>, IFromTuple<Triangle, (Vert a, Vert b, Vert c)>, IGroup<Vert>,
-    IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Triangle, float>, IRound<Triangle>, IShape2D<float>
+    IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Triangle, float>, IRound<Triangle>, IShape2d<float>
 {
     public Vert A
     {

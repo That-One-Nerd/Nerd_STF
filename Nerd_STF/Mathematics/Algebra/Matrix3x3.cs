@@ -106,9 +106,9 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         nums[1, 0], nums[1, 1], nums[1, 2], nums[2, 0], nums[2, 1], nums[2, 2]) { }
     public Matrix3x3(int[,] nums) : this(nums[0, 0], nums[0, 1], nums[0, 2],
         nums[1, 0], nums[1, 1], nums[1, 2], nums[2, 0], nums[2, 1], nums[2, 2]) { }
-    public Matrix3x3(Fill2D<float> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2),
+    public Matrix3x3(Fill2d<float> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2),
         fill(1, 0), fill(1, 1), fill(1, 2), fill(2, 0), fill(2, 1), fill(2, 2)) { }
-    public Matrix3x3(Fill2D<int> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2),
+    public Matrix3x3(Fill2d<int> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2),
         fill(1, 0), fill(1, 1), fill(1, 2), fill(2, 0), fill(2, 1), fill(2, 2)) { }
     public Matrix3x3(Float3 r1, Float3 r2, Float3 r3) : this(r1.x, r1.y, r1.z, r2.x, r2.y, r2.z, r3.x, r3.y, r3.z) { }
     public Matrix3x3(Fill<Float3> fill) : this(fill(0), fill(1), fill(2)) { }
@@ -371,7 +371,7 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         { r3c1, r3c2, r3c3 }
     };
     public Fill<float> ToFill() => ToFillExtension.ToFill(this);
-    public Fill2D<float> ToFill2D()
+    public Fill2d<float> ToFill2D()
     {
         Matrix3x3 @this = this;
         return (x, y) => @this[x, y];

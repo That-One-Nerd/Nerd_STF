@@ -146,10 +146,10 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
     public Matrix4x4(int[,] nums) : this(nums[0, 0], nums[0, 1], nums[0, 2], nums[0, 3], nums[1, 0],
         nums[1, 1], nums[1, 2], nums[1, 3], nums[2, 0], nums[2, 1], nums[2, 2], nums[2, 3], nums[3, 0],
         nums[3, 1], nums[3, 2], nums[3, 3]) { }
-    public Matrix4x4(Fill2D<float> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2), fill(0, 3), fill(1, 0),
+    public Matrix4x4(Fill2d<float> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2), fill(0, 3), fill(1, 0),
         fill(1, 1), fill(1, 2), fill(1, 3), fill(2, 0), fill(2, 1), fill(2, 2), fill(2, 3), fill(3, 0),
         fill(3, 1), fill(3, 2), fill(3, 3)) { }
-    public Matrix4x4(Fill2D<int> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2), fill(0, 3), fill(1, 0),
+    public Matrix4x4(Fill2d<int> fill) : this(fill(0, 0), fill(0, 1), fill(0, 2), fill(0, 3), fill(1, 0),
         fill(1, 1), fill(1, 2), fill(1, 3), fill(2, 0), fill(2, 1), fill(2, 2), fill(2, 3), fill(3, 0),
         fill(3, 1), fill(3, 2), fill(3, 3)) { }
     public Matrix4x4(Float4 r1, Float4 r2, Float4 r3, Float4 r4) : this(r1.x, r1.y, r1.z,
@@ -502,7 +502,7 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
         { r4c1, r4c2, r4c3, r4c4 }
     };
     public Fill<float> ToFill() => ToFillExtension.ToFill(this);
-    public Fill2D<float> ToFill2D()
+    public Fill2d<float> ToFill2D()
     {
         Matrix4x4 @this = this;
         return (x, y) => @this[x, y];

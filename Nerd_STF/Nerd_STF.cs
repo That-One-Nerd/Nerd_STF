@@ -17,5 +17,5 @@ public static class Nerd_STF
         { "nuget", "https://www.nuget.org/packages/Nerd_STF/" }
     };
     public const string MainDeveloper = "That_One_Nerd";
-    public const string Version = "2.3.2";
+    public const string Version = "2.4.0";
 }

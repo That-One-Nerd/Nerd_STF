@@ -3,7 +3,7 @@
 public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClampMagnitude<Int2, int>,
     IComparable<Int2>, ICross<Int2, Int3>, IDivide<Int2>, IDot<Int2, int>, IEquatable<Int2>,
     IFromTuple<Int2, (int x, int y)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<Int2, float>,
-    IMathOperators<Int2>, IMax<Int2>, IMedian<Int2>, IMin<Int2>, IPresets2D<Int2>, IProduct<Int2>,
+    IMathOperators<Int2>, IMax<Int2>, IMedian<Int2>, IMin<Int2>, IPresets2d<Int2>, IProduct<Int2>,
     ISplittable<Int2, (int[] Xs, int[] Ys)>, ISubtract<Int2>, ISum<Int2>
 {
     public static Int2 Down => new(0, -1);
@@ -154,8 +154,6 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
         return (Xs, Ys);
     }
 
-    [Obsolete("This method is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Int2 other) => Magnitude.CompareTo(other.Magnitude);
     public bool Equals(Int2 other) => x == other.x && y == other.y;
     public override int GetHashCode() => base.GetHashCode();
@@ -198,18 +196,6 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
     public static Int2 operator &(Int2 a, Int2 b) => new(a.x & b.x, a.y & b.y);
     public static Int2 operator |(Int2 a, Int2 b) => new(a.x | b.x, a.y | b.y);
     public static Int2 operator ^(Int2 a, Int2 b) => new(a.x ^ b.x, a.y ^ b.y);
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Int2 a, Int2 b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Int2 a, Int2 b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Int2 a, Int2 b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Int2 a, Int2 b) => a == b || a < b;
 
     public static explicit operator Int2(Complex val) => new((int)val.u, (int)val.i);
     public static explicit operator Int2(Quaternion val) => new((int)val.u, (int)val.i);

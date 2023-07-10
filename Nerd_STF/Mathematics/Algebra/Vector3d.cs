@@ -4,7 +4,7 @@ public record struct Vector3d : IAbsolute<Vector3d>, IAverage<Vector3d>, IClampM
     IComparable<Vector3d>, ICross<Vector3d>, IDot<Vector3d, float>, IEquatable<Vector3d>,
     IFromTuple<Vector3d, (Angle yaw, Angle pitch, float mag)>, IIndexAll<Angle>, IIndexRangeAll<Angle>,
     ILerp<Vector3d, float>, IMagnitude<float>, IMax<Vector3d>, IMedian<Vector3d>, IMin<Vector3d>,
-    IPresets3D<Vector3d>, ISubtract<Vector3d>, ISum<Vector3d>
+    IPresets3d<Vector3d>, ISubtract<Vector3d>, ISum<Vector3d>
 {
     public static Vector3d Back => new(Angle.Zero, Angle.Up);
     public static Vector3d Down => new(Angle.Down, Angle.Zero);

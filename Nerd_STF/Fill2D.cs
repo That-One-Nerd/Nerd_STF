@@ -1,3 +1,3 @@
 ﻿namespace Nerd_STF;
 
-public delegate T Fill2D<T>(int indexX, int indexY);
+public delegate T Fill2d<T>(int indexX, int indexY);

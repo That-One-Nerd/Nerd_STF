@@ -3,17 +3,11 @@
 public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClampMagnitude<Int4, int>,
     IComparable<Int4>, IDivide<Int4>, IDot<Int4, int>, IEquatable<Int4>,
     IFromTuple<Int4, (int x, int y, int z, int w)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>,
-    ILerp<Int4, float>, IMathOperators<Int4>, IMax<Int4>, IMedian<Int4>, IMin<Int4>, IPresets4D<Int4>,
+    ILerp<Int4, float>, IMathOperators<Int4>, IMax<Int4>, IMedian<Int4>, IMin<Int4>, IPresets4d<Int4>,
     IProduct<Int4>, ISplittable<Int4, (int[] Xs, int[] Ys, int[] Zs, int[] Ws)>, ISubtract<Int4>, ISum<Int4>
 {
     public static Int4 Back => new(0, 0, -1, 0);
-    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
-        "This field will be removed in v2.4.0.", false)]
-    public static Int4 Deep => new(0, 0, 0, -1);
     public static Int4 Down => new(0, -1, 0, 0);
-    [Obsolete("Field has been replaced by " + nameof(HighW) + ", because it has a better name. " +
-        "This field will be removed in v2.4.0.", false)]
-    public static Int4 Far => new(0, 0, 0, 1);
     public static Int4 Forward => new(0, 0, 1, 0);
     public static Int4 HighW => new(0, 0, 0, 1);
     public static Int4 Left => new(-1, 0, 0, 0);
@@ -196,8 +190,6 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
         return (Xs, Ys, Zs, Ws);
     }
 
-    [Obsolete("This method is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
     public int CompareTo(Int4 other) => Magnitude.CompareTo(other.Magnitude);
     public bool Equals(Int4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
     public override int GetHashCode() => base.GetHashCode();
@@ -244,18 +236,6 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
     public static Int4 operator &(Int4 a, Int4 b) => new(a.x & b.x, a.y & b.y, a.z & b.z, a.w & b.w);
     public static Int4 operator |(Int4 a, Int4 b) => new(a.x | b.x, a.y | b.y, a.z | b.z, a.w | b.w);
     public static Int4 operator ^(Int4 a, Int4 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w);
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator >(Int4 a, Int4 b) => a.CompareTo(b) > 0;
-    [Obsolete("This operator is a bit ambiguous. You should instead compare " +
-        nameof(Magnitude) + "s directly.")]
-    public static bool operator <(Int4 a, Int4 b) => a.CompareTo(b) < 0;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator >=(Int4 a, Int4 b) => a == b || a > b;
-    [Obsolete("This operator is a bit ambiguous (and misleading at times). " +
-        "You should instead compare " + nameof(Magnitude) + "s directly.")]
-    public static bool operator <=(Int4 a, Int4 b) => a == b || a < b;
 
     public static explicit operator Int4(Complex val) => new((int)val.u, (int)val.i, 0, 0);
     public static explicit operator Int4(Quaternion val) => new((int)val.u, (int)val.i, (int)val.j, (int)val.k);

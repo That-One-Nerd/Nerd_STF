@@ -4,7 +4,7 @@ public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
     IClampMagnitude<Vector2d, float>, IComparable<Vector2d>, ICross<Vector2d, Vector3d>,
     IDot<Vector2d, float>, IEquatable<Vector2d>, IFromTuple<Vector2d, (Angle angle, float mag)>,
     ILerp<Vector2d, float>, IMax<Vector2d>, IMagnitude<float>, IMedian<Vector2d>, IMin<Vector2d>,
-    IPresets2D<Vector2d>, ISplittable<Vector2d, (Angle[] rots, float[] mags)>, ISubtract<Vector2d>,
+    IPresets2d<Vector2d>, ISplittable<Vector2d, (Angle[] rots, float[] mags)>, ISubtract<Vector2d>,
     ISum<Vector2d>
 {
     public static Vector2d Down => new(Angle.Down);

@@ -68,8 +68,8 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
     public Matrix2x2(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3)) { }
     public Matrix2x2(float[,] nums) : this(nums[0, 0], nums[0, 1], nums[1, 0], nums[1, 1]) { }
     public Matrix2x2(int[,] nums) : this(nums[0, 0], nums[0, 1], nums[1, 0], nums[1, 1]) { }
-    public Matrix2x2(Fill2D<float> fill) : this(fill(0, 0), fill(0, 1), fill(1, 0), fill(1, 1)) { }
-    public Matrix2x2(Fill2D<int> fill) : this(fill(0, 0), fill(0, 1), fill(1, 0), fill(1, 1)) { }
+    public Matrix2x2(Fill2d<float> fill) : this(fill(0, 0), fill(0, 1), fill(1, 0), fill(1, 1)) { }
+    public Matrix2x2(Fill2d<int> fill) : this(fill(0, 0), fill(0, 1), fill(1, 0), fill(1, 1)) { }
     public Matrix2x2(Float2 r1, Float2 r2) : this(r1.x, r1.y, r2.x, r2.y) { }
     public Matrix2x2(Fill<Float2> fill) : this(fill(0), fill(1)) { }
     public Matrix2x2(Fill<Int2> fill) : this((IEnumerable<int>)fill(0), fill(1)) { }
@@ -265,7 +265,7 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
         { r2c1, r2c2 }
     };
     public Fill<float> ToFill() => ToFillExtension.ToFill(this);
-    public Fill2D<float> ToFill2D()
+    public Fill2d<float> ToFill2D()
     {
         Matrix2x2 @this = this;
         return (x, y) => @this[x, y];

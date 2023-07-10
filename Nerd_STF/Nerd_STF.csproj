@@ -8,28 +8,39 @@
     <AssemblyName>Nerd_STF</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>That_One_Nerd</Authors>
-    <Description>Nerd_STF is a general-purpose .NET library.</Description>
-    <Copyright>Copyright (c) 2022 That_One_Nerd</Copyright>
+    <Description>Nerd_STF is a general-purpose .NET library for .NET 7.0.</Description>
+    <Copyright>Copyright (c) 2023 That_One_Nerd</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/That-One-Nerd/Nerd_STF</RepositoryUrl>
-    <AssemblyVersion>2.3.2</AssemblyVersion>
+    <AssemblyVersion>2.4.0</AssemblyVersion>
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers</PackageTags>
-    <Version>2.3.2</Version>
+    <Version>2.4.0</Version>
     <Product>Nerd_STF</Product>
     <PackageId>Nerd_STF</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Logo Square.png</PackageIcon>
-    <PackageReleaseNotes>A bunch of stuff has changed, hasn't it?
+    <PackageReleaseNotes>I've done a pretty good amount of stuff in this update, and I'm pretty proud of it. Good improvement.
 
-This update was originally intended to be a support update. But among other problems, I don't want to maintain 3 slightly different versions of Nerd_STF at the same time. So I'm going to put the support update on hold for now. I won't delete my progress on it (I got about a quarter of the way done with support for .NET Standard 2.0. It's a big undertaking), I won't promise any completion date either.
+First of all, I've gone and added all of the applicable `Mathf` functions as an extension to the `Equation` delegate. That way if you want to say, calculate the square root of an entire equation, rather than going:
+```csharp
+Equation result = x =&gt; Mathf.Sqrt(equ(x));
+// Where `equ` is an `Equation` that represents the function we want to take the square root of.
+```
+you can shorten it down and remove some of the weirdness.
+```csharp
+Equation result = equ.Sqrt();
+// Where `equ` is an `Equation` that represents the function we want to take the square root of.
+```
 
-Instead, this update ended up being a quality-of-life update. I already finished this part of the update before I decided to cancel the support update. This update now has lots of support for the new .NET 7 features. I'm now using a bunch of static abstract interfaces. I also added range indexing to almost all of the types available. The color byte types now have int fields instead of byte fields because ints are much more common. The values are automatically clamped between 0 and 255 just in case. Basically all types are records now because records are really nice. Lastly, some stuff has been marked as deprecated and to be removed in a future release because they already, exist, are kind of useless, and/or are misleading. Most of the deprecated stuff will be removed in either 2.4.0 or 2.5.0.
+It works for any common function you'd want to apply to an equation.
 
-Also, just want to note that despite the Vert`struct not being marked as deprecated, it will still be removed in 2.5.0. I didn't mark it because that would have created a bunch of warnings in my library. And I don't like warnings.
+---
 
-One final note, I've changed the description of the library and I've changed a bunch of the assembly and compilation settings.
+Speaking of math functions (I guess that's the whole update, given the name), I'm now utilizing an implementation of CORDIC I made to calculate all trigonometric functions, hyperbolic trig functions, exponents, and logs. It's quite a neat process, and I could also have it completely wrong, but whatever I have, CORDIC or something else, works wonders, and is considerably faster than some other methods I tried. Of course, it's still nowhere near as fast as the built-in math functions, but they will always be on a whole other level. Maybe in the optimization update I'll bother to improve them, but they work quite well as-is for most use cases.
 
-Anyway, that's it for this update. The longest delay was just getting this project to other versions of .NET. Stay tuned for v2.4.0, the Equations and Numbers update!</PackageReleaseNotes>
+I've also implemented taylor series into the `Calculus` class. It's not particularly useful is most cases, so I wouldn't bother. The only time it would be a good idea to use it is if you've got some incredibly slow to calculate equation and want to optimize it. The function will take a long time at first, as it will have to generate second-derivatives and beyond, but afterwards the output equation will just be a simple-to-calculate polynomial (though the approximation gets worse the further you are from the reference point). If you've got an equation that's already fast to calculate, using the taylor series approximation will only be a negative. So take it with a grain of salt.
+
+That's mostly it. I've fixed some issues/bugs here and there, renamed some small stuff (check the full changelog for more information), removed all the stuff marked obsolete and to be removed in this update, added some more math stuff like prime calculators, and other tiny changes. The next update will be focused on reworking the badly made geometry stuff I did a while back ([Version 2.1](https://github.com/That-One-Nerd/Nerd_STF/releases/tag/v2.1.0)). I know I say this all the time, but version 2.5 should be substantially bigger than this one. I'm going to be reworking the `Polygon` object entirely and will be improving quite a lot of other things in the whole `Nerd_STF.Mathematics.Geometry` namespace. Stay tuned!</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
@@ -40,6 +51,7 @@ Anyway, that's it for this update. The longest delay was just getting this proje
     <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
     <AssemblyOriginatorKeyFile>C:\Users\kyley\Desktop\Misc Items\Private Keys\SNA\Nerd_STF.snk</AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -51,7 +63,7 @@ Anyway, that's it for this update. The longest delay was just getting this proje
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <WarningLevel>9999</WarningLevel>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
 
   <ItemGroup>
