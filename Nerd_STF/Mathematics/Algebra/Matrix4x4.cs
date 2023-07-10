@@ -451,6 +451,35 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
         { r1c4, r2c4, r3c4, r4c4 }
     });
 
+    public Matrix4x4 AddRow(int rowToChange, int referenceRow, float factor = 1)
+    {
+        Matrix4x4 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
+            else return @this[r, c];
+        });
+    }
+    public Matrix4x4 ScaleRow(int rowIndex, float factor)
+    {
+        Matrix4x4 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowIndex) return @this[r, c] * factor;
+            else return @this[r, c];
+        });
+    }
+    public Matrix4x4 SwapRows(int rowA, int rowB)
+    {
+        Matrix4x4 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowA) return @this[rowB, c];
+            else if (r == rowB) return @this[rowA, c];
+            else return @this[r, c];
+        });
+    }
+
     public virtual bool Equals(Matrix4x4? other)
     {
         if (other is null) return false;

@@ -2,18 +2,38 @@
 
 TODO
 
+added row operations, fixed cofactor bugs, added setters
+
 Here's the full changelog:
 ```
 * Nerd_STF
     * Mathematics
         * Abstract
             * IMatrix
+                + AddRow(int, int, float)
                 + Cofactor()
+                + ScaleRow(int, float)
+                + SwapRows(int, int)
+                + SolveRowEchelon()
         * Algebra
             * Matrix
+                + AddRow(int, int, float)
+                + ScaleRow(int, float)
+                + SwapRows(int, int)
                 = Fixed a blunder in `SignGrid(Int2)` with signs being incorrectly placed on matrixes with even column count.
             * Matrix2x2
+                + AddRow(int, int, float)
+                + ScaleRow(int, float)
+                + SwapRows(int, int)
                 = Fixed a blunder in `Cofactor()` with the position of elements.
+            * Matrix3x3
+                + AddRow(int, int, float)
+                + ScaleRow(int, float)
+                + SwapRows(int, int)
+            * Matrix4x4
+                + AddRow(int, int, float)
+                + ScaleRow(int, float)
+                + SwapRows(int, int)
         * NumberSystems
             * Complex
                 + operator Complex(SystemComplex)

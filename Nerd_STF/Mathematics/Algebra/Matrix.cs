@@ -276,6 +276,35 @@ public class Matrix : IMatrix<Matrix, Matrix>
         });
     }
 
+    public Matrix AddRow(int rowToChange, int referenceRow, float factor = 1)
+    {
+        Matrix @this = this;
+        return new(Size, delegate (int r, int c)
+        {
+            if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
+            else return @this[r, c];
+        });
+    }
+    public Matrix ScaleRow(int rowIndex, float factor)
+    {
+        Matrix @this = this;
+        return new(Size, delegate (int r, int c)
+        {
+            if (r == rowIndex) return @this[r, c] * factor;
+            else return @this[r, c];
+        });
+    }
+    public Matrix SwapRows(int rowA, int rowB)
+    {
+        Matrix @this = this;
+        return new(Size, delegate (int r, int c)
+        {
+            if (r == rowA) return @this[rowB, c];
+            else if (r == rowB) return @this[rowA, c];
+            else return @this[r, c];
+        });
+    }
+
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
         if (obj == null) return base.Equals(obj);

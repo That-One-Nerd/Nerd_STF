@@ -241,6 +241,36 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
         { r1c2, r2c2 }
     });
 
+    public Matrix2x2 AddRow(int rowToChange, int referenceRow, float factor = 1)
+    {
+        Matrix2x2 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
+            else return @this[r, c];
+        });
+    }
+    public Matrix2x2 ScaleRow(int rowIndex, float factor)
+    {
+        Matrix2x2 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowIndex) return @this[r, c] * factor;
+            else return @this[r, c];
+        });
+    }
+    public Matrix2x2 SwapRows(int rowA, int rowB)
+    {
+        Matrix2x2 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowA) return @this[rowB, c];
+            else if (r == rowB) return @this[rowA, c];
+            else return @this[r, c];
+        });
+    }
+
+
     public virtual bool Equals(Matrix2x2? other)
     {
         if (other is null) return false;

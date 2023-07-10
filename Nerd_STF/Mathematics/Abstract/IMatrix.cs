@@ -10,6 +10,12 @@ public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>, IDivide<T>,
     public float Determinant();
     public T? Inverse();
     public T Transpose();
+
+    public T AddRow(int rowToChange, int referenceRow, float factor = 1);
+    public T ScaleRow(int rowIndex, float value);
+    public T SwapRows(int rowA, int rowB);
+
+    //public T SolveRowEchelon();
 }
 
 public interface IMatrix<This, TMinor> : IMatrix<This> where This : IMatrix<This, TMinor>

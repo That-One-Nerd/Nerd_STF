@@ -336,6 +336,35 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         { r1c3, r2c3, r3c3 }
     });
 
+    public Matrix3x3 AddRow(int rowToChange, int referenceRow, float factor = 1)
+    {
+        Matrix3x3 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
+            else return @this[r, c];
+        });
+    }
+    public Matrix3x3 ScaleRow(int rowIndex, float factor)
+    {
+        Matrix3x3 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowIndex) return @this[r, c] * factor;
+            else return @this[r, c];
+        });
+    }
+    public Matrix3x3 SwapRows(int rowA, int rowB)
+    {
+        Matrix3x3 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowA) return @this[rowB, c];
+            else if (r == rowB) return @this[rowA, c];
+            else return @this[r, c];
+        });
+    }
+
     public virtual bool Equals(Matrix3x3? other)
     {
         if (other is null) return false;
