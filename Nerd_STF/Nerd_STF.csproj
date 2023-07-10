@@ -12,35 +12,14 @@
     <Copyright>Copyright (c) 2023 That_One_Nerd</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/That-One-Nerd/Nerd_STF</RepositoryUrl>
-    <AssemblyVersion>2.4.0</AssemblyVersion>
+    <AssemblyVersion>2.5.0</AssemblyVersion>
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers</PackageTags>
-    <Version>2.4.0</Version>
+    <Version>2.4.1</Version>
     <Product>Nerd_STF</Product>
     <PackageId>Nerd_STF</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Logo Square.png</PackageIcon>
-    <PackageReleaseNotes>I've done a pretty good amount of stuff in this update, and I'm pretty proud of it. Good improvement.
-
-First of all, I've gone and added all of the applicable `Mathf` functions as an extension to the `Equation` delegate. That way if you want to say, calculate the square root of an entire equation, rather than going:
-```csharp
-Equation result = x =&gt; Mathf.Sqrt(equ(x));
-// Where `equ` is an `Equation` that represents the function we want to take the square root of.
-```
-you can shorten it down and remove some of the weirdness.
-```csharp
-Equation result = equ.Sqrt();
-// Where `equ` is an `Equation` that represents the function we want to take the square root of.
-```
-
-It works for any common function you'd want to apply to an equation.
-
----
-
-Speaking of math functions (I guess that's the whole update, given the name), I'm now utilizing an implementation of CORDIC I made to calculate all trigonometric functions, hyperbolic trig functions, exponents, and logs. It's quite a neat process, and I could also have it completely wrong, but whatever I have, CORDIC or something else, works wonders, and is considerably faster than some other methods I tried. Of course, it's still nowhere near as fast as the built-in math functions, but they will always be on a whole other level. Maybe in the optimization update I'll bother to improve them, but they work quite well as-is for most use cases.
-
-I've also implemented taylor series into the `Calculus` class. It's not particularly useful is most cases, so I wouldn't bother. The only time it would be a good idea to use it is if you've got some incredibly slow to calculate equation and want to optimize it. The function will take a long time at first, as it will have to generate second-derivatives and beyond, but afterwards the output equation will just be a simple-to-calculate polynomial (though the approximation gets worse the further you are from the reference point). If you've got an equation that's already fast to calculate, using the taylor series approximation will only be a negative. So take it with a grain of salt.
-
-That's mostly it. I've fixed some issues/bugs here and there, renamed some small stuff (check the full changelog for more information), removed all the stuff marked obsolete and to be removed in this update, added some more math stuff like prime calculators, and other tiny changes. The next update will be focused on reworking the badly made geometry stuff I did a while back ([Version 2.1](https://github.com/That-One-Nerd/Nerd_STF/releases/tag/v2.1.0)). I know I say this all the time, but version 2.5 should be substantially bigger than this one. I'm going to be reworking the `Polygon` object entirely and will be improving quite a lot of other things in the whole `Nerd_STF.Mathematics.Geometry` namespace. Stay tuned!</PackageReleaseNotes>
+    <PackageReleaseNotes>DO THIS</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
