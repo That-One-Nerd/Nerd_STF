@@ -6,10 +6,21 @@ Here's the full changelog:
 ```
 * Nerd_STF
     * Mathematics
+        * Abstract
+            * IMatrix
+                + Cofactor()
+        * Algebra
+            * Matrix
+                = Fixed a blunder in `SignGrid(Int2)` with signs being incorrectly placed on matrixes with even column count.
+            * Matrix2x2
+                = Fixed a blunder in `Cofactor()` with the position of elements.
         * NumberSystems
             * Complex
                 + operator Complex(SystemComplex)
                 + operator SystemComplex(Complex)
+            * Quaternion
+                + operator Quaternion(SystemQuaternion)
+                + operator SystemQuaternion(Quaternion)
         * Float3
             = Added a setter to `XY`
             = Added a setter to `XZ`

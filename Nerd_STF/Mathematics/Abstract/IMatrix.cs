@@ -6,6 +6,7 @@ public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>, IDivide<T>,
     where T : IMatrix<T>
 {
     public T Adjugate();
+    public T Cofactor();
     public float Determinant();
     public T? Inverse();
     public T Transpose();

@@ -223,8 +223,8 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
     {
         Matrix2x2 swapped = new(new[,]
         {
-            { r2c2, r1c2 },
-            { r2c1, r1c1 }
+            { r2c2, r2c1 },
+            { r1c2, r1c1 }
         });
         return swapped ^ SignGrid;
     }

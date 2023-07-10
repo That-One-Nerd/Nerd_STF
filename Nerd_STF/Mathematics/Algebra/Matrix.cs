@@ -20,7 +20,12 @@ public class Matrix : IMatrix<Matrix, Matrix>
         return m;
     }
     public static Matrix One(Int2 size) => new(size, 1);
-    public static Matrix SignGrid(Int2 size) => new(size, Fills.SignFill);
+    public static Matrix SignGrid(Int2 size) => new(size, delegate (int x)
+    {
+        float sgnValue = Fills.SignFill(x);
+        if (size.y % 2 == 0 && x / size.y % 2 == 1) sgnValue *= -1;
+        return sgnValue;
+    });
     public static Matrix Zero(Int2 size) => new(size);
 
     public bool HasMinors => Size.x > 1 && Size.y > 1;
