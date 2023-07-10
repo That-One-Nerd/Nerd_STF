@@ -6,6 +6,10 @@ Here's the full changelog:
 ```
 * Nerd_STF
     * Mathematics
+        * NumberSystems
+            * Complex
+                + operator Complex(SystemComplex)
+                + operator SystemComplex(Complex)
         * Float3
             = Added a setter to `XY`
             = Added a setter to `XZ`

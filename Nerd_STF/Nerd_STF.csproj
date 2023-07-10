@@ -12,7 +12,7 @@
     <Copyright>Copyright (c) 2023 That_One_Nerd</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/That-One-Nerd/Nerd_STF</RepositoryUrl>
-    <AssemblyVersion>2.5.0</AssemblyVersion>
+    <AssemblyVersion>2.4.1</AssemblyVersion>
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers</PackageTags>
     <Version>2.4.1</Version>
     <Product>Nerd_STF</Product>
