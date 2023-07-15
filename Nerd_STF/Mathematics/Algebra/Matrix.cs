@@ -1,6 +1,4 @@
-﻿using System.Buffers;
-
-namespace Nerd_STF.Mathematics.Algebra;
+﻿namespace Nerd_STF.Mathematics.Algebra;
 
 public class Matrix : IMatrix<Matrix, Matrix>
 {
@@ -317,6 +315,27 @@ public class Matrix : IMatrix<Matrix, Matrix>
         float[] dataA = GetRow(rowA), dataB = GetRow(rowB);
         SetRow(rowA, dataB);
         SetRow(rowB, dataA);
+    }
+
+    public Matrix SolveRowEchelon()
+    {
+        Matrix result = (Matrix)MemberwiseClone();
+
+        // Scale the first row so the first element of that row is 1.
+        result.ScaleRowMutable(0, 1 / result[0, 0]);
+        
+        // For each row afterwards, subtract the required amount from all rows before it and normalize.
+        for (int r1 = 1; r1 < result.Size.x; r1++)
+        {
+            int min = Mathf.Min(r1, result.Size.y);
+            for (int r2 = 0; r2 < min; r2++)
+            {
+                result.AddRowMutable(r1, r2, -result[r1, r2]);
+            }
+            result.ScaleRowMutable(r1, 1 / result[r1, r1]);
+        }
+
+        return result;
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
