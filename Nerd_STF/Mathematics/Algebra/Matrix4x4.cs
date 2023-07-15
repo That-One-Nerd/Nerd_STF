@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.Algebra;
+﻿using System.Data.Common;
+
+namespace Nerd_STF.Mathematics.Algebra;
 
 public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
 {
@@ -107,6 +109,8 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
             r4c4 = value.w;
         }
     }
+
+    public Int2 Size => (4, 4);
 
     public float r1c1, r2c1, r3c1, r4c1, r1c2, r2c2, r3c2, r4c2, r1c3, r2c3, r3c3, r4c3, r1c4, r2c4, r3c4, r4c4;
 
@@ -451,6 +455,32 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
         { r1c4, r2c4, r3c4, r4c4 }
     });
 
+    public float[] GetColumn(int column) =>
+        new[] { this[0, column], this[1, column], this[2, column], this[3, column] };
+    public float[] GetRow(int row) =>
+        new[] { this[row, 0], this[row, 1], this[row, 2], this[row, 3] };
+
+    public void SetColumn(int column, float[] vals)
+    {
+        if (vals.Length < 4)
+            throw new InvalidSizeException("Array must contain enough values to fill the column.");
+
+        this[0, column] = vals[0];
+        this[1, column] = vals[1];
+        this[2, column] = vals[2];
+        this[3, column] = vals[3];
+    }
+    public void SetRow(int row, float[] vals)
+    {
+        if (vals.Length < 4)
+            throw new InvalidSizeException("Array must contain enough values to fill the row.");
+
+        this[row, 0] = vals[0];
+        this[row, 1] = vals[1];
+        this[row, 2] = vals[2];
+        this[row, 3] = vals[3];
+    }
+
     public Matrix4x4 AddRow(int rowToChange, int referenceRow, float factor = 1)
     {
         Matrix4x4 @this = this;
@@ -459,6 +489,13 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
             if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
             else return @this[r, c];
         });
+    }
+    public void AddRowMutable(int rowToChange, int referenceRow, float factor)
+    {
+        this[rowToChange, 0] += this[referenceRow, 0] * factor;
+        this[rowToChange, 1] += this[referenceRow, 1] * factor;
+        this[rowToChange, 2] += this[referenceRow, 2] * factor;
+        this[rowToChange, 3] += this[referenceRow, 3] * factor;
     }
     public Matrix4x4 ScaleRow(int rowIndex, float factor)
     {
@@ -469,6 +506,13 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
             else return @this[r, c];
         });
     }
+    public void ScaleRowMutable(int rowIndex, float factor)
+    {
+        this[rowIndex, 0] *= factor;
+        this[rowIndex, 1] *= factor;
+        this[rowIndex, 2] *= factor;
+        this[rowIndex, 3] *= factor;
+    }
     public Matrix4x4 SwapRows(int rowA, int rowB)
     {
         Matrix4x4 @this = this;
@@ -478,6 +522,12 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
             else if (r == rowB) return @this[rowA, c];
             else return @this[r, c];
         });
+    }
+    public void SwapRowsMutable(int rowA, int rowB)
+    {
+        float[] dataA = GetRow(rowA), dataB = GetRow(rowB);
+        SetRow(rowA, dataB);
+        SetRow(rowB, dataA);
     }
 
     public virtual bool Equals(Matrix4x4? other)

@@ -285,6 +285,10 @@ public class Matrix : IMatrix<Matrix, Matrix>
             else return @this[r, c];
         });
     }
+    public void AddRowMutable(int rowToChange, int referenceRow, float factor)
+    {
+        for (int c = 0; c < Size.y; c++) this[rowToChange, c] += this[referenceRow, c] * factor;
+    }
     public Matrix ScaleRow(int rowIndex, float factor)
     {
         Matrix @this = this;
@@ -293,6 +297,10 @@ public class Matrix : IMatrix<Matrix, Matrix>
             if (r == rowIndex) return @this[r, c] * factor;
             else return @this[r, c];
         });
+    }
+    public void ScaleRowMutable(int rowIndex, float factor)
+    {
+        for (int c = 0; c < Size.y; c++) this[rowIndex, c] *= factor;
     }
     public Matrix SwapRows(int rowA, int rowB)
     {
@@ -303,6 +311,12 @@ public class Matrix : IMatrix<Matrix, Matrix>
             else if (r == rowB) return @this[rowA, c];
             else return @this[r, c];
         });
+    }
+    public void SwapRowsMutable(int rowA, int rowB)
+    {
+        float[] dataA = GetRow(rowA), dataB = GetRow(rowB);
+        SetRow(rowA, dataB);
+        SetRow(rowB, dataA);
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)

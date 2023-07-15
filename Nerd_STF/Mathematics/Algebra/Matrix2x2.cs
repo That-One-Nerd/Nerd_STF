@@ -52,6 +52,8 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
         }
     }
 
+    public Int2 Size => (2, 2);
+
     public float r1c1, r2c1, r1c2, r2c2;
 
     public Matrix2x2(float all) : this(all, all, all, all) { }
@@ -241,6 +243,24 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
         { r1c2, r2c2 }
     });
 
+    public float[] GetColumn(int column) => new[] { this[0, column], this[1, column] };
+    public float[] GetRow(int row) => new[] { this[row, 0], this[row, 1] };
+
+    public void SetColumn(int column, float[] vals)
+    {
+        if (vals.Length < 2)
+            throw new InvalidSizeException("Array must contain enough values to fill the column.");
+        this[0, column] = vals[0];
+        this[1, column] = vals[1];
+    }
+    public void SetRow(int row, float[] vals)
+    {
+        if (vals.Length < 2)
+            throw new InvalidSizeException("Array must contain enough values to fill the row.");
+        this[row, 0] = vals[0];
+        this[row, 1] = vals[1];
+    }
+
     public Matrix2x2 AddRow(int rowToChange, int referenceRow, float factor = 1)
     {
         Matrix2x2 @this = this;
@@ -250,6 +270,11 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
             else return @this[r, c];
         });
     }
+    public void AddRowMutable(int rowToChange, int referenceRow, float factor)
+    {
+        this[rowToChange, 0] += this[referenceRow, 0] * factor;
+        this[rowToChange, 1] += this[referenceRow, 1] * factor;
+    }
     public Matrix2x2 ScaleRow(int rowIndex, float factor)
     {
         Matrix2x2 @this = this;
@@ -258,6 +283,11 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
             if (r == rowIndex) return @this[r, c] * factor;
             else return @this[r, c];
         });
+    }
+    public void ScaleRowMutable(int rowIndex, float factor)
+    {
+        this[rowIndex, 0] *= factor;
+        this[rowIndex, 1] *= factor;
     }
     public Matrix2x2 SwapRows(int rowA, int rowB)
     {
@@ -269,7 +299,12 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
             else return @this[r, c];
         });
     }
-
+    public void SwapRowsMutable(int rowA, int rowB)
+    {
+        float[] dataA = GetRow(rowA), dataB = GetRow(rowB);
+        SetRow(rowA, dataB);
+        SetRow(rowB, dataA);
+    }
 
     public virtual bool Equals(Matrix2x2? other)
     {
