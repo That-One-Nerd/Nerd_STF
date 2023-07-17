@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.NumberSystems;
+﻿using SystemQuaternion = System.Numerics.Quaternion;
+
+namespace Nerd_STF.Mathematics.NumberSystems;
 
 public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<Quaternion>, IAverage<Quaternion>,
     ICeiling<Quaternion>, IClamp<Quaternion>, IClampMagnitude<Quaternion, float>, IComparable<Quaternion>,
@@ -332,4 +334,7 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
     public static implicit operator Quaternion(Fill<int> fill) => new(fill);
     public static implicit operator Quaternion((float u, float i, float j, float k) val) =>
         new(val.u, val.i, val.j, val.k);
+
+    public static implicit operator Quaternion(SystemQuaternion val) => (val.X, val.Y, val.Z, val.W);
+    public static implicit operator SystemQuaternion(Quaternion val) => new(val.u, val.i, val.j, val.k);
 }

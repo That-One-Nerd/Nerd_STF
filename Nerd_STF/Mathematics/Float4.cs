@@ -24,17 +24,101 @@ public record struct Float4 : IAbsolute<Float4>,
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
     public Float4 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z + w * w);
 
-    public Float2 XY => new(x, y);
-    public Float2 XZ => new(x, z);
-    public Float2 XW => new(x, w);
-    public Float2 YW => new(y, w);
-    public Float2 YZ => new(y, z);
-    public Float2 ZW => new(z, w);
+    public Float2 XW
+    {
+        get => (x, w);
+        set
+        {
+            x = value.x;
+            w = value.y;
+        }
+    }
+    public Float2 XY
+    {
+        get => (x, y);
+        set
+        {
+            x = value.x;
+            y = value.y;
+        }
+    }
+    public Float2 XZ
+    {
+        get => (x, z);
+        set
+        {
+            x = value.x;
+            z = value.y;
+        }
+    }
+    public Float2 YW
+    {
+        get => (y, w);
+        set
+        {
+            y = value.x;
+            w = value.y;
+        }
+    }
+    public Float2 YZ
+    {
+        get => (y, z);
+        set
+        {
+            y = value.x;
+            z = value.y;
+        }
+    }
+    public Float2 ZW
+    {
+        get => (z, w);
+        set
+        {
+            z = value.x;
+            w = value.y;
+        }
+    }
 
-    public Float3 XYW => new(x, y, w);
-    public Float3 XYZ => new(x, y, z);
-    public Float3 YZW => new(y, z, w);
-    public Float3 XZW => new(x, z, w);
+    public Float3 XYW
+    {
+        get => (x, y, w);
+        set
+        {
+            x = value.x;
+            y = value.y;
+            w = value.z;
+        }
+    }
+    public Float3 XYZ
+    {
+        get => (x, y, z);
+        set
+        {
+            x = value.x;
+            y = value.y;
+            z = value.z;
+        }
+    }
+    public Float3 XZW
+    {
+        get => (x, z, w);
+        set
+        {
+            x = value.x;
+            z = value.y;
+            w = value.z;
+        }
+    }
+    public Float3 YZW
+    {
+        get => (y, z, w);
+        set
+        {
+            y = value.x;
+            z = value.y;
+            w = value.z;
+        }
+    }
 
     public float x, y, z, w;
 

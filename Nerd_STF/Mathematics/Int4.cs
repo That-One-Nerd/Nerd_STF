@@ -21,17 +21,101 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
     public Int4 Normalized => (Int4)((Float4)this * Mathf.InverseSqrt(x * x + y * y + z * z + w * w));
 
-    public Int2 XY => new(x, y);
-    public Int2 XZ => new(x, z);
-    public Int2 XW => new(x, w);
-    public Int2 YW => new(y, w);
-    public Int2 YZ => new(y, z);
-    public Int2 ZW => new(z, w);
+    public Int2 XW
+    {
+        get => (x, w);
+        set
+        {
+            x = value.x;
+            w = value.y;
+        }
+    }
+    public Int2 XY
+    {
+        get => (x, y);
+        set
+        {
+            x = value.x;
+            y = value.y;
+        }
+    }
+    public Int2 XZ
+    {
+        get => (x, z);
+        set
+        {
+            x = value.x;
+            z = value.y;
+        }
+    }
+    public Int2 YW
+    {
+        get => (y, w);
+        set
+        {
+            y = value.x;
+            w = value.y;
+        }
+    }
+    public Int2 YZ
+    {
+        get => (y, z);
+        set
+        {
+            y = value.x;
+            z = value.y;
+        }
+    }
+    public Int2 ZW
+    {
+        get => (z, w);
+        set
+        {
+            z = value.x;
+            w = value.y;
+        }
+    }
 
-    public Int3 XYW => new(x, y, w);
-    public Int3 XYZ => new(x, y, z);
-    public Int3 YZW => new(y, z, w);
-    public Int3 XZW => new(x, z, w);
+    public Int3 XYW
+    {
+        get => (x, y, w);
+        set
+        {
+            x = value.x;
+            y = value.y;
+            w = value.z;
+        }
+    }
+    public Int3 XYZ
+    {
+        get => (x, y, z);
+        set
+        {
+            x = value.x;
+            y = value.y;
+            z = value.z;
+        }
+    }
+    public Int3 XZW
+    {
+        get => (x, z, w);
+        set
+        {
+            x = value.x;
+            z = value.y;
+            w = value.z;
+        }
+    }
+    public Int3 YZW
+    {
+        get => (y, z, w);
+        set
+        {
+            y = value.x;
+            z = value.y;
+            w = value.z;
+        }
+    }
 
     public int x, y, z, w;
 

@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.NumberSystems;
+﻿using SystemComplex = System.Numerics.Complex;
+
+namespace Nerd_STF.Mathematics.NumberSystems;
 
 public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Complex>, ICeiling<Complex>,
     IClampMagnitude<Complex, float>, IComparable<Complex>, IDivide<Complex>, IDot<Complex, float>,
@@ -204,4 +206,7 @@ public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Co
     public static implicit operator Complex(Fill<float> fill) => new(fill);
     public static implicit operator Complex(Fill<int> fill) => new(fill);
     public static implicit operator Complex((float u, float i) val) => new(val.u, val.i);
+
+    public static implicit operator Complex(SystemComplex val) => ((float)val.Real, (float)val.Imaginary);
+    public static implicit operator SystemComplex(Complex val) => new(val.u, val.i);
 }

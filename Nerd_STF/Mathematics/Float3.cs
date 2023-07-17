@@ -23,9 +23,33 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
     public Float3 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z);
 
-    public Float2 XY => new(x, y);
-    public Float2 XZ => new(x, z);
-    public Float2 YZ => new(y, z);
+    public Float2 XY
+    {
+        get => (x, y);
+        set
+        {
+            x = value.x;
+            y = value.y;
+        }
+    }
+    public Float2 XZ
+    {
+        get => (x, z);
+        set
+        {
+            x = value.x;
+            z = value.y;
+        }
+    }
+    public Float2 YZ
+    {
+        get => (y, z);
+        set
+        {
+            y = value.x;
+            z = value.y;
+        }
+    }
 
     public float x, y, z;
 
