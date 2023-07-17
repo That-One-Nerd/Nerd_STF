@@ -78,6 +78,8 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         }
     }
 
+    public Int2 Size => (3, 3);
+
     public float r1c1, r2c1, r3c1, r1c2, r2c2, r3c2, r1c3, r2c3, r3c3;
 
     public Matrix3x3(float all) : this(all, all, all, all, all, all, all, all, all) { }
@@ -335,6 +337,75 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         { r1c2, r2c2, r3c2 },
         { r1c3, r2c3, r3c3 }
     });
+
+    public float[] GetColumn(int column) => new[] { this[0, column], this[1, column], this[2, column] };
+    public float[] GetRow(int row) => new[] { this[row, 0], this[row, 1], this[row, 2] };
+
+    public void SetColumn(int column, float[] vals)
+    {
+        if (vals.Length < 3)
+            throw new InvalidSizeException("Array must contain enough values to fill the column.");
+
+        this[0, column] = vals[0];
+        this[1, column] = vals[1];
+        this[2, column] = vals[2];
+    }
+    public void SetRow(int row, float[] vals)
+    {
+        if (vals.Length < 3)
+            throw new InvalidSizeException("Array must contain enough values to fill the row.");
+
+        this[row, 0] = vals[0];
+        this[row, 1] = vals[1];
+        this[row, 2] = vals[2];
+    }
+
+    public Matrix3x3 AddRow(int rowToChange, int referenceRow, float factor = 1)
+    {
+        Matrix3x3 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
+            else return @this[r, c];
+        });
+    }
+    public void AddRowMutable(int rowToChange, int referenceRow, float factor)
+    {
+        this[rowToChange, 0] += this[referenceRow, 0] * factor;
+        this[rowToChange, 1] += this[referenceRow, 1] * factor;
+        this[rowToChange, 2] += this[referenceRow, 2] * factor;
+    }
+    public Matrix3x3 ScaleRow(int rowIndex, float factor)
+    {
+        Matrix3x3 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowIndex) return @this[r, c] * factor;
+            else return @this[r, c];
+        });
+    }
+    public void ScaleRowMutable(int rowIndex, float factor)
+    {
+        this[rowIndex, 0] *= factor;
+        this[rowIndex, 1] *= factor;
+        this[rowIndex, 2] *= factor;
+    }
+    public Matrix3x3 SwapRows(int rowA, int rowB)
+    {
+        Matrix3x3 @this = this;
+        return new(delegate (int r, int c)
+        {
+            if (r == rowA) return @this[rowB, c];
+            else if (r == rowB) return @this[rowA, c];
+            else return @this[r, c];
+        });
+    }
+    public void SwapRowsMutable(int rowA, int rowB)
+    {
+        float[] dataA = GetRow(rowA), dataB = GetRow(rowB);
+        SetRow(rowA, dataB);
+        SetRow(rowB, dataA);
+    }
 
     public virtual bool Equals(Matrix3x3? other)
     {

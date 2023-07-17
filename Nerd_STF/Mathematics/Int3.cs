@@ -21,9 +21,33 @@ public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClam
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
     public Int3 Normalized => (Int3)((Float3)this * Mathf.InverseSqrt(x * x + y * y + z * z));
 
-    public Int2 XY => new(x, y);
-    public Int2 XZ => new(x, z);
-    public Int2 YZ => new(y, z);
+    public Int2 XY
+    {
+        get => (x, y);
+        set
+        {
+            x = value.x;
+            y = value.y;
+        }
+    }
+    public Int2 XZ
+    {
+        get => (x, z);
+        set
+        {
+            x = value.x;
+            z = value.y;
+        }
+    }
+    public Int2 YZ
+    {
+        get => (y, z);
+        set
+        {
+            y = value.x;
+            z = value.y;
+        }
+    }
 
     public int x, y, z;
 

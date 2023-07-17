@@ -1,6 +1,4 @@
-﻿using System.Buffers;
-
-namespace Nerd_STF.Mathematics.Algebra;
+﻿namespace Nerd_STF.Mathematics.Algebra;
 
 public class Matrix : IMatrix<Matrix, Matrix>
 {
@@ -20,7 +18,12 @@ public class Matrix : IMatrix<Matrix, Matrix>
         return m;
     }
     public static Matrix One(Int2 size) => new(size, 1);
-    public static Matrix SignGrid(Int2 size) => new(size, Fills.SignFill);
+    public static Matrix SignGrid(Int2 size) => new(size, delegate (int x)
+    {
+        float sgnValue = Fills.SignFill(x);
+        if (size.y % 2 == 0 && x / size.y % 2 == 1) sgnValue *= -1;
+        return sgnValue;
+    });
     public static Matrix Zero(Int2 size) => new(size);
 
     public bool HasMinors => Size.x > 1 && Size.y > 1;
@@ -269,6 +272,70 @@ public class Matrix : IMatrix<Matrix, Matrix>
             if (c >= index.y) c++;
             return @this[r, c];
         });
+    }
+
+    public Matrix AddRow(int rowToChange, int referenceRow, float factor = 1)
+    {
+        Matrix @this = this;
+        return new(Size, delegate (int r, int c)
+        {
+            if (r == rowToChange) return @this[r, c] += factor * @this[referenceRow, c];
+            else return @this[r, c];
+        });
+    }
+    public void AddRowMutable(int rowToChange, int referenceRow, float factor)
+    {
+        for (int c = 0; c < Size.y; c++) this[rowToChange, c] += this[referenceRow, c] * factor;
+    }
+    public Matrix ScaleRow(int rowIndex, float factor)
+    {
+        Matrix @this = this;
+        return new(Size, delegate (int r, int c)
+        {
+            if (r == rowIndex) return @this[r, c] * factor;
+            else return @this[r, c];
+        });
+    }
+    public void ScaleRowMutable(int rowIndex, float factor)
+    {
+        for (int c = 0; c < Size.y; c++) this[rowIndex, c] *= factor;
+    }
+    public Matrix SwapRows(int rowA, int rowB)
+    {
+        Matrix @this = this;
+        return new(Size, delegate (int r, int c)
+        {
+            if (r == rowA) return @this[rowB, c];
+            else if (r == rowB) return @this[rowA, c];
+            else return @this[r, c];
+        });
+    }
+    public void SwapRowsMutable(int rowA, int rowB)
+    {
+        float[] dataA = GetRow(rowA), dataB = GetRow(rowB);
+        SetRow(rowA, dataB);
+        SetRow(rowB, dataA);
+    }
+
+    public Matrix SolveRowEchelon()
+    {
+        Matrix result = (Matrix)MemberwiseClone();
+
+        // Scale the first row so the first element of that row is 1.
+        result.ScaleRowMutable(0, 1 / result[0, 0]);
+        
+        // For each row afterwards, subtract the required amount from all rows before it and normalize.
+        for (int r1 = 1; r1 < result.Size.x; r1++)
+        {
+            int min = Mathf.Min(r1, result.Size.y);
+            for (int r2 = 0; r2 < min; r2++)
+            {
+                result.AddRowMutable(r1, r2, -result[r1, r2]);
+            }
+            result.ScaleRowMutable(r1, 1 / result[r1, r1]);
+        }
+
+        return result;
     }
 
     public override bool Equals([NotNullWhen(true)] object? obj)
