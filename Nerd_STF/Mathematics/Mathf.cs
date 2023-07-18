@@ -25,7 +25,7 @@ public static class Mathf
     public static Angle ArcSin(float value)
     {
         if (value > 1 || value < -1) throw new ArgumentOutOfRangeException(nameof(value));
-        return (SolveNewton(x => Sin(x) - value, 0), Angle.Type.Degrees);
+        return (SolveNewton(x => Sin(x) - value, 0), Angle.Type.Radians);
     }    
     public static Angle ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
     public static Angle ArcTan2(float a, float b) => ArcTan(a / b);
