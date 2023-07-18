@@ -155,7 +155,7 @@ public static class Mathf
         return -1;
     }
 
-    public static float InverseSqrt(float val) => 1 / Sqrt(val);
+    public static float InverseSqrt(float val) => UnsafeHelper.Q_rsqrt(val);
 
     public static bool IsPrime(int num, PrimeCheckMethod method = PrimeCheckMethod.Classic) =>
         method switch
