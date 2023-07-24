@@ -1,10 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, IClamp<Box2D>, IContains<Vert>,
-    IEquatable<Box2D>, IFloor<Box2D>, ILerp<Box2D, float>, IMedian<Box2D>, IRound<Box2D>, IShape2d<float>,
-    ISplittable<Box2D, (Vert[] centers, Float2[] sizes)>
+public record class Box2d : IAbsolute<Box2d>, IAverage<Box2d>, ICeiling<Box2d>, IClamp<Box2d>, IContains<Vert>,
+    IEquatable<Box2d>, IFloor<Box2d>, ILerp<Box2d, float>, IMedian<Box2d>, IRound<Box2d>, IShape2d<float>,
+    ISplittable<Box2d, (Vert[] centers, Float2[] sizes)>
 {
-    public static Box2D Unit => new(Vert.Zero, Float2.One);
+    public static Box2d Unit => new(Vert.Zero, Float2.One);
 
     public Vert MaxVert
     {
@@ -31,13 +31,13 @@ public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, 
     public Vert center;
     public Float2 size;
 
-    public Box2D(Vert min, Vert max) : this(Vert.Average(min, max), (Float2)(min - max)) { }
-    public Box2D(Vert center, Float2 size)
+    public Box2d(Vert min, Vert max) : this(Vert.Average(min, max), (Float2)(min - max)) { }
+    public Box2d(Vert center, Float2 size)
     {
         this.center = center;
         this.size = size;
     }
-    public Box2D(Fill<float> fill) : this(fill, new Float2(fill(3), fill(4))) { }
+    public Box2d(Fill<float> fill) : this(fill, new Float2(fill(3), fill(4))) { }
 
     public float this[int index]
     {
@@ -45,26 +45,26 @@ public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, 
         set => size[index] = value;
     }
 
-    public static Box2D Absolute(Box2D val) => new(Vert.Absolute(val.MinVert), Vert.Absolute(val.MaxVert));
-    public static Box2D Average(params Box2D[] vals)
+    public static Box2d Absolute(Box2d val) => new(Vert.Absolute(val.MinVert), Vert.Absolute(val.MaxVert));
+    public static Box2d Average(params Box2d[] vals)
     {
         (Vert[] centers, Float2[] sizes) = SplitArray(vals);
         return new(Vert.Average(centers), Float2.Average(sizes));
     }
-    public static Box2D Ceiling(Box2D val) => new(Vert.Ceiling(val.center), Float2.Ceiling(val.size));
-    public static Box2D Clamp(Box2D val, Box2D min, Box2D max) =>
+    public static Box2d Ceiling(Box2d val) => new(Vert.Ceiling(val.center), Float2.Ceiling(val.size));
+    public static Box2d Clamp(Box2d val, Box2d min, Box2d max) =>
         new(Vert.Clamp(val.center, min.center, max.center), Float2.Clamp(val.size, min.size, max.size));
-    public static Box2D Floor(Box2D val) => new(Vert.Floor(val.center), Float2.Floor(val.size));
-    public static Box2D Lerp(Box2D a, Box2D b, float t, bool clamp = true) =>
+    public static Box2d Floor(Box2d val) => new(Vert.Floor(val.center), Float2.Floor(val.size));
+    public static Box2d Lerp(Box2d a, Box2d b, float t, bool clamp = true) =>
         new(Vert.Lerp(a.center, b.center, t, clamp), Float2.Lerp(a.size, b.size, t, clamp));
-    public static Box2D Median(params Box2D[] vals)
+    public static Box2d Median(params Box2d[] vals)
     {
         (Vert[] verts, Float2[] sizes) = SplitArray(vals);
         return new(Vert.Median(verts), Float2.Median(sizes));
     }
-    public static Box2D Round(Box2D val) => new(Vert.Round(val.center), Float2.Round(val.size));
+    public static Box2d Round(Box2d val) => new(Vert.Round(val.center), Float2.Round(val.size));
 
-    public static (Vert[] centers, Float2[] sizes) SplitArray(params Box2D[] vals)
+    public static (Vert[] centers, Float2[] sizes) SplitArray(params Box2d[] vals)
     {
         Vert[] centers = new Vert[vals.Length];
         Float2[] sizes = new Float2[vals.Length];
@@ -78,7 +78,7 @@ public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, 
         return (centers, sizes);
     }
 
-    public virtual bool Equals(Box2D? other)
+    public virtual bool Equals(Box2d? other)
     {
         if (other is null) return false;
         return center == other.center && size == other.size;
@@ -100,16 +100,16 @@ public record class Box2D : IAbsolute<Box2D>, IAverage<Box2D>, ICeiling<Box2D>, 
         return true;
     }
 
-    public static Box2D operator +(Box2D a, Vert b) => new(a.center + b, a.size);
-    public static Box2D operator +(Box2D a, Float2 b) => new(a.center, a.size + b);
-    public static Box2D operator -(Box2D b) => new(-b.MaxVert, -b.MinVert);
-    public static Box2D operator -(Box2D a, Vert b) => new(a.center - b, a.size);
-    public static Box2D operator -(Box2D a, Float2 b) => new(a.center, a.size - b);
-    public static Box2D operator *(Box2D a, float b) => new(a.center * b, a.size * b);
-    public static Box2D operator *(Box2D a, Float2 b) => new(a.center, a.size * b);
-    public static Box2D operator /(Box2D a, float b) => new(a.center / b, a.size / b);
-    public static Box2D operator /(Box2D a, Float2 b) => new(a.center, a.size / b);
+    public static Box2d operator +(Box2d a, Vert b) => new(a.center + b, a.size);
+    public static Box2d operator +(Box2d a, Float2 b) => new(a.center, a.size + b);
+    public static Box2d operator -(Box2d b) => new(-b.MaxVert, -b.MinVert);
+    public static Box2d operator -(Box2d a, Vert b) => new(a.center - b, a.size);
+    public static Box2d operator -(Box2d a, Float2 b) => new(a.center, a.size - b);
+    public static Box2d operator *(Box2d a, float b) => new(a.center * b, a.size * b);
+    public static Box2d operator *(Box2d a, Float2 b) => new(a.center, a.size * b);
+    public static Box2d operator /(Box2d a, float b) => new(a.center / b, a.size / b);
+    public static Box2d operator /(Box2d a, Float2 b) => new(a.center, a.size / b);
 
-    public static implicit operator Box2D(Fill<float> fill) => new(fill);
-    public static explicit operator Box2D(Box3D box) => new(box.center, (Float2)box.size);
+    public static implicit operator Box2d(Fill<float> fill) => new(fill);
+    public static explicit operator Box2d(Box3d box) => new(box.center, (Float2)box.size);
 }
