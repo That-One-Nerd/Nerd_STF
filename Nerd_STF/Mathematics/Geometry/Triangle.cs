@@ -3,10 +3,10 @@
 namespace Nerd_STF.Mathematics.Geometry;
 
 public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling<Triangle>, IClamp<Triangle>,
-    IEquatable<Triangle>, IFloor<Triangle>, IFromTuple<Triangle, (Vert a, Vert b, Vert c)>, IGroup<Vert>,
-    IIndexAll<Vert>, IIndexRangeAll<Vert>, ILerp<Triangle, float>, IRound<Triangle>, IShape2d<float>
+    IEquatable<Triangle>, IFloor<Triangle>, IFromTuple<Triangle, (Float3 a, Float3 b, Float3 c)>, IGroup<Float3>,
+    IIndexAll<Float3>, IIndexRangeAll<Float3>, ILerp<Triangle, float>, IRound<Triangle>, IShape2d<float>
 {
-    public Vert A
+    public Float3 A
     {
         get => p_a;
         set
@@ -16,7 +16,7 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
             p_ca.b = value;
         }
     }
-    public Vert B
+    public Float3 B
     {
         get => p_b;
         set
@@ -26,7 +26,7 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
             p_bc.a = value;
         }
     }
-    public Vert C
+    public Float3 C
     {
         get => p_c;
         set
@@ -73,17 +73,17 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
         }
     }
 
-    private Vert p_a, p_b, p_c;
+    private Float3 p_a, p_b, p_c;
     private Line p_ab, p_bc, p_ca;
 
     [Obsolete("This field doesn't account for the Z-axis. This will be fixed in v2.4.0")]
-    public float Area => (float)Mathf.Absolute((A.position.x * B.position.y) + (B.position.x * C.position.y) +
-        (C.position.x * A.position.y) - ((B.position.x * A.position.y) + (C.position.x * B.position.y) +
-        (A.position.x * C.position.y))) * 0.5f;
-    public Vert Midpoint => Vert.Average(A, B, C);
+    public float Area => (float)Mathf.Absolute((A.x * B.y) + (B.x * C.y) +
+        (C.x * A.y) - ((B.x * A.y) + (C.x * B.y) +
+        (A.x * C.y))) * 0.5f;
+    public Float3 Midpoint => Float3.Average(A, B, C);
     public float Perimeter => AB.Length + BC.Length + CA.Length;
 
-    public Triangle(Vert a, Vert b, Vert c)
+    public Triangle(Float3 a, Float3 b, Float3 c)
     {
         p_a = a;
         p_b = b;
@@ -105,19 +105,18 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
         p_ca = ca;
     }
     public Triangle(float x1, float y1, float x2, float y2, float x3, float y3)
-        : this(new Vert(x1, y1), new Vert(x2, y2), new Vert(x3, y3)) { }
+        : this(new Float3(x1, y1), new Float3(x2, y2), new Float3(x3, y3)) { }
     public Triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3,
-        float z3) : this(new Vert(x1, y1, z1), new Vert(x2, y2, z2), new Vert(x3, y3, z3)) { }
+        float z3) : this(new Float3(x1, y1, z1), new Float3(x2, y2, z2), new Float3(x3, y3, z3)) { }
     public Triangle(Fill<Float3> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<Int3> fill) : this(fill(0), fill(1), fill(2)) { }
-    public Triangle(Fill<Vert> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<Line> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<float> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4), fill(5), fill(6),
         fill(7), fill(8)) { }
     public Triangle(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4), fill(5), fill(6),
         fill(7), fill(8)) { }
 
-    public Vert this[int index]
+    public Float3 this[int index]
     {
         get => index switch
         {
@@ -146,18 +145,18 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
             }
         }
     }
-    public Vert this[Index index]
+    public Float3 this[Index index]
     {
         get => this[index.IsFromEnd ? 3 - index.Value : index.Value];
         set => this[index.IsFromEnd ? 3 - index.Value : index.Value] = value;
     }
-    public Vert[] this[Range range]
+    public Float3[] this[Range range]
     {
         get
         {
             int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
             int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
-            List<Vert> res = new();
+            List<Float3> res = new();
             for (int i = start; i < end; i++) res.Add(this[i]);
             return res.ToArray();
         }
@@ -170,41 +169,41 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
     }
 
     public static Triangle Absolute(Triangle val) =>
-        new(Vert.Absolute(val.A), Vert.Absolute(val.B), Vert.Absolute(val.C));
+        new(Float3.Absolute(val.A), Float3.Absolute(val.B), Float3.Absolute(val.C));
     public static Triangle Average(params Triangle[] vals)
     {
-        (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
-        return new(Vert.Average(As), Vert.Average(Bs), Vert.Average(Cs));
+        (Float3[] As, Float3[] Bs, Float3[] Cs) = SplitFloat3Array(vals);
+        return new(Float3.Average(As), Float3.Average(Bs), Float3.Average(Cs));
     }
     public static Triangle Ceiling(Triangle val) =>
-        new(Vert.Ceiling(val.A), Vert.Ceiling(val.B), Vert.Ceiling(val.C));
+        new(Float3.Ceiling(val.A), Float3.Ceiling(val.B), Float3.Ceiling(val.C));
     public static Triangle Clamp(Triangle val, Triangle min, Triangle max) =>
-        new(Vert.Clamp(val.A, min.A, max.A), Vert.Clamp(val.B, min.B, max.B), Vert.Clamp(val.C, min.C, max.C));
+        new(Float3.Clamp(val.A, min.A, max.A), Float3.Clamp(val.B, min.B, max.B), Float3.Clamp(val.C, min.C, max.C));
     public static Triangle Floor(Triangle val) =>
-        new(Vert.Floor(val.A), Vert.Floor(val.B), Vert.Floor(val.C));
+        new(Float3.Floor(val.A), Float3.Floor(val.B), Float3.Floor(val.C));
     public static Triangle Lerp(Triangle a, Triangle b, float t, bool clamp = true) =>
-        new(Vert.Lerp(a.A, b.A, t, clamp), Vert.Lerp(a.B, b.B, t, clamp), Vert.Lerp(a.C, b.C, t, clamp));
+        new(Float3.Lerp(a.A, b.A, t, clamp), Float3.Lerp(a.B, b.B, t, clamp), Float3.Lerp(a.C, b.C, t, clamp));
     public static Triangle Max(params Triangle[] vals)
     {
-        (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
-        return new(Vert.Max(As), Vert.Max(Bs), Vert.Max(Cs));
+        (Float3[] As, Float3[] Bs, Float3[] Cs) = SplitFloat3Array(vals);
+        return new(Float3.Max(As), Float3.Max(Bs), Float3.Max(Cs));
     }
     public static Triangle Median(params Triangle[] vals)
     {
-        (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
-        return new(Vert.Median(As), Vert.Median(Bs), Vert.Median(Cs));
+        (Float3[] As, Float3[] Bs, Float3[] Cs) = SplitFloat3Array(vals);
+        return new(Float3.Median(As), Float3.Median(Bs), Float3.Median(Cs));
     }
     public static Triangle Min(params Triangle[] vals)
     {
-        (Vert[] As, Vert[] Bs, Vert[] Cs) = SplitVertArray(vals);
-        return new(Vert.Min(As), Vert.Min(Bs), Vert.Min(Cs));
+        (Float3[] As, Float3[] Bs, Float3[] Cs) = SplitFloat3Array(vals);
+        return new(Float3.Min(As), Float3.Min(Bs), Float3.Min(Cs));
     }
     public static Triangle Round(Triangle val) =>
-        new(Vert.Round(val.A), Vert.Round(val.B), Vert.Round(val.C));
+        new(Float3.Round(val.A), Float3.Round(val.B), Float3.Round(val.C));
 
-    public static (Vert[] As, Vert[] Bs, Vert[] Cs) SplitVertArray(params Triangle[] tris)
+    public static (Float3[] As, Float3[] Bs, Float3[] Cs) SplitFloat3Array(params Triangle[] tris)
     {
-        Vert[] a = new Vert[tris.Length], b = new Vert[tris.Length], c = new Vert[tris.Length];
+        Float3[] a = new Float3[tris.Length], b = new Float3[tris.Length], c = new Float3[tris.Length];
         for (int i = 0; i < tris.Length; i++)
         {
             a[i] = tris[i].A;
@@ -231,15 +230,15 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
         for (int i = 0; i < tris.Length; i++)
         {
             int pos = i * 9;
-            vals[pos + 0] = tris[i].A.position.x;
-            vals[pos + 1] = tris[i].A.position.y;
-            vals[pos + 2] = tris[i].A.position.z;
-            vals[pos + 3] = tris[i].B.position.x;
-            vals[pos + 4] = tris[i].B.position.y;
-            vals[pos + 5] = tris[i].B.position.z;
-            vals[pos + 6] = tris[i].C.position.x;
-            vals[pos + 7] = tris[i].C.position.y;
-            vals[pos + 8] = tris[i].C.position.z;
+            vals[pos + 0] = tris[i].A.x;
+            vals[pos + 1] = tris[i].A.y;
+            vals[pos + 2] = tris[i].A.z;
+            vals[pos + 3] = tris[i].B.x;
+            vals[pos + 4] = tris[i].B.y;
+            vals[pos + 5] = tris[i].B.z;
+            vals[pos + 6] = tris[i].C.x;
+            vals[pos + 7] = tris[i].C.y;
+            vals[pos + 8] = tris[i].C.z;
         }
         return vals;
     }
@@ -253,27 +252,27 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
     public override int GetHashCode() => base.GetHashCode();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<Vert> GetEnumerator()
+    public IEnumerator<Float3> GetEnumerator()
     {
         yield return A;
         yield return B;
         yield return C;
     }
 
-    public Vert[] ToArray() => new Vert[] { A, B, C };
-    public Fill<Vert> ToFill()
+    public Float3[] ToArray() => new Float3[] { A, B, C };
+    public Fill<Float3> ToFill()
     {
         Triangle @this = this;
         return i => @this[i];
     }
-    public List<Vert> ToList() => new() { A, B, C };
+    public List<Float3> ToList() => new() { A, B, C };
 
-    public float[] ToFloatArray() => new float[] { A.position.x, A.position.y, A.position.z,
-                                                   B.position.x, B.position.y, B.position.z,
-                                                   C.position.x, C.position.y, C.position.z };
-    public List<float> ToFloatList() => new() { A.position.x, A.position.y, A.position.z,
-                                                B.position.x, B.position.y, B.position.z,
-                                                C.position.x, C.position.y, C.position.z };
+    public float[] ToFloatArray() => new float[] { A.x, A.y, A.z,
+                                                   B.x, B.y, B.z,
+                                                   C.x, C.y, C.z };
+    public List<float> ToFloatList() => new() { A.x, A.y, A.z,
+                                                B.x, B.y, B.z,
+                                                C.x, C.y, C.z };
 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
@@ -287,23 +286,22 @@ public record class Triangle : IAbsolute<Triangle>, IAverage<Triangle>, ICeiling
     }
 
     public static Triangle operator +(Triangle a, Triangle b) => new(a.A + b.A, a.B + b.B, a.C + b.C);
-    public static Triangle operator +(Triangle a, Vert b) => new(a.A + b, a.B + b, a.C + b);
+    public static Triangle operator +(Triangle a, Float3 b) => new(a.A + b, a.B + b, a.C + b);
     public static Triangle operator -(Triangle t) => new(-t.A, -t.B, -t.C);
     public static Triangle operator -(Triangle a, Triangle b) => new(a.A - b.A, a.B - b.B, a.C - b.C);
-    public static Triangle operator -(Triangle a, Vert b) => new(a.A - b, a.B - b, a.C - b);
+    public static Triangle operator -(Triangle a, Float3 b) => new(a.A - b, a.B - b, a.C - b);
     public static Triangle operator *(Triangle a, Triangle b) => new(a.A * b.A, a.B * b.B, a.C * b.C);
-    public static Triangle operator *(Triangle a, Vert b) => new(a.A * b, a.B * b, a.C * b);
+    public static Triangle operator *(Triangle a, Float3 b) => new(a.A * b, a.B * b, a.C * b);
     public static Triangle operator *(Triangle a, float b) => new(a.A * b, a.B * b, a.C * b);
     public static Triangle operator /(Triangle a, Triangle b) => new(a.A / b.A, a.B / b.B, a.C / b.C);
-    public static Triangle operator /(Triangle a, Vert b) => new(a.A / b, a.B / b, a.C / b);
+    public static Triangle operator /(Triangle a, Float3 b) => new(a.A / b, a.B / b, a.C / b);
     public static Triangle operator /(Triangle a, float b) => new(a.A / b, a.B / b, a.C / b);
 
-    public static implicit operator Triangle(Fill<Vert> fill) => new(fill);
     public static implicit operator Triangle(Fill<Float3> fill) => new(fill);
     public static implicit operator Triangle(Fill<Int3> fill) => new(fill);
     public static implicit operator Triangle(Fill<Line> fill) => new(fill);
     public static implicit operator Triangle(Fill<float> fill) => new(fill);
     public static implicit operator Triangle(Fill<int> fill) => new(fill);
-    public static implicit operator Triangle((Vert a, Vert b, Vert c) val) =>
+    public static implicit operator Triangle((Float3 a, Float3 b, Float3 c) val) =>
         new(val.a, val.b, val.c);
 }

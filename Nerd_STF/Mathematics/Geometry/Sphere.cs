@@ -1,66 +1,66 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public record class Sphere : IAverage<Sphere>, ICeiling<Sphere>, IClamp<Sphere>, IClosestTo<Vert>,
-    IComparable<Sphere>, IComparable<float>, IContains<Vert>, IEquatable<Sphere>, IEquatable<float>, IFloor<Sphere>,
-    IFromTuple<Sphere, (Vert center, float radius)>, ILerp<Sphere, float>, IMax<Sphere>, IMedian<Sphere>,
-    IMin<Sphere>, IRound<Sphere>, ISplittable<Sphere, (Vert[] centers, float[] radii)>
+public record class Sphere : IAverage<Sphere>, ICeiling<Sphere>, IClamp<Sphere>, IClosestTo<Float3>,
+    IComparable<Sphere>, IComparable<float>, IContains<Float3>, IEquatable<Sphere>, IEquatable<float>, IFloor<Sphere>,
+    IFromTuple<Sphere, (Float3 center, float radius)>, ILerp<Sphere, float>, IMax<Sphere>, IMedian<Sphere>,
+    IMin<Sphere>, IRound<Sphere>, ISplittable<Sphere, (Float3[] centers, float[] radii)>
 {
-    public static Sphere Unit => new(Vert.Zero, 1);
+    public static Sphere Unit => new(Float3.Zero, 1);
 
-    public Vert center;
+    public Float3 center;
     public float radius;
 
     public float SurfaceArea => 4 * Constants.Pi * radius * radius;
     public float Volume => 4 / 3 * (Constants.Pi * radius * radius * radius);
 
-    public static Sphere FromDiameter(Vert a, Vert b) => new(Vert.Average(a, b), (a - b).Magnitude / 2);
-    public static Sphere FromRadius(Vert center, Vert radius) => new(center, (center - radius).Magnitude);
+    public static Sphere FromDiameter(Float3 a, Float3 b) => new(Float3.Average(a, b), (a - b).Magnitude / 2);
+    public static Sphere FromRadius(Float3 center, Float3 radius) => new(center, (center - radius).Magnitude);
 
-    public Sphere(Vert center, float radius)
+    public Sphere(Float3 center, float radius)
     {
         this.center = center;
         this.radius = radius;
     }
-    public Sphere(float cX, float cY, float radius) : this(new Vert(cX, cY), radius) { }
-    public Sphere(float cX, float cY, float cZ, float radius) : this(new Vert(cX, cY, cZ), radius) { }
-    public Sphere(Fill<float> fill, float radius) : this(new Vert(fill), radius) { }
-    public Sphere(Fill<float> fill) : this(new Vert(fill), fill(3)) { }
-    public Sphere(Fill<int> fill, float radius) : this(new Vert(fill), radius) { }
-    public Sphere(Fill<int> fill) : this(new Vert(fill), fill(3)) { }
-    public Sphere(Fill<Vert> fill, float radius) : this(fill(0), radius) { }
-    public Sphere(Fill<Vert> fillA, Fill<float> fillB) : this(fillA(0), fillB(0)) { }
+    public Sphere(float cX, float cY, float radius) : this(new Float3(cX, cY), radius) { }
+    public Sphere(float cX, float cY, float cZ, float radius) : this(new Float3(cX, cY, cZ), radius) { }
+    public Sphere(Fill<float> fill, float radius) : this(new Float3(fill), radius) { }
+    public Sphere(Fill<float> fill) : this(new Float3(fill), fill(3)) { }
+    public Sphere(Fill<int> fill, float radius) : this(new Float3(fill), radius) { }
+    public Sphere(Fill<int> fill) : this(new Float3(fill), fill(3)) { }
+    public Sphere(Fill<Float3> fill, float radius) : this(fill(0), radius) { }
+    public Sphere(Fill<Float3> fillA, Fill<float> fillB) : this(fillA(0), fillB(0)) { }
 
     public static Sphere Average(params Sphere[] vals)
     {
-        (Vert[] centers, float[] radii) = SplitArray(vals);
-        return new(Vert.Average(centers), Mathf.Average(radii));
+        (Float3[] centers, float[] radii) = SplitArray(vals);
+        return new(Float3.Average(centers), Mathf.Average(radii));
     }
-    public static Sphere Ceiling(Sphere val) => new(Vert.Ceiling(val.center), Mathf.Ceiling(val.radius));
+    public static Sphere Ceiling(Sphere val) => new(Float3.Ceiling(val.center), Mathf.Ceiling(val.radius));
     public static Sphere Clamp(Sphere val, Sphere min, Sphere max) =>
-        new(Vert.Clamp(val.center, min.center, max.center), Mathf.Clamp(val.radius, min.radius, max.radius));
-    public static Sphere Floor(Sphere val) => new(Vert.Floor(val.center), Mathf.Floor(val.radius));
+        new(Float3.Clamp(val.center, min.center, max.center), Mathf.Clamp(val.radius, min.radius, max.radius));
+    public static Sphere Floor(Sphere val) => new(Float3.Floor(val.center), Mathf.Floor(val.radius));
     public static Sphere Lerp(Sphere a, Sphere b, float t, bool clamp = true) =>
-        new(Vert.Lerp(a.center, b.center, t, clamp), Mathf.Lerp(a.radius, b.radius, t, clamp));
+        new(Float3.Lerp(a.center, b.center, t, clamp), Mathf.Lerp(a.radius, b.radius, t, clamp));
     public static Sphere Max(params Sphere[] vals)
     {
-        (Vert[] centers, float[] radii) = SplitArray(vals);
-        return new(Vert.Max(centers), Mathf.Max(radii));
+        (Float3[] centers, float[] radii) = SplitArray(vals);
+        return new(Float3.Max(centers), Mathf.Max(radii));
     }
     public static Sphere Median(params Sphere[] vals)
     {
-        (Vert[] centers, float[] radii) = SplitArray(vals);
-        return new(Vert.Median(centers), Mathf.Median(radii));
+        (Float3[] centers, float[] radii) = SplitArray(vals);
+        return new(Float3.Median(centers), Mathf.Median(radii));
     }
     public static Sphere Min(params Sphere[] vals)
     {
-        (Vert[] centers, float[] radii) = SplitArray(vals);
-        return new(Vert.Min(centers), Mathf.Min(radii));
+        (Float3[] centers, float[] radii) = SplitArray(vals);
+        return new(Float3.Min(centers), Mathf.Min(radii));
     }
-    public static Sphere Round(Sphere val) => new(Vert.Round(val.center), Mathf.Round(val.radius));
+    public static Sphere Round(Sphere val) => new(Float3.Round(val.center), Mathf.Round(val.radius));
 
-    public static (Vert[] centers, float[] radii) SplitArray(params Sphere[] spheres)
+    public static (Float3[] centers, float[] radii) SplitArray(params Sphere[] spheres)
     {
-        Vert[] centers = new Vert[spheres.Length];
+        Float3[] centers = new Float3[spheres.Length];
         float[] radii = new float[spheres.Length];
         for (int i = 0; i < spheres.Length; i++)
         {
@@ -89,9 +89,9 @@ public record class Sphere : IAverage<Sphere>, ICeiling<Sphere>, IClamp<Sphere>,
               "This method will be removed in Nerd_STF 2.5.0.")]
     public int CompareTo(float volume) => Volume.CompareTo(volume);
 
-    public bool Contains(Vert vert) => (center - vert).Magnitude <= radius;
+    public bool Contains(Float3 vert) => (center - vert).Magnitude <= radius;
 
-    public Vert ClosestTo(Vert vert) => Contains(vert) ? vert : ((vert - center).Normalized * radius) + center;
+    public Float3 ClosestTo(Float3 vert) => Contains(vert) ? vert : ((vert - center).Normalized * radius) + center;
 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
@@ -103,10 +103,10 @@ public record class Sphere : IAverage<Sphere>, ICeiling<Sphere>, IClamp<Sphere>,
     }
 
     public static Sphere operator +(Sphere a, Sphere b) => new(a.center + b.center, a.radius + b.radius);
-    public static Sphere operator +(Sphere a, Vert b) => new(a.center + b, a.radius);
+    public static Sphere operator +(Sphere a, Float3 b) => new(a.center + b, a.radius);
     public static Sphere operator +(Sphere a, float b) => new(a.center, a.radius + b);
     public static Sphere operator -(Sphere a, Sphere b) => new(a.center + b.center, a.radius + b.radius);
-    public static Sphere operator -(Sphere a, Vert b) => new(a.center + b, a.radius);
+    public static Sphere operator -(Sphere a, Float3 b) => new(a.center + b, a.radius);
     public static Sphere operator -(Sphere a, float b) => new(a.center, a.radius + b);
     public static Sphere operator *(Sphere a, Sphere b) => new(a.center * b.center, a.radius * b.radius);
     public static Sphere operator *(Sphere a, float b) => new(a.center * b, a.radius * b);
@@ -143,6 +143,6 @@ public record class Sphere : IAverage<Sphere>, ICeiling<Sphere>, IClamp<Sphere>,
               "This method will be removed in Nerd_STF 2.5.0.")]
     public static bool operator <=(Sphere a, float b) => a < b || a == b;
 
-    public static implicit operator Sphere((Vert center, float radius) val) =>
+    public static implicit operator Sphere((Float3 center, float radius) val) =>
         new(val.center, val.radius);
 }

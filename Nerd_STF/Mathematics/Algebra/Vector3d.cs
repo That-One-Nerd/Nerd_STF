@@ -201,7 +201,6 @@ public record struct Vector3d : IAbsolute<Vector3d>, IAverage<Vector3d>, IClampM
     public static explicit operator Vector3d(Int2 val) => val.ToVector();
     public static explicit operator Vector3d(Int3 val) => val.ToVector();
     public static explicit operator Vector3d(Matrix m) => ((Float3)m).ToVector();
-    public static explicit operator Vector3d(Vert val) => val.ToVector();
     public static implicit operator Vector3d(Vector2d v) => new(v.theta, Angle.Zero, v.magnitude);
     public static implicit operator Vector3d((Angle yaw, Angle pitch, float mag) val) =>
         new(val.yaw, val.pitch, val.mag);

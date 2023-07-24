@@ -136,7 +136,6 @@ public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
     public static explicit operator Vector2d(Int2 val) => val.ToVector();
     public static explicit operator Vector2d(Int3 val) => (Vector2d)val.ToVector();
     public static explicit operator Vector2d(Matrix m) => ((Float2)m).ToVector();
-    public static explicit operator Vector2d(Vert val) => (Vector2d)val.ToVector();
     public static explicit operator Vector2d(Vector3d val) => new(val.yaw, val.magnitude);
     public static implicit operator Vector2d((Angle angle, float mag) val) => new(val.angle, val.mag);
 }

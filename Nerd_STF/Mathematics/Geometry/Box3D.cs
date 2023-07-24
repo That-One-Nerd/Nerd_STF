@@ -1,27 +1,29 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using Nerd_STF.Mathematics.Abstract;
+
+namespace Nerd_STF.Mathematics.Geometry;
 
 public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, IClamp<Box3d>,
-    IContains<Vert>, IEquatable<Box3d>, IFloor<Box3d>, ILerp<Box3d, float>, IMedian<Box3d>,
-    IRound<Box3d>, IShape3d<float>, ISplittable<Box3d, (Vert[] centers, Float3[] sizes)>
+    IContains<Float3>, IEquatable<Box3d>, IFloor<Box3d>, ILerp<Box3d, float>, IMedian<Box3d>,
+    IRound<Box3d>, IShape3d<float>, ISplittable<Box3d, (Float3[] centers, Float3[] sizes)>
 {
-    public static Box3d Unit => new(Vert.Zero, Float3.One);
+    public static Box3d Unit => new(Float3.Zero, Float3.One);
 
-    public Vert MaxVert
+    public Float3 MaxFloat3
     {
-        get => center + (Vert)(size / 2);
+        get => center + (size / 2);
         set
         {
-            Vert diff = center - value;
-            size = diff.position * 2;
+            Float3 diff = center - value;
+            size = diff * 2;
         }
     }
-    public Vert MinVert
+    public Float3 MinFloat3
     {
-        get => center - (Vert)(size / 2);
+        get => center - (size / 2);
         set
         {
-            Vert diff = center + value;
-            size = diff.position * 2;
+            Float3 diff = center + value;
+            size = diff * 2;
         }
     }
 
@@ -29,15 +31,14 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
     public float SurfaceArea => 2 * (size.x * size.y + size.y * size.z + size.x * size.z);
     public float Volume => size.x * size.y * size.z;
 
-    public Vert center;
+    public Float3 center;
     public Float3 size;
 
     public Box3d(Box2d box) : this(box.center, (Float3)box.size) { }
-    public Box3d(Vert min, Vert max) : this(Vert.Average(min, max), (Float3)(min - max)) { }
-    public Box3d(Vert center, Float3 size)
+    public Box3d(Float3 min, Float3 max)
     {
-        this.center = center;
-        this.size = size;
+        this.center = Float3.Average(min, max);
+        this.size = max - min;
     }
     public Box3d(Fill<float> fill) : this(fill, new Float3(fill(3), fill(4), fill(5))) { }
 
@@ -47,30 +48,30 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
         set => size[index] = value;
     }
 
-    public static Box3d Absolute(Box3d val) => new(Vert.Absolute(val.MinVert), Vert.Absolute(val.MaxVert));
+    public static Box3d Absolute(Box3d val) => new(Float3.Absolute(val.MinFloat3), Float3.Absolute(val.MaxFloat3));
     public static Box3d Average(params Box3d[] vals)
     {
-        (Vert[] centers, Float3[] sizes) = SplitArray(vals);
-        return new(Vert.Average(centers), Float3.Average(sizes));
+        (Float3[] centers, Float3[] sizes) = SplitArray(vals);
+        return new(Float3.Average(centers), Float3.Average(sizes));
     }
     public static Box3d Ceiling(Box3d val) =>
-        new(Vert.Ceiling(val.center), (Float3)Float3.Ceiling(val.size));
+        new(Float3.Ceiling(val.center), (Float3)Float3.Ceiling(val.size));
     public static Box3d Clamp(Box3d val, Box3d min, Box3d max) =>
-        new(Vert.Clamp(val.center, min.center, max.center), Float3.Clamp(val.size, min.size, max.size));
+        new(Float3.Clamp(val.center, min.center, max.center), Float3.Clamp(val.size, min.size, max.size));
     public static Box3d Floor(Box3d val) =>
-        new(Vert.Floor(val.center), (Float3)Float3.Floor(val.size));
+        new(Float3.Floor(val.center), (Float3)Float3.Floor(val.size));
     public static Box3d Lerp(Box3d a, Box3d b, float t, bool clamp = true) =>
-        new(Vert.Lerp(a.center, b.center, t, clamp), Float3.Lerp(a.size, b.size, t, clamp));
+        new(Float3.Lerp(a.center, b.center, t, clamp), Float3.Lerp(a.size, b.size, t, clamp));
     public static Box3d Median(params Box3d[] vals)
     {
-        (Vert[] verts, Float3[] sizes) = SplitArray(vals);
-        return new(Vert.Median(verts), Float3.Median(sizes));
+        (Float3[] verts, Float3[] sizes) = SplitArray(vals);
+        return new(Float3.Median(verts), Float3.Median(sizes));
     }
-    public static Box3d Round(Box3d val) => new(Vert.Ceiling(val.center), (Float3)Float3.Ceiling(val.size));
+    public static Box3d Round(Box3d val) => new(Float3.Ceiling(val.center), (Float3)Float3.Ceiling(val.size));
 
-    public static (Vert[] centers, Float3[] sizes) SplitArray(params Box3d[] vals)
+    public static (Float3[] centers, Float3[] sizes) SplitArray(params Box3d[] vals)
     {
-        Vert[] centers = new Vert[vals.Length];
+        Float3[] centers = new Float3[vals.Length];
         Float3[] sizes = new Float3[vals.Length];
 
         for (int i = 0; i < vals.Length; i++)
@@ -89,7 +90,7 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
     }
     public override int GetHashCode() => base.GetHashCode();
 
-    public bool Contains(Vert vert)
+    public bool Contains(Float3 vert)
     {
         Float3 diff = Float3.Absolute(center - vert);
         return diff.x <= size.x && diff.y <= size.y && diff.z <= size.z;
@@ -98,17 +99,15 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
         builder.Append("Min = ");
-        builder.Append(MinVert);
+        builder.Append(MinFloat3);
         builder.Append(", Max = ");
-        builder.Append(MaxVert);
+        builder.Append(MaxFloat3);
         return true;
     }
 
-    public static Box3d operator +(Box3d a, Vert b) => new(a.center + b, a.size);
-    public static Box3d operator +(Box3d a, Float3 b) => new(a.center, a.size + b);
-    public static Box3d operator -(Box3d b) => new(-b.MaxVert, -b.MinVert);
-    public static Box3d operator -(Box3d a, Vert b) => new(a.center - b, a.size);
-    public static Box3d operator -(Box3d a, Float3 b) => new(a.center, a.size - b);
+    public static Box3d operator +(Box3d a, Float3 b) => new(a.center + b, a.size);
+    public static Box3d operator -(Box3d b) => new(-b.MaxFloat3, -b.MinFloat3);
+    public static Box3d operator -(Box3d a, Float3 b) => new(a.center - b, a.size);
     public static Box3d operator *(Box3d a, float b) => new(a.center * b, a.size * b);
     public static Box3d operator *(Box3d a, Float3 b) => new(a.center, a.size * b);
     public static Box3d operator /(Box3d a, float b) => new(a.center / b, a.size / b);

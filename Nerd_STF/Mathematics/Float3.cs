@@ -270,7 +270,6 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
     public static explicit operator Float3(Int4 val) => new(val.x, val.y, val.z);
     public static explicit operator Float3(Matrix m) => new(m[0, 0], m[1, 0], m[2, 0]);
     public static explicit operator Float3(Vector2d val) => val.ToXYZ();
-    public static implicit operator Float3(Vert val) => new(val.position.x, val.position.y, val.position.z);
     public static explicit operator Float3(RGBA val) => new(val.R, val.G, val.B);
     public static explicit operator Float3(HSVA val) => new(val.H.Normalized, val.S, val.V);
     public static explicit operator Float3(RGBAByte val) => (Float3)val.ToRGBA();

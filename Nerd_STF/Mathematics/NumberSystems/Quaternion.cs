@@ -329,7 +329,6 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
     public static implicit operator Quaternion(Float4 val) => new(val.x, val.y, val.z, val.w);
     public static explicit operator Quaternion(Matrix m) => new(m[0, 0], m[1, 0], m[2, 0], m[3, 0]);
     public static explicit operator Quaternion(Vector2d val) => (Quaternion)val.ToXYZ();
-    public static implicit operator Quaternion(Vert val) => new(val);
     public static implicit operator Quaternion(Fill<float> fill) => new(fill);
     public static implicit operator Quaternion(Fill<int> fill) => new(fill);
     public static implicit operator Quaternion((float u, float i, float j, float k) val) =>

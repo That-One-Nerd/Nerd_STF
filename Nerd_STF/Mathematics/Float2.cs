@@ -212,7 +212,6 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
     public static explicit operator Float2(Int4 val) => new(val.x, val.y);
     public static explicit operator Float2(Matrix m) => new(m[0, 0], m[1, 0]);
     public static explicit operator Float2(Vector2d val) => val.ToXYZ();
-    public static explicit operator Float2(Vert val) => new(val.position.x, val.position.y);
     public static implicit operator Float2(Fill<float> fill) => new(fill);
     public static implicit operator Float2(Fill<int> fill) => new(fill);
     public static implicit operator Float2((float x, float y) val) => new(val.x, val.y);

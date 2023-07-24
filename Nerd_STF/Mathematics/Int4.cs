@@ -330,8 +330,6 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
     public static implicit operator Int4(Int3 val) => new(val.x, val.y, val.z, 0);
     public static explicit operator Int4(Matrix m) => new((int)m[0, 0], (int)m[1, 0], (int)m[2, 0], (int)m[3, 0]);
     public static explicit operator Int4(Vector2d val) => (Int4)val.ToXYZ();
-    public static explicit operator Int4(Vert val) => new((int)val.position.x, (int)val.position.y,
-                                                          (int)val.position.z, 0);
     public static explicit operator Int4(RGBA val) => val.ToRGBAByte();
     public static explicit operator Int4(CMYKA val) => (Int4)val.ToCMYKAByte();
     public static explicit operator Int4(HSVA val) => val.ToHSVAByte();

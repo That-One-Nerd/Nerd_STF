@@ -202,7 +202,6 @@ public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Co
     public static explicit operator Complex(Int4 val) => new(val.x, val.y);
     public static explicit operator Complex(Matrix m) => new(m[0, 0], m[1, 0]);
     public static explicit operator Complex(Vector2d val) => val.ToXYZ();
-    public static explicit operator Complex(Vert val) => new(val.position.x, val.position.y);
     public static implicit operator Complex(Fill<float> fill) => new(fill);
     public static implicit operator Complex(Fill<int> fill) => new(fill);
     public static implicit operator Complex((float u, float i) val) => new(val.u, val.i);

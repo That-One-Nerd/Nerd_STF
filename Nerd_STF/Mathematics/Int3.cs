@@ -256,8 +256,6 @@ public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClam
     public static explicit operator Int3(Int4 val) => new(val.x, val.y, val.z);
     public static explicit operator Int3(Matrix m) => new((int)m[0, 0], (int)m[1, 0], (int)m[2, 0]);
     public static explicit operator Int3(Vector2d val) => (Int3)val.ToXYZ();
-    public static explicit operator Int3(Vert val) => new((int)val.position.x, (int)val.position.y,
-                                                          (int)val.position.z);
     public static explicit operator Int3(RGBA val) => (Int3)val.ToRGBAByte();
     public static explicit operator Int3(HSVA val) => (Int3)val.ToHSVAByte();
     public static explicit operator Int3(RGBAByte val) => new(val.R, val.G, val.B);

@@ -338,7 +338,6 @@ public record struct Float4 : IAbsolute<Float4>,
     public static implicit operator Float4(Int4 val) => new(val.x, val.y, val.z, val.w);
     public static explicit operator Float4(Matrix m) => new(m[0, 0], m[1, 0], m[2, 0], m[3, 0]);
     public static explicit operator Float4(Vector2d val) => val.ToXYZ();
-    public static implicit operator Float4(Vert val) => new(val.position.x, val.position.y, val.position.z, 0);
     public static implicit operator Float4(RGBA val) => new(val.R, val.G, val.B, val.A);
     public static explicit operator Float4(CMYKA val) => new(val.C, val.M, val.Y, val.K);
     public static explicit operator Float4(HSVA val) => new(val.H.Normalized, val.S, val.V, val.A);

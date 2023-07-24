@@ -11,7 +11,7 @@
 
 Nerd_STF is a multi-purpose .NET 7.0 library that contains many objects I feel would help the default C# library package. Feel free to do with it what you'd like.
 
-Nerd_STF includes some math as well as many other computer science topics. It contains types like groups of floats/ints, geometry types like `Vert`, `Line`, and `Triangle`, and color types like `RGBA`, `CMYKA`, `HSVA`, and their byte equivalents, all of which can convert seamlessly between each other.
+Nerd_STF includes some math as well as many other computer science topics. It contains types like groups of floats/ints, geometry types like `Line` and `Triangle`, and color types like `RGBA`, `CMYKA`, `HSVA`, and their byte equivalents, all of which can convert seamlessly between each other.
 
 ## What about Nerd_STF Versions `2021`?
 Nerd_STF `2021` used an different version scheme, based on the year, as you might have guessed (it is not the year `2` right now), and while I will be keeping the `2021` versions up, I wouldn't recommend using them, and the code is old code, written by a more naive me. Hell, I wrote an entire `List<T>` class there before I knew of the `System.Collections.Generic.List<T>` class that did literally everything for me already. Oh well. So, keep that in mind when you check out those versions of the library.

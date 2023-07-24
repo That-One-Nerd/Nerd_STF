@@ -206,7 +206,6 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
     public static explicit operator Int2(Vector2d val) => (Int2)val.ToXYZ();
     public static explicit operator Int2(Int3 val) => new(val.x, val.y);
     public static explicit operator Int2(Int4 val) => new(val.x, val.y);
-    public static explicit operator Int2(Vert val) => new((int)val.position.x, (int)val.position.y);
     public static implicit operator Int2(Fill<int> fill) => new(fill);
     public static implicit operator Int2((int x, int y) val) => new(val.x, val.y);
 }
