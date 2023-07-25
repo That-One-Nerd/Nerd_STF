@@ -9,11 +9,11 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
         set
         {
             p_lines = value;
-            p_verts = GenerateFloat3s(value);
+            p_verts = GenerateVerts(value);
         }
     }
-    public Float3 Midpoint => Float3.Average(Float3s);
-    public Float3[] Float3s
+    public Float3 Midpoint => Float3.Average(Verts);
+    public Float3[] Verts
     {
         get => p_verts;
         set
@@ -97,13 +97,13 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
     public Polygon(params Line[] lines)
         {
             p_lines = lines;
-            p_verts = GenerateFloat3s(lines);
+            p_verts = GenerateVerts(lines);
         }
 
     public Float3 this[int index]
         {
-            get => Float3s[index];
-            set => Float3s[index] = value;
+            get => Verts[index];
+            set => Verts[index] = value;
         }
 
     public static Polygon CreateCircle(int vertCount)
@@ -119,13 +119,13 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
 
     public static Polygon Absolute(Polygon val)
         {
-            Float3[] v = val.Float3s;
+            Float3[] v = val.Verts;
             for (int i = 0; i < v.Length; i++) v[i] = Float3.Absolute(v[i]);
             return new(v);
         }
     public static Polygon Average(params Polygon[] vals)
         {
-            if (!CheckFloat3s(vals)) throw new DifferingVertCountException(nameof(vals), vals);
+            if (!CheckVerts(vals)) throw new DifferingVertCountException(nameof(vals), vals);
             if (vals.Length < 1) return default;
 
             Line[][] lines = new Line[vals.Length][];
@@ -143,13 +143,13 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
         }
     public static Polygon Ceiling(Polygon val)
         {
-            Float3[] v = val.Float3s;
+            Float3[] v = val.Verts;
             for (int i = 0; i < v.Length; i++) v[i] = Float3.Ceiling(v[i]);
             return new(v);
         }
     public static Polygon Clamp(Polygon val, Polygon min, Polygon max)
         {
-            if (!CheckFloat3s(val, min, max)) throw new DifferingVertCountException(val, min, max);
+            if (!CheckVerts(val, min, max)) throw new DifferingVertCountException(val, min, max);
             Line[][] lines = new Line[3][] { val.Lines, min.Lines, max.Lines };
             Line[] res = new Line[val.Lines.Length];
             for (int i = 0; i < res.Length; i++) res[i] = Line.Clamp(lines[0][i], lines[1][i], lines[2][i]);
@@ -157,13 +157,13 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
         }
     public static Polygon Floor(Polygon val)
         {
-            Float3[] v = val.Float3s;
+            Float3[] v = val.Verts;
             for (int i = 0; i < v.Length; i++) v[i] = Float3.Floor(v[i]);
             return new(v);
         }
     public static Polygon Lerp(Polygon a, Polygon b, float t, bool clamp = true)
         {
-            if (!CheckFloat3s(a, b)) throw new DifferingVertCountException(a, b);
+            if (!CheckVerts(a, b)) throw new DifferingVertCountException(a, b);
             Line[][] lines = new Line[2][] { a.Lines, b.Lines };
             Line[] res = new Line[a.Lines.Length];
             for (int i = 0; i < res.Length; i++) res[i] = Line.Lerp(lines[0][i], lines[1][i], t, clamp);
@@ -171,7 +171,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
         }
     public static Polygon Median(params Polygon[] vals)
         {
-            if (!CheckFloat3s(vals)) throw new DifferingVertCountException(nameof(vals), vals);
+            if (!CheckVerts(vals)) throw new DifferingVertCountException(nameof(vals), vals);
             if (vals.Length < 1) return default;
 
             Line[][] lines = new Line[vals.Length][];
@@ -203,7 +203,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
         }
     public bool Equals(Polygon other)
         {
-            if (!CheckFloat3s(this, other)) return false;
+            if (!CheckVerts(this, other)) return false;
             return Lines == other.Lines;
         }
     public override int GetHashCode() => Lines.GetHashCode();
@@ -217,25 +217,25 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
     public object Clone() => new Polygon(Lines);
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<Float3> GetEnumerator() { foreach (Float3 v in Float3s) yield return v; }
+    public IEnumerator<Float3> GetEnumerator() { foreach (Float3 v in Verts) yield return v; }
 
-    public Float3[] ToArray() => Float3s;
+    public Float3[] ToArray() => Verts;
     public Fill<Float3> ToFill()
     {
         Polygon @this = this;
         return i => @this[i];
     }
-    public List<Float3> ToList() => new(Float3s);
+    public List<Float3> ToList() => new(Verts);
 
     public float[] ToFloatArray()
         {
-            float[] vals = new float[Float3s.Length * 3];
-            for (int i = 0; i < Float3s.Length; i++)
+            float[] vals = new float[Verts.Length * 3];
+            for (int i = 0; i < Verts.Length; i++)
             {
                 int pos = i * 3;
-                vals[pos + 0] = Float3s[i].x;
-                vals[pos + 1] = Float3s[i].y;
-                vals[pos + 2] = Float3s[i].z;
+                vals[pos + 0] = Verts[i].x;
+                vals[pos + 1] = Verts[i].y;
+                vals[pos + 2] = Verts[i].z;
             }
             return vals;
         }
@@ -259,32 +259,32 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
     public Polygon SubdivideCatmullClark(int segments)
     {
         // Thanks Saalty for making this accidentally.
-        List<Float3> newFloat3s = new();
-        for (int i = 0; i < Float3s.Length; i++)
+        List<Float3> newVerts = new();
+        for (int i = 0; i < Verts.Length; i++)
         {
             for (int factor = 0; factor < segments; factor++)
             {
                 float unit = factor / (float)(segments * 2), unit2 = unit + 0.5f, lastUnit = unit * 2;
                 Float3 p1, p2;
-                if (i == Float3s.Length - 1)
+                if (i == Verts.Length - 1)
                 {
-                    p1 = Float3s[^1] + (Float3s[0] - Float3s[^1]) * unit2;
-                    p2 = Float3s[0] + (Float3s[1] - Float3s[0]) * unit;
+                    p1 = Verts[^1] + (Verts[0] - Verts[^1]) * unit2;
+                    p2 = Verts[0] + (Verts[1] - Verts[0]) * unit;
                 }
-                else if (i == Float3s.Length - 2)
+                else if (i == Verts.Length - 2)
                 {
-                    p1 = Float3s[^2] + (Float3s[^1] - Float3s[^2]) * unit2;
-                    p2 = Float3s[^1] + (Float3s[0] - Float3s[^1]) * unit;
+                    p1 = Verts[^2] + (Verts[^1] - Verts[^2]) * unit2;
+                    p2 = Verts[^1] + (Verts[0] - Verts[^1]) * unit;
                 }
                 else
                 {
-                    p1 = Float3s[i] + (Float3s[i + 1] - Float3s[i]) * unit2;
-                    p2 = Float3s[i + 1] + (Float3s[i + 2] - Float3s[i + 1]) * unit;
+                    p1 = Verts[i] + (Verts[i + 1] - Verts[i]) * unit2;
+                    p2 = Verts[i + 1] + (Verts[i + 2] - Verts[i + 1]) * unit;
                 }
-                newFloat3s.Add(p1 + (p2 - p1) * lastUnit);
+                newVerts.Add(p1 + (p2 - p1) * lastUnit);
             }
         }
-        return new(newFloat3s.ToArray());
+        return new(newVerts.ToArray());
     }
 
     [Obsolete("This method doesn't work very well, and will give very weird results in certain cases. " +
@@ -294,15 +294,15 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
             // This may cause issues. FIXME
             // Tbh, not even sure if this works. This was a bit confusing.
 
-            if (Float3s.Length == 3) return new Triangle[] { new(Float3s[0], Float3s[1], Float3s[2]) };
+            if (Verts.Length == 3) return new Triangle[] { new(Verts[0], Verts[1], Verts[2]) };
 
             (int posA, int posB, Line line)? closest = null;
-            for (int i = 0; i < Float3s.Length; i++)
+            for (int i = 0; i < Verts.Length; i++)
             {
-                for (int j = 0; j < Float3s.Length; j++)
+                for (int j = 0; j < Verts.Length; j++)
                 {
                     if (i == j) continue;
-                    Line l = new(Float3s[i], Float3s[j]);
+                    Line l = new(Verts[i], Verts[j]);
                     if (Lines.Contains(l)) continue;
 
                     if (!closest.HasValue || closest.Value.line.Length > l.Length) closest = (i, j, l);
@@ -333,17 +333,17 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
             return tris.ToArray();
         }
 
-    private static bool CheckFloat3s(params Polygon[] polys)
+    private static bool CheckVerts(params Polygon[] polys)
         {
             int len = -1;
             foreach (Polygon poly in polys)
             {
                 if (len == -1)
                 {
-                    len = poly.Float3s.Length;
+                    len = poly.Verts.Length;
                     continue;
                 }
-                if (poly.Float3s.Length != len) return false;
+                if (poly.Verts.Length != len) return false;
             }
             return true;
         }
@@ -354,7 +354,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
                 lines[i] = new(verts[i], verts[i == lines.Length - 1 ? 0 : i + 1]);
             return lines;
         }
-    private static Float3[] GenerateFloat3s(Line[] lines)
+    private static Float3[] GenerateVerts(Line[] lines)
         {
             Float3[] verts = new Float3[lines.Length];
             for (int i = 0; i < verts.Length; i++)
@@ -368,7 +368,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
 
     public static Polygon operator +(Polygon a, Polygon b)
     {
-        if (!CheckFloat3s(a, b)) throw new DifferingVertCountException(a, b);
+        if (!CheckVerts(a, b)) throw new DifferingVertCountException(a, b);
         Line[][] lines = new Line[2][] { a.Lines, b.Lines };
         Line[] res = new Line[a.Lines.Length];
         for (int i = 0; i < res.Length; i++) res[i] = lines[0][i] + lines[1][i];
@@ -388,7 +388,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
     }
     public static Polygon operator -(Polygon a, Polygon b)
     {
-        if (!CheckFloat3s(a, b)) throw new DifferingVertCountException(a, b);
+        if (!CheckVerts(a, b)) throw new DifferingVertCountException(a, b);
         Line[][] lines = new Line[2][] { a.Lines, b.Lines };
         Line[] res = new Line[a.Lines.Length];
         for (int i = 0; i < res.Length; i++) res[i] = lines[0][i] - lines[1][i];
@@ -402,7 +402,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
     }
     public static Polygon operator *(Polygon a, Polygon b)
     {
-        if (!CheckFloat3s(a, b)) throw new DifferingVertCountException(a, b);
+        if (!CheckVerts(a, b)) throw new DifferingVertCountException(a, b);
         Line[][] lines = new Line[2][] { a.Lines, b.Lines };
         Line[] res = new Line[a.Lines.Length];
         for (int i = 0; i < res.Length; i++) res[i] = lines[0][i] * lines[1][i];
@@ -422,7 +422,7 @@ public struct Polygon : ICloneable, IEquatable<Polygon>, IGroup<Float3>, ISubdiv
     }
     public static Polygon operator /(Polygon a, Polygon b)
     {
-        if (!CheckFloat3s(a, b)) throw new DifferingVertCountException(a, b);
+        if (!CheckVerts(a, b)) throw new DifferingVertCountException(a, b);
         Line[][] lines = new Line[2][] { a.Lines, b.Lines };
         Line[] res = new Line[a.Lines.Length];
         for (int i = 0; i < res.Length; i++) res[i] = lines[0][i] / lines[1][i];

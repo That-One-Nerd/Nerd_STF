@@ -208,7 +208,7 @@ public record class Quadrilateral : IAbsolute<Quadrilateral>, IAverage<Quadrilat
         new(Float3.Absolute(val.A), Float3.Absolute(val.B), Float3.Absolute(val.C), Float3.Absolute(val.D));
     public static Quadrilateral Average(params Quadrilateral[] vals)
     {
-        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitFloat3Array(vals);
+        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitVertArray(vals);
         return new(Float3.Average(As), Float3.Average(Bs), Float3.Average(Cs), Float3.Average(Ds));
     }
     public static Quadrilateral Ceiling(Quadrilateral val) =>
@@ -223,23 +223,23 @@ public record class Quadrilateral : IAbsolute<Quadrilateral>, IAverage<Quadrilat
             Float3.Lerp(a.D, b.D, t, clamp));
     public static Quadrilateral Max(params Quadrilateral[] vals)
     {
-        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitFloat3Array(vals);
+        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitVertArray(vals);
         return new(Float3.Max(As), Float3.Max(Bs), Float3.Max(Cs), Float3.Max(Ds));
     }
     public static Quadrilateral Median(params Quadrilateral[] vals)
     {
-        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitFloat3Array(vals);
+        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitVertArray(vals);
         return new(Float3.Median(As), Float3.Median(Bs), Float3.Median(Cs), Float3.Median(Ds));
     }
     public static Quadrilateral Min(params Quadrilateral[] vals)
     {
-        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitFloat3Array(vals);
+        (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) = SplitVertArray(vals);
         return new(Float3.Min(As), Float3.Min(Bs), Float3.Min(Cs), Float3.Min(Ds));
     }
     public static Quadrilateral Round(Quadrilateral val) =>
         new(Float3.Round(val.A), Float3.Round(val.B), Float3.Round(val.C), Float3.Round(val.D));
 
-    public static (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) SplitFloat3Array(params Quadrilateral[] quads)
+    public static (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds) SplitVertArray(params Quadrilateral[] quads)
     {
         Float3[] a = new Float3[quads.Length], b = new Float3[quads.Length],
                c = new Float3[quads.Length], d = new Float3[quads.Length];

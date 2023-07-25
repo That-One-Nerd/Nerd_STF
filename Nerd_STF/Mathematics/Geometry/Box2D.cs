@@ -6,7 +6,7 @@ public record class Box2d : IAbsolute<Box2d>, IAverage<Box2d>, ICeiling<Box2d>, 
 {
     public static Box2d Unit => new(Float3.Zero, Float2.One);
 
-    public Float3 MaxFloat3
+    public Float3 MaxVert
     {
         get => center + (size / 2);
         set
@@ -15,7 +15,7 @@ public record class Box2d : IAbsolute<Box2d>, IAverage<Box2d>, ICeiling<Box2d>, 
             size = (Float2)diff * 2f;
         }
     }
-    public Float3 MinFloat3
+    public Float3 MinVert
     {
         get => center - (size / 2);
         set

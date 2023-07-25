@@ -8,7 +8,7 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
 {
     public static Box3d Unit => new(Float3.Zero, Float3.One);
 
-    public Float3 MaxFloat3
+    public Float3 MaxVert
     {
         get => center + (size / 2);
         set
@@ -17,7 +17,7 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
             size = diff * 2;
         }
     }
-    public Float3 MinFloat3
+    public Float3 MinVert
     {
         get => center - (size / 2);
         set
