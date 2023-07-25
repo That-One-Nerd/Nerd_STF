@@ -48,7 +48,7 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
         set => size[index] = value;
     }
 
-    public static Box3d Absolute(Box3d val) => new(Float3.Absolute(val.MinFloat3), Float3.Absolute(val.MaxFloat3));
+    public static Box3d Absolute(Box3d val) => new(Float3.Absolute(val.MinVert), Float3.Absolute(val.MaxVert));
     public static Box3d Average(params Box3d[] vals)
     {
         (Float3[] centers, Float3[] sizes) = SplitArray(vals);
@@ -99,14 +99,14 @@ public record class Box3d : IAbsolute<Box3d>, IAverage<Box3d>, ICeiling<Box3d>, 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
         builder.Append("Min = ");
-        builder.Append(MinFloat3);
+        builder.Append(MinVert);
         builder.Append(", Max = ");
-        builder.Append(MaxFloat3);
+        builder.Append(MaxVert);
         return true;
     }
 
     public static Box3d operator +(Box3d a, Float3 b) => new(a.center + b, a.size);
-    public static Box3d operator -(Box3d b) => new(-b.MaxFloat3, -b.MinFloat3);
+    public static Box3d operator -(Box3d b) => new(-b.MaxVert, -b.MinVert);
     public static Box3d operator -(Box3d a, Float3 b) => new(a.center - b, a.size);
     public static Box3d operator *(Box3d a, float b) => new(a.center * b, a.size * b);
     public static Box3d operator *(Box3d a, Float3 b) => new(a.center, a.size * b);
