@@ -16,6 +16,7 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
     public static Float2 One => new(1, 1);
     public static Float2 Zero => new(0, 0);
 
+    public float InverseMagnitude => Mathf.InverseSqrt(x * x + y * y);
     public float Magnitude => Mathf.Sqrt(x * x + y * y);
     public Float2 Normalized => this * Mathf.InverseSqrt(x * x + y * y);
 

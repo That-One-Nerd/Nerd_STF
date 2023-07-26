@@ -14,6 +14,7 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
     public static Int2 One => new(1, 1);
     public static Int2 Zero => new(0, 0);
 
+    public float InverseMagnitude => Mathf.InverseSqrt(x * x + y * y);
     public float Magnitude => Mathf.Sqrt(x * x + y * y);
     public Int2 Normalized => (Int2)((Float2)this * Mathf.InverseSqrt(x * x + y * y));
 

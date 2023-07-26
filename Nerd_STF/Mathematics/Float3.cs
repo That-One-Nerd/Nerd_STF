@@ -20,6 +20,7 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
     public static Float3 One => new(1, 1, 1);
     public static Float3 Zero => new(0, 0, 0);
 
+    public float InverseMagnitude => Mathf.InverseSqrt(x * x + y * y + z * z);
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
     public Float3 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z);
 

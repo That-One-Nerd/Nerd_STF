@@ -130,7 +130,7 @@ public record class Line : IAbsolute<Line>, IAverage<Line>, ICeiling<Line>, ICla
     public bool Contains(Float3 vert)
     {
         Float3 diffA = a - vert, diffB = a - b;
-        float lerpVal = diffA.Magnitude / diffB.Magnitude;
+        float lerpVal = diffA.Magnitude * diffB.InverseMagnitude;
         return Float3.Lerp(a, b, lerpVal) == vert;
     }
 

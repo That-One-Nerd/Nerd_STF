@@ -21,6 +21,7 @@ public record struct Float4 : IAbsolute<Float4>,
     public static Float4 One => new(1, 1, 1, 1);
     public static Float4 Zero => new(0, 0, 0, 0);
 
+    public float InverseMagnitude => Mathf.InverseSqrt(x * x + y * y + z * z + w * w);
     public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
     public Float4 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z + w * w);
 
