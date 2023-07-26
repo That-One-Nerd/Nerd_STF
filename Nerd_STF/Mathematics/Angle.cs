@@ -22,7 +22,7 @@ public struct Angle : IAbsolute<Angle>, IAverage<Angle>, IClamp<Angle>, ICloneab
     }
     public float Gradians
     {
-        get => p_deg * 1.11111111111f; // Reciprocal of 9/10 as a constant (10/9)
+        get => p_deg * 1.11111111111f;
         set => p_deg = value * 0.9f;
     }
     public float Normalized
@@ -51,6 +51,15 @@ public struct Angle : IAbsolute<Angle>, IAverage<Angle>, IClamp<Angle>, ICloneab
         Type.Radians => value * Constants.RadToDeg,
         _ => throw new ArgumentException("Unknown type.", nameof(valueType)),
     };
+
+    public static Angle FromVerts(Float3 endA, Float3 middleB, Float3 endC)
+    {
+        endA -= middleB;
+        endC -= middleB;
+
+        float dot = Float3.Dot(endA, endC);
+        return Mathf.ArcCos(dot * endA.InverseMagnitude * endC.InverseMagnitude);
+    }
 
     public static Angle Absolute(Angle val) => new(Mathf.Absolute(val.p_deg));
     public static Angle Average(params Angle[] vals) => new(Mathf.Average(SplitArray(Type.Degrees, vals)));
