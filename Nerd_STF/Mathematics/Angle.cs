@@ -119,6 +119,31 @@ public struct Angle : IAbsolute<Angle>, IAverage<Angle>, IClamp<Angle>, ICloneab
 
     public object Clone() => new Angle(p_deg);
 
+    public Angle[] GetCoterminalAngles() => GetCoterminalAngles(Zero, Full);
+    public Angle[] GetCoterminalAngles(Angle lowerBound, Angle upperBound)
+    {
+        List<Angle> values = new();
+
+        Angle active = this;
+
+        // A little bit redundant but it's a fairly easy way to guarentee
+        // all coterminal angles are between the lower and upper bounds.
+        // Definitely not the most efficient approach.
+        while (active < upperBound) active += Full;
+        active -= Full;
+
+        while (active > lowerBound) active -= Full;
+        active += Full;
+
+        while (active < upperBound)
+        {
+            values.Add(active);
+            active += Full;
+        }
+
+        return values.ToArray();
+    }
+
     public float ValueFromType(Type type) => type switch
     {
         Type.Degrees => Degrees,
