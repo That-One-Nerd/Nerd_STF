@@ -10,38 +10,46 @@ Here's the full changelog:
         * UnsafeHelper
             + Q_rsqrt
     * Mathematics
+        * Abstract
+            + IPolygon<T>h
+            * ITriangulate
+                - TriangulateAll(ITriangulate[])
+                = Marked the method `TriangulateAll<T>(T[])` as virtual
         * Geometry
-                * Line
-                    = Replaced all references to `Vert` with references to `Float3`
-                * Polygon
-                    = Replaced all references to `Vert` with references to `Float3`
-                * Quadrilateral
-                    = Replaced all references to `Vert` with references to `Float3`
-                * Sphere
-                    = Replaced all references to `Vert` with references to `Float3`
-                * Triangle
-                    = Replaced all references to `Vert` with references to `Float3`
-                = Renamed `Box2D` to `Box2d`
-                    = Replaced all references to `Vert` with references to `Float3`
-                = Renamed `Box3D` to `Box3d`
-                    = Replaced all references to `Vert` with references to `Float3`
+            - Box2d (REMEMBER: name change)
+            - Box3d (REMEMBER: name change)
+            - Line
+            - Polygon
+            - Quadrilateral
+            - Sphere
+            - Triangle
             - Vert
         * NumberSystems
             * Complex
                 = Replaced all references to `Vert` with references to `Float3`
             * Quaternion
                 = Replaced all references to `Vert` with references to `Float3`
+        * Angle
+            + FromVerts(Float3, Float3, Float3)
+            + GetCoterminalAngles()
+            + GetCoterminalAngles(Angle, Angle)
         * Float2
+            + InverseMagnitude
             = Replaced all references to `Vert` with references to `Float3`
         * Float3
+            + InverseMagnitude
             = Replaced all references to `Vert` with references to `Float3`
         * Float4
+            + InverseMagnitude
             = Replaced all references to `Vert` with references to `Float3`
         * Int2
+            + InverseMagnitude
             = Replaced all references to `Vert` with references to `Float3`
         * Int3
+            + InverseMagnitude
             = Replaced all references to `Vert` with references to `Float3`
         * Int4
+            + InverseMagnitude
             = Replaced all references to `Vert` with references to `Float3`
         * Vector2d
             = Replaced all references to `Vert` with references to `Float3`
