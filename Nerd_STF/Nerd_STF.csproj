@@ -66,8 +66,4 @@ Anyway, that's everything in this update. Again, pretty small, but meaningful no
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Mathematics\Geometry\" />
-  </ItemGroup>
-
 </Project>

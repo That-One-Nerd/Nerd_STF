@@ -18,12 +18,13 @@ Here's the full changelog:
         * Geometry
             - Box2d (REMEMBER: name change)
             - Box3d (REMEMBER: name change)
-            - Line
             - Polygon
             - Quadrilateral
             - Sphere
             - Triangle
             - Vert
+            = Rewrote all of `Line`
+                TODO: Compare me to the original line and note changes.
         * NumberSystems
             * Complex
                 = Replaced all references to `Vert` with references to `Float3`
