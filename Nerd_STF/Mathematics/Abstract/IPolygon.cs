@@ -19,6 +19,9 @@ public interface IPolygon<T> : IAverage<T>, IEquatable<T>,
     public static abstract T operator /(T poly, float scale);
     public static abstract T operator /(T poly, Float3 scale3);
 
+    public static abstract bool operator ==(T a, T b);
+    public static abstract bool operator !=(T a, T b);
+
     public static abstract implicit operator T(Fill<Float3> fill);
     public static abstract implicit operator T(Fill<Int3> fill);
     public static abstract implicit operator T(Fill<Line> fill);

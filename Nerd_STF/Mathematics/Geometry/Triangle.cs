@@ -8,7 +8,7 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
     {
         get // Heron's Formula
         {
-            float a = AB.Length, b = AC.Length, c = BC.Length,
+            float a = AB.Length, b = BC.Length, c = CA.Length,
                   s = (a + b + c) / 2;
             return Mathf.Sqrt(s * (s - a) * (s - b) * (s - c));
         }
@@ -77,6 +77,7 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
     }
     public Triangle(Fill<Float3> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<Int3> fill) : this(fill(0), fill(1), fill(2)) { }
+    public Triangle(Fill<Line> fill) : this(fill(0), fill(1), fill(2)) { }
     public Triangle(Fill<float> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4),
         fill(5), fill(6), fill(7), fill(8)) { }
     public Triangle(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3), fill(4),
@@ -134,5 +135,47 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
         }
     }
 
+    public bool Equals(Triangle? other) => other is not null && a == other.a
+        && b == other.b && c == other.c;
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        else if (obj is Triangle tri) return Equals(tri);
+        return false;
+    }
+    public override int GetHashCode() => base.GetHashCode();
+
+    public bool Contains(Float3 point)
+    {
+        Triangle pab = (point, a, b),
+                 pbc = (point, b, c),
+                 pca = (point, c, a);
+        return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < 0.025f;
+    }
+
     public Float3[] GetAllVerts() => new[] { a, b, c };
+
+    public static Triangle operator +(Triangle t, Float3 offset) =>
+        new(t.a + offset, t.b + offset, t.c + offset);
+    public static Triangle operator -(Triangle t, Float3 offset) =>
+        new(t.a - offset, t.b - offset, t.c - offset);
+    public static Triangle operator *(Triangle t, float factor) =>
+        new(t.a * factor, t.b * factor, t.c * factor);
+    public static Triangle operator *(Triangle t, Float3 factor) =>
+        new(t.a * factor, t.b * factor, t.c * factor);
+    public static Triangle operator /(Triangle t, float factor) =>
+        new(t.a / factor, t.b / factor, t.c / factor);
+    public static Triangle operator /(Triangle t, Float3 factor) =>
+        new(t.a / factor, t.b / factor, t.c / factor);
+
+    public static bool operator ==(Triangle a, Triangle b) => a.Equals(b);
+    public static bool operator !=(Triangle a, Triangle b) => !a.Equals(b);
+
+    public static implicit operator Triangle(Fill<Float3> fill) => new(fill);
+    public static implicit operator Triangle(Fill<Int3> fill) => new(fill);
+    public static implicit operator Triangle(Fill<Line> fill) => new(fill);
+    public static implicit operator Triangle(Fill<float> fill) => new(fill);
+    public static implicit operator Triangle(Fill<int> fill) => new(fill);
+    public static implicit operator Triangle((Float3 a, Float3 b, Float3 c) val) =>
+        new(val.a, val.b, val.c);
 }
