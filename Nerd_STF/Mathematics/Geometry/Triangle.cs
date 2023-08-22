@@ -2,7 +2,8 @@
 
 public class Triangle : IClosestTo<Float3>, IContains<Float3>,
     IFromTuple<Triangle, (Float3 a, Float3 b, Float3 c)>, IPolygon<Triangle>,
-    ISubdivide<Triangle>, IWithinRange<Triangle>
+    ISplittable<Triangle, (Float3[] As, Float3[] Bs, Float3[] Cs)>,
+    ISubdivide<Triangle[]>, IWithinRange<Float3, float>
 {
     public float Area
     {
@@ -135,6 +136,46 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
         }
     }
 
+    public static Triangle Average(params Triangle[] vals)
+    {
+        (Float3[] As, Float3[] Bs, Float3[] Cs) = SplitArray(vals);
+        return (Float3.Average(As), Float3.Average(Bs), Float3.Average(Cs));
+    }
+    public static Triangle Lerp(Triangle a, Triangle b, float t, bool clamp = true) =>
+        (Float3.Lerp(a.a, b.a, t, clamp), Float3.Lerp(a.b, b.b, t, clamp), Float3.Lerp(a.c, a.c, t, clamp));
+    public static (Float3[] As, Float3[] Bs, Float3[] Cs) SplitArray(params Triangle[] vals)
+    {
+        Float3[] As = new Float3[vals.Length],
+                 Bs = new Float3[vals.Length],
+                 Cs = new Float3[vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            As[i] = vals[i].a;
+            Bs[i] = vals[i].b;
+            Cs[i] = vals[i].c;
+        }
+        return (As, Bs, Cs);
+    }
+
+    public static float[] ToFloatArrayAll(params Triangle[] vals)
+    {
+        float[] result = new float[9 * vals.Length];
+        for (int i = 0; i < vals.Length; i++)
+        {
+            int p = i * 9;
+            result[p + 0] = vals[i].a.x;
+            result[p + 1] = vals[i].a.y;
+            result[p + 2] = vals[i].a.z;
+            result[p + 3] = vals[i].b.x;
+            result[p + 4] = vals[i].b.y;
+            result[p + 5] = vals[i].b.z;
+            result[p + 6] = vals[i].c.x;
+            result[p + 7] = vals[i].c.y;
+            result[p + 8] = vals[i].c.z;
+        }
+        return result;
+    }
+
     public bool Equals(Triangle? other) => other is not null && a == other.a
         && b == other.b && c == other.c;
     public override bool Equals(object? obj)
@@ -154,6 +195,64 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
     }
 
     public Float3[] GetAllVerts() => new[] { a, b, c };
+
+    public Triangle[] Subdivide()
+    {
+        Float3 abMid = AB.Midpoint,
+               bcMid = BC.Midpoint,
+               caMid = CA.Midpoint;
+
+        return new Triangle[4]
+        {
+            (a, abMid, caMid),
+            (abMid, b, bcMid),
+            (caMid, bcMid, c),
+            (abMid, bcMid, caMid)
+        };
+    }
+    public Triangle[] Subdivide(int iterations)
+    {
+        Triangle[] active = new[] { this };
+        for (int i = 0; i < iterations; i++)
+        {
+            List<Triangle> newTris = new();
+            foreach (Triangle tri in active) newTris.AddRange(tri.Subdivide());
+            active = newTris.ToArray();
+        }
+        return active;
+    }
+
+    public Triangle[] Triangulate() => new[] { this };
+
+    public bool WithinRange(Float3 point, float range) =>
+        WithinRange(point, range, Calculus.DefaultStep);
+    public bool WithinRange(Float3 point, float range, float step)
+    {
+        // Just like line, this is probably optimizable but who cares?
+        return AB.WithinRange(point, range, step) ||
+               BC.WithinRange(point, range, step) ||
+               CA.WithinRange(point, range, step);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public IEnumerator<Float3> GetEnumerator()
+    {
+        yield return a;
+        yield return b;
+        yield return c;
+    }
+
+    public Float3[] ToArray() => new[] { a, b, c };
+    public Fill<Float3> ToFill()
+    {
+        Triangle @this = this;
+        return i => @this[i];
+    }
+    public List<Float3> ToList() => new() { a, b, c };
+
+    public float[] ToFloatArray() => new[] { a.x, a.y, a.z,
+                                             b.x, b.y, b.z,
+                                             c.x, c.y, c.z};
 
     public static Triangle operator +(Triangle t, Float3 offset) =>
         new(t.a + offset, t.b + offset, t.c + offset);

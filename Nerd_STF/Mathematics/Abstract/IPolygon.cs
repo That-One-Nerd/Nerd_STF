@@ -2,8 +2,7 @@
 
 public interface IPolygon<T> : IAverage<T>, IEquatable<T>,
     IFloatArray<T>, IGroup<Float3>, IIndexAll<Float3>, IIndexRangeAll<Float3>,
-    ILerp<T, float>, IMedian<T>, ISplittable<T, (float[] Xs, float[] Ys, float[] Zs)>,
-    ITriangulate
+    ILerp<T, float>, IMedian<T>, ITriangulate
     where T : IPolygon<T>
 {
     public float Area { get; }
