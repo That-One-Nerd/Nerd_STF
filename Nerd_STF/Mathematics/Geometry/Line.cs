@@ -2,8 +2,8 @@
 
 public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEquatable<Line>,
     IFloatArray<Line>, IFromTuple<Line, (Float3 a, Float3 b)>, IGroup<Float3>,
-    ILerp<Line, float>, IMedian<Line>, IPresets3d<Line>,
-    ISplittable<Line, (Float3[] As, Float3[] Bs)>, ISubdivide<Line[]>,
+    IIndexAll<Float3>, IIndexRangeAll<Float3>, ILerp<Line, float>, IMedian<Line>,
+    IPresets3d<Line>, ISplittable<Line, (Float3[] As, Float3[] Bs)>, ISubdivide<Line[]>,
     IWithinRange<Float3, float>
 {
     public static Line Back => (Float3.Zero, Float3.Back);
@@ -172,8 +172,8 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
         return builder.ToString();
     }
 
-    public Float3 ClosestTo(Float3 item) => ClosestTo(item, Calculus.DefaultStep);
-    public Float3 ClosestTo(Float3 item, float step)
+    public Float3 ClosestTo(Float3 point) => ClosestTo(point, Calculus.DefaultStep);
+    public Float3 ClosestTo(Float3 point, float step)
     {
         // Probably could optimize this with some weird formula but whatever.
         // This isn't the optimization update.
@@ -182,7 +182,7 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
         for (float f = 0; f < 1; f += step)
         {
             Float3 check = Float3.Lerp(a, b, f);
-            float dist = (check - item).Magnitude;
+            float dist = (check - point).Magnitude;
 
             if (dist < min.dist) min = (check, dist);
         }
@@ -240,5 +240,18 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
         return false;
     }
 
-    public static implicit operator Line((Float3 a, Float3 b) tuple) => new(tuple.a, tuple.b);
+    public static Line operator +(Line l, Float3 offset) => (l.a + offset, l.b + offset);
+    public static Line operator -(Line l, Float3 offset) => (l.a + offset, l.b + offset);
+    public static Line operator *(Line l, float factor) => (l.a * factor, l.b * factor);
+    public static Line operator *(Line l, Float3 factor) => (l.a * factor, l.b * factor);
+    public static Line operator /(Line l, float factor) => (l.a / factor, l.b / factor);
+    public static Line operator /(Line l, Float3 factor) => (l.a / factor, l.b / factor);
+    public static bool operator ==(Line a, Line b) => a.Equals(b);
+    public static bool operator !=(Line a, Line b) => !a.Equals(b);
+
+    public static implicit operator Line(Fill<Float3> fill) => new(fill);
+    public static implicit operator Line(Fill<Int3> fill) => new(fill);
+    public static implicit operator Line(Fill<float> fill) => new(fill);
+    public static implicit operator Line(Fill<int> fill) => new(fill);
+    public static implicit operator Line((Float3 a, Float3 b) tuple) => (tuple.a, tuple.b);
 }
