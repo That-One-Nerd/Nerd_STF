@@ -30,6 +30,7 @@ Here's the full changelog:
                 + : IIndexRangeAll<Float3>
                 + : ISplittable<Line, (Float3[] As, Float3[] Bs)>
                 + IWithinRange<Float3, float>
+                + Angle
                 + Slope
                 + Line()
                 + ToFloatArrayAll(params Line[])

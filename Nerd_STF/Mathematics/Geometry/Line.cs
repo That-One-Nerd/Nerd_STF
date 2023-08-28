@@ -16,6 +16,7 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
     public static Line One => (Float3.Zero, Float3.One);
     public static Line Zero => (Float3.Zero, Float3.Zero);
 
+    public Angle Angle => Mathf.ArcTan(Slope);
     public float Length => (b - a).Magnitude;
     public Float3 Midpoint => (a + b) / 2;
     public float Slope => (b.y - a.y) / (b.x - a.x);
@@ -253,5 +254,5 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
     public static implicit operator Line(Fill<Int3> fill) => new(fill);
     public static implicit operator Line(Fill<float> fill) => new(fill);
     public static implicit operator Line(Fill<int> fill) => new(fill);
-    public static implicit operator Line((Float3 a, Float3 b) tuple) => (tuple.a, tuple.b);
+    public static implicit operator Line((Float3 a, Float3 b) tuple) => new(tuple.a, tuple.b);
 }

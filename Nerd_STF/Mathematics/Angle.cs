@@ -52,11 +52,15 @@ public struct Angle : IAbsolute<Angle>, IAverage<Angle>, IClamp<Angle>, ICloneab
         _ => throw new ArgumentException("Unknown type.", nameof(valueType)),
     };
 
-    public static Angle FromVerts(Float3 endA, Float3 middleB, Float3 endC)
+    public static Angle FromLines(Line ab, Line bc)
+    {
+        if (ab.b != bc.a) throw new DisconnectedLinesException(ab, bc);
+        return FromPoints(ab.a, ab.b, bc.b);
+    }
+    public static Angle FromPoints(Float3 endA, Float3 middleB, Float3 endC)
     {
         endA -= middleB;
         endC -= middleB;
-
         float dot = Float3.Dot(endA, endC);
         return Mathf.ArcCos(dot * endA.InverseMagnitude * endC.InverseMagnitude);
     }

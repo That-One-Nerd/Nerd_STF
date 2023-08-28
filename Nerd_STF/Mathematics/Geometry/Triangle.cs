@@ -45,6 +45,10 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
         }
     }
 
+    public Angle AngleABC => Angle.FromPoints(a, b, c);
+    public Angle AngleBCA => Angle.FromPoints(b, c, a);
+    public Angle AngleCAB => Angle.FromPoints(c, a, b);
+
     public Float3 a, b, c;
 
     public Triangle() : this(Float3.Zero, Float3.Zero, Float3.Zero) { }
@@ -176,6 +180,24 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
         return result;
     }
 
+    public Float3 ClosestTo(Float3 point)
+    {
+        Float3 abClosest = AB.ClosestTo(point),
+               bcClosest = BC.ClosestTo(point),
+               caClosest = CA.ClosestTo(point);
+
+        // Very inefficient way to select the closest point.
+
+        float abDist = (abClosest - point).Magnitude,
+              bcDist = (bcClosest - point).Magnitude,
+              caDist = (caClosest - point).Magnitude;
+
+        float min = Mathf.Min(abDist, bcDist, caDist);
+        if (abDist == min) return abClosest;
+        else if (bcDist == min) return bcClosest;
+        else return caClosest;
+    }
+
     public bool Equals(Triangle? other) => other is not null && a == other.a
         && b == other.b && c == other.c;
     public override bool Equals(object? obj)
@@ -191,7 +213,7 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
         Triangle pab = (point, a, b),
                  pbc = (point, b, c),
                  pca = (point, c, a);
-        return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < 0.025f;
+        return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < 0.05f;
     }
 
     public Float3[] GetAllVerts() => new[] { a, b, c };
