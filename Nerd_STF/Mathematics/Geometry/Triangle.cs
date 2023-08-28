@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public class Triangle : IClosestTo<Float3>, IContains<Float3>,
+public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<Line>,
     IFromTuple<Triangle, (Float3 a, Float3 b, Float3 c)>, IPolygon<Triangle>,
     ISplittable<Triangle, (Float3[] As, Float3[] Bs, Float3[] Cs)>,
     ISubdivide<Triangle[]>, IWithinRange<Float3, float>
@@ -215,6 +215,11 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>,
                  pca = (point, c, a);
         return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < 0.05f;
     }
+    public bool Contains(Line line) =>
+        Contains(line.a) && Contains(line.b);
+
+    public bool ContainsPartially(Line line) =>
+        Contains(line.a) || Contains(line.b);
 
     public Float3[] GetAllVerts() => new[] { a, b, c };
 
