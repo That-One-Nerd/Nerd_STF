@@ -343,16 +343,14 @@ public class Matrix : IMatrix<Matrix, Matrix>
         return result;
     }
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public override bool Equals(object? obj)
     {
-        if (obj == null) return base.Equals(obj);
-        Type t = obj.GetType();
-        if (t == typeof(Matrix)) return Equals((Matrix)obj);
-        else if (t == typeof(Matrix2x2)) return Equals((Matrix)obj);
-        else if (t == typeof(Matrix3x3)) return Equals((Matrix)obj);
-        else if (t == typeof(Matrix4x4)) return Equals((Matrix)obj);
-
-        return base.Equals(obj);
+        if (obj is null) return base.Equals(obj);
+        else if (obj is Matrix m) return Equals(m);
+        else if (obj is Matrix2x2 m2x2) return Equals(m2x2);
+        else if (obj is Matrix3x3 m3x3) return Equals(m3x3);
+        else if (obj is Matrix4x4 m4x4) return Equals(m4x4);
+        return false;
     }
     public bool Equals(Matrix? other)
     {

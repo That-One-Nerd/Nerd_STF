@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public record class ProjectionMatrix : Matrix3x3
+public class ProjectionMatrix : Matrix3x3
 {
     // TODO: i need to remove the record check from everything, add new equals comparitors
     //       and re-implement IsValidProjectionMatrix

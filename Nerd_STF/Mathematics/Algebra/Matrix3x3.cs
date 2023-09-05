@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
+public class Matrix3x3 : IStaticMatrix<Matrix3x3>
 {
     public static Matrix3x3 Identity => new(new[,]
     {
@@ -435,6 +435,12 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         SetRow(rowB, dataA);
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        else if (obj is Matrix3x3 m3x3) return Equals(m3x3);
+        return false;
+    }
     public virtual bool Equals(Matrix3x3? other)
     {
         if (other is null) return false;
@@ -512,6 +518,8 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         new(a.r1c1 * b.r1c1, a.r1c2 * b.r1c2, a.r1c3 * b.r1c3,
             a.r2c1 * b.r2c1, a.r2c2 * b.r2c2, a.r2c3 * b.r2c3,
             a.r3c1 * b.r3c1, a.r3c2 * b.r3c2, a.r3c3 * b.r3c3);
+    public static bool operator ==(Matrix3x3 a, Matrix3x3 b) => a.Equals(b);
+    public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !a.Equals(b);
 
     public static explicit operator Matrix3x3(Matrix m)
     {

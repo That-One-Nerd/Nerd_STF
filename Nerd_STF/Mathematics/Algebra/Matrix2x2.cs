@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
+public class Matrix2x2 : IStaticMatrix<Matrix2x2>
 {
     public static Matrix2x2 Identity => new(new[,]
     {
@@ -312,6 +312,12 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
         SetRow(rowB, dataA);
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        else if (obj is Matrix2x2 m2x2) return Equals(m2x2);
+        return false;
+    }
     public virtual bool Equals(Matrix2x2? other)
     {
         if (other is null) return false;
@@ -365,6 +371,8 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
     public static Float2 operator /(Matrix2x2 a, Float2 b) => (Matrix)a / b;
     public static Matrix2x2 operator ^(Matrix2x2 a, Matrix2x2 b) => // Single number multiplication.
         new(a.r1c1 * b.r1c1, a.r1c2 * b.r1c2, a.r2c1 * b.r2c1, a.r2c2 * b.r2c2);
+    public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => a.Equals(b);
+    public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !a.Equals(b);
 
     public static explicit operator Matrix2x2(Matrix m)
     {

@@ -2,7 +2,7 @@
 
 namespace Nerd_STF.Mathematics.Algebra;
 
-public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
+public class Matrix4x4 : IStaticMatrix<Matrix4x4>
 {
     public static Matrix4x4 Identity => new(new[,]
     {
@@ -530,6 +530,12 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
         SetRow(rowB, dataA);
     }
 
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        else if (obj is Matrix4x4 m4x4) return Equals(m4x4);
+        return false;
+    }
     public virtual bool Equals(Matrix4x4? other)
     {
         if (other is null) return false;
@@ -639,6 +645,8 @@ public record class Matrix4x4 : IStaticMatrix<Matrix4x4>
             a.r2c1 * b.r2c1, a.r2c2 * b.r2c2, a.r2c3 * b.r2c3, a.r2c4 * b.r2c4,
             a.r3c1 * b.r3c1, a.r3c2 * b.r3c2, a.r3c3 * b.r3c3, a.r3c4 * b.r3c4,
             a.r4c1 * b.r4c1, a.r4c2 * b.r4c2, a.r4c3 * b.r4c3, a.r4c4 * b.r4c4);
+    public static bool operator ==(Matrix4x4 a, Matrix4x4 b) => a.Equals(b);
+    public static bool operator !=(Matrix4x4 a, Matrix4x4 b) => !a.Equals(b);
 
     public static explicit operator Matrix4x4(Matrix m)
     {
