@@ -157,6 +157,11 @@ public class Matrix : IMatrix<Matrix, Matrix>
         }
     }
 
+    public static Matrix Get2dRotationMatrix(Angle rot) =>
+        Matrix2x2.GenerateRotationMatrix(rot);
+    public static Matrix Get3dRotationMatrix(Angle yaw, Angle pitch, Angle roll) =>
+        Matrix3x3.GenerateRotationMatrix(yaw, pitch, roll);
+
     public static Matrix Absolute(Matrix val) => new(val.Size, (r, c) => Mathf.Absolute(val[r, c]));
     public static Matrix Ceiling(Matrix val) => new(val.Size, (r, c) => Mathf.Ceiling(val[r, c]));
     public static Matrix Clamp(Matrix val, Matrix min, Matrix max) =>

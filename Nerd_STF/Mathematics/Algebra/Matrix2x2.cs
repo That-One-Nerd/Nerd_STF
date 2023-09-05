@@ -161,6 +161,12 @@ public record class Matrix2x2 : IStaticMatrix<Matrix2x2>
         }
     }
 
+    public static Matrix2x2 GenerateRotationMatrix(Angle rot) => new(new[,]
+    {
+        { Mathf.Cos(rot), -Mathf.Sin(rot) },
+        { Mathf.Sin(rot),  Mathf.Cos(rot) }
+    });
+
     public static Matrix2x2 Absolute(Matrix2x2 val) => new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2),
         Mathf.Absolute(val.r2c1), Mathf.Absolute(val.r2c2));
     public static Matrix2x2 Average(params Matrix2x2[] vals) => Sum(vals) / vals.Length;

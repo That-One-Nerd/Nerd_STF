@@ -2,7 +2,7 @@
 
 public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Float2, Int2>,
     IClamp<Float2>, IClampMagnitude<Float2, float>, IComparable<Float2>,
-    ICross<Float2, Float3>, IDivide<Float2>, IDot<Float2, float>, IEquatable<Float2>,
+    ICross<Float2, float>, IDivide<Float2>, IDot<Float2, float>, IEquatable<Float2>,
     IFloor<Float2, Int2>, IFromTuple<Float2, (float x, float y)>, IGroup<float>,
     ILerp<Float2, float>, IMathOperators<Float2>, IMax<Float2>, IMedian<Float2>, IMin<Float2>,
     IIndexAll<float>, IIndexRangeAll<float>, IPresets2d<Float2>, IProduct<Float2>, IRound<Float2, Int2>,
@@ -96,8 +96,8 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
         else if (mag > maxMag) val *= maxMag;
         return val;
     }
-    public static Float3 Cross(Float2 a, Float2 b, bool normalized = false) =>
-        Float3.Cross(a, b, normalized);
+    public static float Cross(Float2 a, Float2 b, bool normalized = false) =>
+        Float3.Cross(a, b, normalized).z;
     public static Float2 Divide(Float2 num, params Float2[] vals) => num / Product(vals);
     public static float Dot(Float2 a, Float2 b) => a.x * b.x + a.y * b.y;
     public static float Dot(params Float2[] vals)

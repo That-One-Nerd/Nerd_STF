@@ -50,7 +50,7 @@ public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
         return new(val.theta, mag);
     }
     public static Vector3d Cross(Vector2d a, Vector2d b, bool normalized = false) =>
-        Float2.Cross(a.ToXYZ(), b.ToXYZ(), normalized).ToVector();
+        new Float3(0, 0, Float2.Cross(a.ToXYZ(), b.ToXYZ(), normalized)).ToVector();
     public static float Dot(Vector2d a, Vector2d b) => Float2.Dot(a.ToXYZ(), b.ToXYZ());
     public static float Dot(params Vector2d[] vals)
     {

@@ -225,6 +225,34 @@ public record class Matrix3x3 : IStaticMatrix<Matrix3x3>
         }
     }
 
+    public static Matrix3x3 GenerateRotationMatrix(Angle yaw, Angle pitch, Angle roll)
+    {
+        // Could be optimized by merging all of the matrices by hand
+        // but that's a huge matrix and, as said before like a gajillion
+        // times, this ain't the optimization update.
+
+        Matrix3x3 yawMatrix = new(new[,]
+        {
+            { Mathf.Cos(yaw), -Mathf.Sin(yaw), 0 },
+            { Mathf.Sin(yaw),  Mathf.Cos(yaw), 0 },
+            {              0,               0, 1 }
+        });
+        Matrix3x3 pitchMatrix = new(new[,]
+        {
+            {  Mathf.Cos(pitch), 0, Mathf.Sin(pitch) },
+            {                 0, 1,                0 },
+            { -Mathf.Sin(pitch), 0, Mathf.Cos(pitch) }
+        });
+        Matrix3x3 rollMatrix = new(new[,]
+        {
+            { 1,               0,                0 },
+            { 0, Mathf.Cos(roll), -Mathf.Sin(roll) },
+            { 0, Mathf.Sin(roll),  Mathf.Cos(roll) }
+        });
+
+        return yawMatrix * pitchMatrix * rollMatrix;
+    }
+
     public static Matrix3x3 Absolute(Matrix3x3 val) =>
         new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2), Mathf.Absolute(val.r1c3),
             Mathf.Absolute(val.r2c1), Mathf.Absolute(val.r2c2), Mathf.Absolute(val.r2c3),

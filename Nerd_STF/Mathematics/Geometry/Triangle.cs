@@ -208,18 +208,21 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
     }
     public override int GetHashCode() => base.GetHashCode();
 
-    public bool Contains(Float3 point)
+    public bool Contains(Float3 point) => Contains(point, 0.05f);
+    public bool Contains(Float3 point, float tolerance)
     {
         Triangle pab = (point, a, b),
                  pbc = (point, b, c),
                  pca = (point, c, a);
-        return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < 0.05f;
+        return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < tolerance;
     }
-    public bool Contains(Line line) =>
-        Contains(line.a) && Contains(line.b);
+    public bool Contains(Line line) => Contains(line, 0.05f);
+    public bool Contains(Line line, float tolerance) =>
+        Contains(line.a, tolerance) && Contains(line.b, tolerance);
 
-    public bool ContainsPartially(Line line) =>
-        Contains(line.a) || Contains(line.b);
+    public bool ContainsPartially(Line line) => ContainsPartially(line, 0.05f);
+    public bool ContainsPartially(Line line, float tolerance) =>
+        Contains(line.a, tolerance) || Contains(line.b, tolerance);
 
     public Float3[] GetAllVerts() => new[] { a, b, c };
 
