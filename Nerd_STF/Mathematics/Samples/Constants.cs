@@ -67,6 +67,10 @@ public static class Constants
     public const float Tan60Deg = Sqrt3;
     public const float Tan90Deg = float.PositiveInfinity;
 
+    public static readonly Angle IsometricAngle = (35.2643896828f, Angle.Type.Degrees);
+    public const float IsometricCos = 0.816496580928f;
+    public const float IsometricSin = 0.57737026919f;
+
     public const float AperyConstant = 1.2020569031f;
     public const float ArtinConstant = 0.3739558136f;
     public const float AsymptoticLebesgueConstant = 0.9894312738f;

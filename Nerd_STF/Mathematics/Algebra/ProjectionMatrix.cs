@@ -40,13 +40,27 @@ public class ProjectionMatrix : Matrix3x3
     public ProjectionMatrix(Fill<int> r1, Fill<int> r2, Fill<int> r3)
         : this(r1(0), r1(1), r1(2), r2(0), r2(1), r2(2), r3(0), r3(1), r3(2)) { }
 
-    public static ProjectionMatrix SingleViewProjection(CrossSection2d section) => new(new[,]
+    public static ProjectionMatrix Orthographic(CrossSection2d section) => new(new[,]
     {
         { section == CrossSection2d.XY || section == CrossSection2d.ZX ? 1 : 0, 0, 0 },
         { 0, section == CrossSection2d.XY || section == CrossSection2d.YZ ? 1 : 0, 0 },
         { 0, 0, section == CrossSection2d.YZ || section == CrossSection2d.ZX ? 1 : 0 }
     });
-    public static ProjectionMatrix IsometricProjection(Angle alpha, Angle beta)
+
+    public static ProjectionMatrix Isometric()
+    {
+        const float invSqrt2   = 0.707106781187f,
+                    invSqrt3   = 0.57735026919f,
+                    invSqrt6   = 0.408248290464f,
+                    invSqrt6_2 = 0.816496580928f;
+        return new(new[,]
+        {
+            { invSqrt2,          0, -invSqrt2 },
+            { invSqrt6, invSqrt6_2,  invSqrt6 },
+            {        0,          0,         0 },
+        });
+    }
+    public static ProjectionMatrix Isometric(Angle alpha, Angle beta)
     {
         Matrix3x3 alphaMat = new(new[,]
         {
@@ -66,8 +80,8 @@ public class ProjectionMatrix : Matrix3x3
             { 0, 1, 0 },
             { 0, 0, 0 }
         });
-        Matrix3x3 result = alphaMat * betaMat * flatten;
-        return new(result.ToFill2D());
+        Matrix3x3 result = (alphaMat * betaMat).Transpose() * flatten;
+        return new(result.Transpose().ToFill2D());
     }
 
     public Fill<Float3> Project(Fill<Float3> toProject) => i => this * toProject(i);
