@@ -11,7 +11,7 @@
 // to which we know the values of each part.
 // Then we just do this iteratively on a bunch
 // of powers of 2.
-public static class CordicHelper
+internal static class CordicHelper
 {
     private static readonly float[] p_cosTable =
     {
