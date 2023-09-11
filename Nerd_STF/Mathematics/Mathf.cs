@@ -47,8 +47,18 @@ public static class Mathf
         for (float x = min; x <= max; x += step) vals.Add(equ(x));
         return Average(vals.ToArray());
     }
-    public static float Average(params float[] vals) => Sum(vals) / vals.Length;
-    public static int Average(params int[] vals) => Sum(vals) / vals.Length;
+    public static float Average(params float[] vals)
+    {
+        float sum = 0;
+        foreach (float f in vals) sum += f;
+        return sum / vals.Length;
+    }
+    public static int Average(params int[] vals)
+    {
+        int sum = 0;
+        foreach (int i in vals) sum += i;
+        return sum / vals.Length;
+    }
 
     public static float Binomial(int n, int total, float successRate) =>
         Combinations(total, n) * Power(successRate, n) * Power(1 - successRate, total - n);
@@ -98,20 +108,20 @@ public static class Mathf
     public static float Dot(float[] a, float[] b)
     {
         if (a.Length != b.Length) throw new InvalidSizeException("Both arrays must have the same length");
-        float[] vals = new float[a.Length];
-        for (int i = 0; i < a.Length; i++) vals[i] = a[i] * b[i];
-        return Sum(vals);
+        float sum = 0;
+        for (int i = 0; i < a.Length; i++) sum += a[i] * b[i];
+        return sum;
     }
     public static float Dot(params float[][] vals)
     {
-        float[] res = new float[vals[0].Length];
-        for (int i = 0; i < res.Length; i++)
+        float sum = 0;
+        for (int i = 0; i < vals[0].Length; i++)
         {
             float m = 1;
             for (int j = 0; j < vals.Length; j++) m *= vals[j][i];
-            res[i] = m;
+            sum += m;
         }
-        return Sum(res);
+        return sum;
     }
 
     public static int Factorial(int amount)
@@ -162,7 +172,12 @@ public static class Mathf
             _ => throw new ArgumentException("Unknown prime check method.", nameof(method))
         };
 
-    public static int LeastCommonMultiple(params int[] vals) => Product(vals) / GreatestCommonFactor(vals);
+    public static int LeastCommonMultiple(params int[] vals)
+    {
+        int product = 1;
+        foreach (int i in vals) product *= i;
+        return product / GreatestCommonFactor(vals);
+    }
 
     public static float Lerp(float a, float b, float t, bool clamp = true)
     {
@@ -376,6 +391,13 @@ public static class Mathf
         return val;
     }
 
+    public static float Product(Equation equ, float lower, float upper, float step = 1)
+    {
+        float result = 0;
+        for (float f = lower; f < upper; f += step) result *= equ(f);
+        return result;
+    }
+
     public static float Root(float value, float index) => (float)Math.Exp(Math.Log(value) / index);
 
     public static float Round(float num) => num % 1 >= 0.5 ? Ceiling(num) : Floor(num);
@@ -491,10 +513,15 @@ public static class Mathf
 
     public static float Sqrt(float value) => SolveNewton(x => x * x - value, 1);
 
-    // TODO: include equation product and sum
-
     // Known as stdev
     public static float StandardDeviation(params float[] vals) => Sqrt(Variance(vals));
+
+    public static float Sum(Equation equ, float lower, float upper, float step = 1)
+    {
+        float result = 0;
+        for (float f = lower; f < upper; f += step) result += equ(f);
+        return result;
+    }
 
     public static float Tan(Angle angle) => Tan(angle.Radians);
     public static float Tan(float radians) => Sin(radians) / Cos(radians);

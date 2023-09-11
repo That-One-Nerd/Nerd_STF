@@ -194,7 +194,12 @@ public record struct Float4 : IAbsolute<Float4>,
 
     public static Float4 Absolute(Float4 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z), Mathf.Absolute(val.w));
-    public static Float4 Average(params Float4[] vals) => Sum(vals) / vals.Length;
+    public static Float4 Average(params Float4[] vals)
+    {
+        Float4 sum = Zero;
+        foreach (Float4 f in vals) sum += f;
+        return sum / vals.Length;
+    }
     public static Int4 Ceiling(Float4 val) =>
         new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y), Mathf.Ceiling(val.z), Mathf.Ceiling(val.w));
     public static Float4 Clamp(Float4 val, Float4 min, Float4 max) =>

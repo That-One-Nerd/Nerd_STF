@@ -169,7 +169,12 @@ public class Matrix2x2 : ICloneable, IStaticMatrix<Matrix2x2>
 
     public static Matrix2x2 Absolute(Matrix2x2 val) => new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2),
         Mathf.Absolute(val.r2c1), Mathf.Absolute(val.r2c2));
-    public static Matrix2x2 Average(params Matrix2x2[] vals) => Sum(vals) / vals.Length;
+    public static Matrix2x2 Average(params Matrix2x2[] vals)
+    {
+        Matrix2x2 sum = Zero;
+        foreach (Matrix2x2 m in vals) sum += m;
+        return sum / vals.Length;
+    }
     public static Matrix2x2 Ceiling(Matrix2x2 val) => new(Mathf.Ceiling(val.r1c1), Mathf.Ceiling(val.r1c2),
         Mathf.Ceiling(val.r2c1), Mathf.Ceiling(val.r2c2));
     public static Matrix2x2 Clamp(Matrix2x2 val, Matrix2x2 min, Matrix2x2 max) =>

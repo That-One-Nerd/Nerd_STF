@@ -4,7 +4,7 @@ public record struct Vector3d : IAbsolute<Vector3d>, IAverage<Vector3d>, IClampM
     IComparable<Vector3d>, ICross<Vector3d>, IDot<Vector3d, float>, IEquatable<Vector3d>,
     IFromTuple<Vector3d, (Angle yaw, Angle pitch, float mag)>, IIndexAll<Angle>, IIndexRangeAll<Angle>,
     ILerp<Vector3d, float>, IMagnitude<float>, IMax<Vector3d>, IMedian<Vector3d>, IMin<Vector3d>,
-    IPresets3d<Vector3d>, ISubtract<Vector3d>, ISum<Vector3d>
+    IPresets3d<Vector3d>
 {
     public static Vector3d Back => new(Angle.Zero, Angle.Up);
     public static Vector3d Down => new(Angle.Down, Angle.Zero);
@@ -142,18 +142,6 @@ public record struct Vector3d : IAbsolute<Vector3d>, IAverage<Vector3d>, IClampM
     }
     public static Vector3d Round(Vector3d val, Angle.Type angleRound = Angle.Type.Degrees) =>
         new(Angle.Round(val.yaw, angleRound), Angle.Round(val.pitch, angleRound), Mathf.Round(val.magnitude));
-    public static Vector3d Subtract(Vector3d num, params Vector3d[] vals)
-    {
-        foreach (Vector3d v in vals) num -= v;
-        return num;
-    }
-    public static Vector3d Sum(params Vector3d[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Vector3d val = One;
-        foreach (Vector3d v in vals) val += v;
-        return val;
-    }
 
     public static (Angle[] yaws, Angle[] pitches, float[] mags) SplitArray(params Vector3d[] vals)
     {

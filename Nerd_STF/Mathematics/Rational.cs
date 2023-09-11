@@ -79,7 +79,24 @@ public readonly record struct Rational : IAbsolute<Rational>, IAverage<Rational>
 
     public static Rational Absolute(Rational value) =>
         new(Mathf.Absolute(value.numerator), value.denominator);
-    public static Rational Average(params Rational[] vals) => Sum(vals) / (float)vals.Length;
+    public static Rational Average(params Rational[] vals)
+    {
+        // TODO: this doesn't work.
+
+        int[] denominators = new int[vals.Length];
+        for (int i = 0; i < vals.Length; i++) denominators[i] = vals[i].denominator;
+
+        int lcm = Mathf.LeastCommonMultiple(denominators);
+        int sumNum = 0, sumDen = lcm * vals.Length;
+
+        foreach (Rational r in vals)
+        {
+            int scale = lcm / r.denominator;
+            sumNum += r.numerator * scale;
+        }
+
+        return new(sumNum / vals.Length, sumDen);
+    }
     public static int Ceiling(Rational r)
     {
         int mod = r.numerator % r.denominator;

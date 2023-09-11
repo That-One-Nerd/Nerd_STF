@@ -4,8 +4,7 @@ public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
     IClampMagnitude<Vector2d, float>, IComparable<Vector2d>, ICross<Vector2d, Vector3d>,
     IDot<Vector2d, float>, IEquatable<Vector2d>, IFromTuple<Vector2d, (Angle angle, float mag)>,
     ILerp<Vector2d, float>, IMax<Vector2d>, IMagnitude<float>, IMedian<Vector2d>, IMin<Vector2d>,
-    IPresets2d<Vector2d>, ISplittable<Vector2d, (Angle[] rots, float[] mags)>, ISubtract<Vector2d>,
-    ISum<Vector2d>
+    IPresets2d<Vector2d>, ISplittable<Vector2d, (Angle[] rots, float[] mags)>
 {
     public static Vector2d Down => new(Angle.Down);
     public static Vector2d Left => new(Angle.Left);
@@ -84,18 +83,6 @@ public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
     }
     public static Vector2d Round(Vector2d val, Angle.Type angleRound = Angle.Type.Degrees) =>
         new(Angle.Round(val.theta, angleRound), Mathf.Round(val.magnitude));
-    public static Vector2d Subtract(Vector2d num, params Vector2d[] vals)
-    {
-        foreach (Vector2d v in vals) num -= v;
-        return num;
-    }
-    public static Vector2d Sum(params Vector2d[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Vector2d val = One;
-        foreach (Vector2d v in vals) val += v;
-        return val;
-    }
 
     public static (Angle[] rots, float[] mags) SplitArray(params Vector2d[] vals)
     {

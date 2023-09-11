@@ -191,7 +191,12 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
 
     public static Int4 Absolute(Int4 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z), Mathf.Absolute(val.w));
-    public static Int4 Average(params Int4[] vals) => Sum(vals) / vals.Length;
+    public static Int4 Average(params Int4[] vals)
+    {
+        Int4 sum = Zero;
+        foreach (Int4 i in vals) sum += i;
+        return sum / vals.Length;
+    }
     public static Int4 Clamp(Int4 val, Int4 min, Int4 max) =>
         new(Mathf.Clamp(val.x, min.x, max.x),
             Mathf.Clamp(val.y, min.y, max.y),

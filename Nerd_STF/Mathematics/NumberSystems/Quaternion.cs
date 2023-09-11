@@ -7,7 +7,7 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
     IDot<Quaternion, float>, IEquatable<Quaternion>, IFloor<Quaternion>, IGroup<float>,
     IIndexAll<float>, IIndexRangeAll<float>, ILerp<Quaternion, float>, IMax<Quaternion>, IMedian<Quaternion>,
     IMin<Quaternion>, IPresets4d<Quaternion>, IRound<Quaternion>,
-    ISplittable<Quaternion, (float[] Us, float[] Is, float[] Js, float[] Ks)>,
+    ISplittable<Quaternion, (float[] Us, float[] Is, float[] Js, float[] Ks)>
 {
     public static Quaternion Back => new(0, 0, -1, 0);
     public static Quaternion Down => new(0, -1, 0, 0);

@@ -257,7 +257,12 @@ public class Matrix3x3 : ICloneable, IStaticMatrix<Matrix3x3>
         new(Mathf.Absolute(val.r1c1), Mathf.Absolute(val.r1c2), Mathf.Absolute(val.r1c3),
             Mathf.Absolute(val.r2c1), Mathf.Absolute(val.r2c2), Mathf.Absolute(val.r2c3),
             Mathf.Absolute(val.r3c1), Mathf.Absolute(val.r3c2), Mathf.Absolute(val.r3c3));
-    public static Matrix3x3 Average(params Matrix3x3[] vals) => Sum(vals) / vals.Length;
+    public static Matrix3x3 Average(params Matrix3x3[] vals)
+    {
+        Matrix3x3 sum = Zero;
+        foreach (Matrix3x3 m in vals) sum += m;
+        return sum / vals.Length;
+    }
     public static Matrix3x3 Ceiling(Matrix3x3 val) =>
         new(Mathf.Ceiling(val.r1c1), Mathf.Ceiling(val.r1c2), Mathf.Ceiling(val.r1c3),
             Mathf.Ceiling(val.r2c1), Mathf.Ceiling(val.r2c2), Mathf.Ceiling(val.r2c3),

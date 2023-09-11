@@ -20,6 +20,9 @@ public static class EquationExtension
     public static Equation Absolute(this Equation equ) => x => Mathf.Absolute(equ(x));
     public static Equation AbsoluteMod(this Equation equ, float mod) => x => Mathf.AbsoluteMod(equ(x), mod);
 
+    public static Equation Add(this Equation equ, float offset) => x => equ(x) + offset;
+    public static Equation Add(this Equation equ, Equation offset) => x => equ(x) + offset(x);
+
     public static Equation ArcCos(this Equation equ) => x => Mathf.ArcCos(equ(x)).Radians;
     public static Equation ArcCot(this Equation equ) => x => Mathf.ArcCot(equ(x)).Radians;
     public static Equation ArcCsc(this Equation equ) => x => Mathf.ArcCsc(equ(x)).Radians;
@@ -65,7 +68,8 @@ public static class EquationExtension
     public static Equation Coth(this Equation equ) => x => Mathf.Coth(equ(x));
     public static Equation Csch(this Equation equ) => x => Mathf.Csch(equ(x));
 
-    // todo: add divide, multiply, add, subtract
+    public static Equation Divide(this Equation equ, float factor) => x => equ(x) / factor;
+    public static Equation Divide(this Equation equ, Equation factor) => x => equ(x) / factor(x);
 
     public static Equation Factorial(this Equation equ) => x => Mathf.Factorial((int)equ(x));
 
@@ -100,6 +104,9 @@ public static class EquationExtension
     public static float Min(this Equation equ, float min, float max, float step = Calculus.DefaultStep) =>
         Mathf.Min(equ, min, max, step);
 
+    public static Equation Multiply(this Equation equ, float factor) => x => equ(x) * factor;
+    public static Equation Multiply(this Equation equ, Equation factor) => x => equ(x) * factor(x);
+
     public static Equation Permutations(this Equation equ, int size) =>
         x => Mathf.Permutations(size, (int)equ(x));
     public static Equation Permutations(this Equation equ, Equation size) =>
@@ -107,6 +114,9 @@ public static class EquationExtension
 
     public static Equation Power(this Equation equ, float pow) => x => Mathf.Power(equ(x), pow);
     public static Equation Power(this Equation equ, Equation pow) => x => Mathf.Power(equ(x), pow(x));
+
+    public static float Product(this Equation equ, float lower, float upper, float step = 1) =>
+        Mathf.Product(equ, lower, upper, step);
 
     public static Equation Root(this Equation equ, float index) => x => Mathf.Root(equ(x), index);
     public static Equation Root(this Equation equ, Equation index) => x => Mathf.Root(equ(x), index(x));
@@ -130,6 +140,12 @@ public static class EquationExtension
         Mathf.SolveNewton(equ, initial, tolerance, step, maxIterations);
 
     public static Equation Sqrt(this Equation equ) => x => Mathf.Sqrt(equ(x));
+
+    public static Equation Subtract(this Equation equ, float offset) => x => equ(x) - offset;
+    public static Equation Subtract(this Equation equ, Equation offset) => x => equ(x) - offset(x);
+    
+    public static float Sum(this Equation equ, float lower, float upper, float step = 1) =>
+        Mathf.Sum(equ, lower, upper, step);
 
     public static Equation Tan(this Equation equ) => x => Mathf.Tan(equ(x));
 

@@ -119,7 +119,12 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
 
     public static Float3 Absolute(Float3 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z));
-    public static Float3 Average(params Float3[] vals) => Sum(vals) / vals.Length;
+    public static Float3 Average(params Float3[] vals)
+    {
+        Float3 sum = Zero;
+        foreach (Float3 f in vals) sum += f;
+        return sum / vals.Length;
+    }
     public static Int3 Ceiling(Float3 val) =>
         new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y), Mathf.Ceiling(val.z));
     public static Float3 Clamp(Float3 val, Float3 min, Float3 max) =>

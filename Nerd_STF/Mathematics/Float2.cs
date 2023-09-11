@@ -79,7 +79,12 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
 
     public static Float2 Absolute(Float2 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y));
-    public static Float2 Average(params Float2[] vals) => Sum(vals) / vals.Length;
+    public static Float2 Average(params Float2[] vals)
+    {
+        Float2 sum = Zero;
+        foreach (Float2 f in vals) sum += f;
+        return sum / vals.Length;
+    }
     public static Int2 Ceiling(Float2 val) =>
         new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y));
     public static Float2 Clamp(Float2 val, Float2 min, Float2 max) =>

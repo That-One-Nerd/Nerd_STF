@@ -77,7 +77,12 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
 
     public static Int2 Absolute(Int2 val) =>
         new(Mathf.Absolute(val.x), Mathf.Absolute(val.y));
-    public static Int2 Average(params Int2[] vals) => Sum(vals) / vals.Length;
+    public static Int2 Average(params Int2[] vals)
+    {
+        Int2 sum = Zero;
+        foreach (Int2 i in vals) sum += i;
+        return sum / vals.Length;
+    }
     public static Int2 Clamp(Int2 val, Int2 min, Int2 max) =>
         new(Mathf.Clamp(val.x, min.x, max.x),
             Mathf.Clamp(val.y, min.y, max.y));

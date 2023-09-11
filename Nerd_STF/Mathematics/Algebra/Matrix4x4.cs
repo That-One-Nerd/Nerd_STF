@@ -303,7 +303,12 @@ public class Matrix4x4 : ICloneable, IStaticMatrix<Matrix4x4>
             Mathf.Absolute(val.r2c1), Mathf.Absolute(val.r2c2), Mathf.Absolute(val.r2c3), Mathf.Absolute(val.r2c4),
             Mathf.Absolute(val.r3c1), Mathf.Absolute(val.r3c2), Mathf.Absolute(val.r3c3), Mathf.Absolute(val.r3c4),
             Mathf.Absolute(val.r4c1), Mathf.Absolute(val.r4c2), Mathf.Absolute(val.r4c3), Mathf.Absolute(val.r4c4));
-    public static Matrix4x4 Average(params Matrix4x4[] vals) => Sum(vals) / vals.Length;
+    public static Matrix4x4 Average(params Matrix4x4[] vals)
+    {
+        Matrix4x4 sum = Zero;
+        foreach (Matrix4x4 m in vals) sum += m;
+        return sum / vals.Length;
+    }
     public static Matrix4x4 Ceiling(Matrix4x4 val) =>
         new(Mathf.Ceiling(val.r1c1), Mathf.Ceiling(val.r1c2), Mathf.Ceiling(val.r1c3), Mathf.Ceiling(val.r1c4),
             Mathf.Ceiling(val.r2c1), Mathf.Ceiling(val.r2c2), Mathf.Ceiling(val.r2c3), Mathf.Ceiling(val.r2c4),

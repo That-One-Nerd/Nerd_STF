@@ -38,21 +38,32 @@ public class NDArray<T> : IEnumerable<T>, IEquatable<NDArray<T>>
         sizes = new int[dimensions];
         Array.Fill(sizes, allLengths);
 
-        arr = new T[Mathf.Product(sizes)];
+        long allSizes = 1;
+        foreach (int i in sizes) allSizes *= i;
+
+        arr = new T[allSizes];
     }
     public NDArray(int[] lengths)
     {
-        arr = new T[Mathf.Product(lengths)];
         dimensions = lengths.Length;
         sizes = lengths;
+
+        long allSizes = 1;
+        foreach (int i in sizes) allSizes *= i;
+
+        arr = new T[allSizes];
     }
     public NDArray(int dimensions, int[] lengths)
     {
         if (dimensions != lengths.Length) throw new InvalidSizeException("Dimension count doesn't match length count.");
 
-        arr = new T[Mathf.Product(lengths)];
         this.dimensions = lengths.Length;
         sizes = lengths;
+
+        long allSizes = 1;
+        foreach (int i in sizes) allSizes *= i;
+
+        arr = new T[allSizes];
     }
     public NDArray(T[] items, int[] lengths)
     {
@@ -60,17 +71,30 @@ public class NDArray<T> : IEnumerable<T>, IEquatable<NDArray<T>>
         dimensions = lengths.Length;
         sizes = lengths;
 
-        if (arr.Length != Mathf.Product(lengths)) throw new InvalidSizeException("Too many or too few items were provided.");
+        long allSizes = 1;
+        foreach (int i in sizes) allSizes *= i;
+
+        arr = new T[allSizes];
+
+        if (arr.Length != allSizes)
+            throw new InvalidSizeException("Too many or too few items were provided.");
     }
     public NDArray(T[] items, int dimensions, int[] lengths)
     {
-        if (dimensions != lengths.Length) throw new InvalidSizeException("Dimension count doesn't match length count.");
+        if (dimensions != lengths.Length)
+            throw new InvalidSizeException("Dimension count doesn't match length count.");
 
         arr = items;
         this.dimensions = lengths.Length;
         sizes = lengths;
 
-        if (arr.Length != Mathf.Product(lengths)) throw new InvalidSizeException("Too many or too few items were provided.");
+        long allSizes = 1;
+        foreach (int i in sizes) allSizes *= i;
+
+        arr = new T[allSizes];
+
+        if (arr.Length != allSizes)
+            throw new InvalidSizeException("Too many or too few items were provided.");
     }
 
     public T this[params int[] indexes]
@@ -81,7 +105,8 @@ public class NDArray<T> : IEnumerable<T>, IEquatable<NDArray<T>>
 
     private int FlattenIndex(params int[] indexes)
     {
-        if (indexes.Length != sizes.Length) throw new InvalidSizeException("Too many or too few indexes were provided.");
+        if (indexes.Length != sizes.Length)
+            throw new InvalidSizeException("Too many or too few indexes were provided.");
 
         int ind = indexes[^1];
         Console.WriteLine($"Start at {ind}");
