@@ -2,11 +2,11 @@
 
 public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Float2, Int2>,
     IClamp<Float2>, IClampMagnitude<Float2, float>, IComparable<Float2>,
-    ICross<Float2, float>, IDivide<Float2>, IDot<Float2, float>, IEquatable<Float2>,
+    ICross<Float2, float>, IDot<Float2, float>, IEquatable<Float2>,
     IFloor<Float2, Int2>, IFromTuple<Float2, (float x, float y)>, IGroup<float>,
     ILerp<Float2, float>, IMathOperators<Float2>, IMax<Float2>, IMedian<Float2>, IMin<Float2>,
-    IIndexAll<float>, IIndexRangeAll<float>, IPresets2d<Float2>, IProduct<Float2>, IRound<Float2, Int2>,
-    ISplittable<Float2, (float[] Xs, float[] Ys)>, ISubtract<Float2>, ISum<Float2>
+    IIndexAll<float>, IIndexRangeAll<float>, IPresets2d<Float2>, IRound<Float2, Int2>,
+    ISplittable<Float2, (float[] Xs, float[] Ys)>
 {
     public static Float2 Down => new(0, -1);
     public static Float2 Left => new(-1, 0);
@@ -98,7 +98,6 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
     }
     public static float Cross(Float2 a, Float2 b, bool normalized = false) =>
         Float3.Cross(a, b, normalized).z;
-    public static Float2 Divide(Float2 num, params Float2[] vals) => num / Product(vals);
     public static float Dot(Float2 a, Float2 b) => a.x * b.x + a.y * b.y;
     public static float Dot(params Float2[] vals)
     {
@@ -135,22 +134,8 @@ public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Floa
         foreach (Float2 f in vals) val = f.Magnitude < val.Magnitude ? f : val;
         return val;
     }
-    public static Float2 Product(params Float2[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float2 val = One;
-        foreach (Float2 f in vals) val *= f;
-        return val;
-    }
     public static Int2 Round(Float2 val) =>
         new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y));
-    public static Float2 Subtract(Float2 num, params Float2[] vals) => num - Sum(vals);
-    public static Float2 Sum(params Float2[] vals)
-    {
-        Float2 val = Zero;
-        foreach (Float2 f in vals) val += f;
-        return val;
-    }
 
     public static (float[] Xs, float[] Ys) SplitArray(params Float2[] vals)
     {

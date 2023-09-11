@@ -2,7 +2,7 @@
 
 namespace Nerd_STF.Mathematics.Algebra;
 
-public class Matrix4x4 : IStaticMatrix<Matrix4x4>
+public class Matrix4x4 : ICloneable, IStaticMatrix<Matrix4x4>
 {
     public static Matrix4x4 Identity => new(new[,]
     {
@@ -318,11 +318,6 @@ public class Matrix4x4 : IStaticMatrix<Matrix4x4>
             Mathf.Clamp(val.r3c3, min.r3c3, max.r3c3), Mathf.Clamp(val.r3c4, min.r3c4, max.r3c4),
             Mathf.Clamp(val.r4c1, min.r4c1, max.r4c1), Mathf.Clamp(val.r4c2, min.r4c2, max.r4c2),
             Mathf.Clamp(val.r4c3, min.r4c3, max.r4c3), Mathf.Clamp(val.r4c4, min.r4c4, max.r4c4));
-    public static Matrix4x4 Divide(Matrix4x4 num, params Matrix4x4[] vals)
-    {
-        foreach (Matrix4x4 m in vals) num /= m;
-        return num;
-    }
     public static Matrix4x4 Floor(Matrix4x4 val) =>
         new(Mathf.Floor(val.r1c1), Mathf.Floor(val.r1c2), Mathf.Floor(val.r1c3), Mathf.Floor(val.r1c4),
             Mathf.Floor(val.r2c1), Mathf.Floor(val.r2c2), Mathf.Floor(val.r2c3), Mathf.Floor(val.r2c4),
@@ -343,29 +338,11 @@ public class Matrix4x4 : IStaticMatrix<Matrix4x4>
         Matrix4x4 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
-    public static Matrix4x4 Product(params Matrix4x4[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Matrix4x4 val = Identity;
-        foreach (Matrix4x4 m in vals) val *= m;
-        return val;
-    }
     public static Matrix4x4 Round(Matrix4x4 val) =>
         new(Mathf.Round(val.r1c1), Mathf.Round(val.r1c2), Mathf.Round(val.r1c3), Mathf.Round(val.r1c4),
             Mathf.Round(val.r2c1), Mathf.Round(val.r2c2), Mathf.Round(val.r2c3), Mathf.Round(val.r2c4),
             Mathf.Round(val.r3c1), Mathf.Round(val.r3c2), Mathf.Round(val.r3c3), Mathf.Round(val.r3c4),
             Mathf.Round(val.r4c1), Mathf.Round(val.r4c2), Mathf.Round(val.r4c3), Mathf.Round(val.r4c4));
-    public static Matrix4x4 Subtract(Matrix4x4 num, params Matrix4x4[] vals)
-    {
-        foreach (Matrix4x4 m in vals) num -= m;
-        return num;
-    }
-    public static Matrix4x4 Sum(params Matrix4x4[] vals)
-    {
-        Matrix4x4 val = Zero;
-        foreach (Matrix4x4 m in vals) val += m;
-        return val;
-    }
 
     public static (float[] r1c1s, float[] r1c2, float[] r1c3, float[] r1c4, float[] r2c1, float[] r2c2s,
         float[] r2c3, float[] r2c4, float[] r3c1, float[] r3c2, float[] r3c3s, float[] r3c4, float[] r4c1,
@@ -536,7 +513,7 @@ public class Matrix4x4 : IStaticMatrix<Matrix4x4>
         else if (obj is Matrix4x4 m4x4) return Equals(m4x4);
         return false;
     }
-    public virtual bool Equals(Matrix4x4? other)
+    public bool Equals(Matrix4x4? other)
     {
         if (other is null) return false;
         return r1c1 == other.r1c1 && r1c2 == other.r1c2 && r1c3 == other.r1c3 && r1c4 == other.r1c4 &&
@@ -571,6 +548,11 @@ public class Matrix4x4 : IStaticMatrix<Matrix4x4>
         yield return r4c3;
         yield return r4c4;
     }
+
+    public object Clone() => new Matrix4x4(r1c1, r1c2, r1c3, r1c4,
+                                           r2c1, r2c2, r2c3, r2c4,
+                                           r3c1, r3c2, r3c3, r3c4,
+                                           r4c1, r4c2, r4c3, r4c4);
 
     public float[] ToArray() => new[]
     {

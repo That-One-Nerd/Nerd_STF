@@ -95,9 +95,6 @@ public static class Mathf
 
     public static float Csch(float value) => 1 / Sinh(value);
 
-    public static float Divide(float val, params float[] dividends) => val / Product(dividends);
-    public static int Divide(int val, params int[] dividends) => val / Product(dividends);
-
     public static float Dot(float[] a, float[] b)
     {
         if (a.Length != b.Length) throw new InvalidSizeException("Both arrays must have the same length");
@@ -337,27 +334,6 @@ public static class Mathf
         return factors.ToArray();
     }
 
-    public static float Product(params float[] vals)
-    {
-        if (vals.Length < 1) return 0;
-        float val = 1;
-        foreach (float d in vals) val *= d;
-        return val;
-    }
-    public static int Product(params int[] vals)
-    {
-        if (vals.Length < 1) return 0;
-        int val = 1;
-        foreach (int i in vals) val *= i;
-        return val;
-    }
-    public static float Product(Equation equ, float min, float max, float step = 1)
-    {
-        float total = 1;
-        for (float f = min; f <= max; f += step) total *= equ(f);
-        return total;
-    }
-
     public static float Power(float num, float pow)
     {
         if (pow == 0) return 1;
@@ -515,27 +491,7 @@ public static class Mathf
 
     public static float Sqrt(float value) => SolveNewton(x => x * x - value, 1);
 
-    public static float Subtract(float num, params float[] vals) => num - Sum(vals);
-    public static int Subtract(int num, params int[] vals) => num - Sum(vals);
-
-    public static float Sum(params float[] vals)
-    {
-        float val = 0;
-        foreach (float d in vals) val += d;
-        return val;
-    }
-    public static int Sum(params int[] vals)
-    {
-        int val = 0;
-        foreach (int i in vals) val += i;
-        return val;
-    }
-    public static float Sum(Equation equ, float min, float max, float step = 1)
-    {
-        float total = 0;
-        for (float f = min; f <= max; f += step) total += equ(f);
-        return total;
-    }
+    // TODO: include equation product and sum
 
     // Known as stdev
     public static float StandardDeviation(params float[] vals) => Sqrt(Variance(vals));

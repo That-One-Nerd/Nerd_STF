@@ -3,10 +3,10 @@
 namespace Nerd_STF.Mathematics.NumberSystems;
 
 public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Complex>, ICeiling<Complex>,
-    IClampMagnitude<Complex, float>, IComparable<Complex>, IDivide<Complex>, IDot<Complex, float>,
+    IClampMagnitude<Complex, float>, IComparable<Complex>, IDot<Complex, float>,
     IEquatable<Complex>, IFloor<Complex>, IGroup<float>, IIndexAll<float>, IIndexRangeAll<float>,
-    ILerp<Complex, float>, IMax<Complex>, IMedian<Complex>, IMin<Complex>, IPresets2d<Complex>, IProduct<Complex>,
-    IRound<Complex>, ISplittable<Complex, (float[] Us, float[] Is)>, ISum<Complex>
+    ILerp<Complex, float>, IMax<Complex>, IMedian<Complex>, IMin<Complex>, IPresets2d<Complex>,
+    IRound<Complex>, ISplittable<Complex, (float[] Us, float[] Is)>
 {
     public static Complex Down => new(0, -1);
     public static Complex Left => new(-1, 0);
@@ -86,12 +86,6 @@ public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Co
     public static Complex Clamp(Complex val, Complex min, Complex max) => Float2.Clamp(val, min, max);
     public static Complex ClampMagnitude(Complex val, float minMag, float maxMag) =>
         Float2.ClampMagnitude(val, minMag, maxMag);
-    public static Complex Divide(Complex num, params Complex[] vals)
-    {
-        List<Float2> floats = new();
-        foreach (Complex c in vals) floats.Add(c);
-        return Float2.Divide(num, floats.ToArray());
-    }
     public static float Dot(Complex a, Complex b) => Float2.Dot(a, b);
     public static float Dot(params Complex[] vals)
     {
@@ -119,25 +113,7 @@ public record struct Complex(float u, float i) : IAbsolute<Complex>, IAverage<Co
         foreach (Complex c in vals) floats.Add(c);
         return Float2.Min(floats.ToArray());
     }
-    public static Complex Product(params Complex[] vals)
-    {
-        List<Float2> floats = new();
-        foreach (Complex c in vals) floats.Add(c);
-        return Float2.Product(floats.ToArray());
-    }
     public static Complex Round(Complex val) => Float2.Round(val);
-    public static Complex Subtract(Complex num, params Complex[] vals)
-    {
-        List<Float2> floats = new();
-        foreach (Complex c in vals) floats.Add(c);
-        return Float2.Subtract(num, floats.ToArray());
-    }
-    public static Complex Sum(params Complex[] vals)
-    {
-        List<Float2> floats = new();
-        foreach (Complex c in vals) floats.Add(c);
-        return Float2.Sum(floats.ToArray());
-    }
 
     public static (float[] Us, float[] Is) SplitArray(params Complex[] vals)
     {

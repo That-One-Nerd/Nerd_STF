@@ -2,12 +2,11 @@
 
 public record struct Float4 : IAbsolute<Float4>,
     IAverage<Float4>, ICeiling<Float4, Int4>, IClamp<Float4>, IClampMagnitude<Float4, float>,
-    IComparable<Float4>, IDivide<Float4>, IDot<Float4, float>, IEquatable<Float4>,
+    IComparable<Float4>, IDot<Float4, float>, IEquatable<Float4>,
     IFloor<Float4, Int4>, IFromTuple<Float4, (float x, float y, float z, float w)>,
     IGroup<float>, IIndexAll<float>, IIndexRangeAll<float>, ILerp<Float4, float>, IMathOperators<Float4>,
-    IMax<Float4>, IMedian<Float4>, IMin<Float4>, IPresets4d<Float4>, IProduct<Float4>, IRound<Float4, Int4>,
-    ISplittable<Float4, (float[] Xs, float[] Ys, float[] Zs, float[] Ws)>, ISubtract<Float4>,
-    ISum<Float4>
+    IMax<Float4>, IMedian<Float4>, IMin<Float4>, IPresets4d<Float4>, IRound<Float4, Int4>,
+    ISplittable<Float4, (float[] Xs, float[] Ys, float[] Zs, float[] Ws)>
 {
     public static Float4 Back => new(0, 0, -1, 0);
     public static Float4 Down => new(0, -1, 0, 0);
@@ -214,7 +213,6 @@ public record struct Float4 : IAbsolute<Float4>,
         else if (mag > maxMag) val *= maxMag;
         return val;
     }
-    public static Float4 Divide(Float4 num, params Float4[] vals) => num / Product(vals);
     public static float Dot(Float4 a, Float4 b) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     public static float Dot(params Float4[] vals)
     {
@@ -257,20 +255,6 @@ public record struct Float4 : IAbsolute<Float4>,
     public static Int4 Round(Float4 val) =>
         new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y), Mathf.RoundInt(val.z),
             Mathf.RoundInt(val.w));
-    public static Float4 Product(params Float4[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float4 val = One;
-        foreach (Float4 d in vals) val *= d;
-        return val;
-    }
-    public static Float4 Subtract(Float4 num, params Float4[] vals) => num - Sum(vals);
-    public static Float4 Sum(params Float4[] vals)
-    {
-        Float4 val = Zero;
-        foreach (Float4 d in vals) val += d;
-        return val;
-    }
 
     public static (float[] Xs, float[] Ys, float[] Zs, float[] Ws) SplitArray(params Float4[] vals)
     {

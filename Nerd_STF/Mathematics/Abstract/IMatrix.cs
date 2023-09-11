@@ -1,8 +1,7 @@
 ﻿namespace Nerd_STF.Mathematics.Abstract;
 
-public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>, IDivide<T>,
-    IEquatable<T>, IFloor<T>, IGroup2d<float>, ILerp<T, float>, IProduct<T>, IRound<T>,
-    ISubtract<T>, ISum<T>
+public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>,
+    IEquatable<T>, IFloor<T>, IGroup2d<float>, ILerp<T, float>, IRound<T>
     where T : IMatrix<T>
 {
     public Int2 Size { get; }
@@ -28,6 +27,15 @@ public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>, IDivide<T>,
     public void ScaleRowMutable(int rowIndex, float value);
     public T SwapRows(int rowA, int rowB);
     public void SwapRowsMutable(int rowA, int rowB);
+
+    public static abstract T operator +(T a, T b);
+    public static abstract T? operator -(T m);
+    public static abstract T operator -(T a, T b);
+    public static abstract T operator *(T a, T b);
+    public static abstract T operator /(T a, T b);
+    public static abstract T operator ^(T a, T b);
+    public static abstract bool operator ==(T a, T b);
+    public static abstract bool operator !=(T a, T b);
 }
 
 public interface IMatrix<This, TMinor> : IMatrix<This> where This : IMatrix<This, TMinor>

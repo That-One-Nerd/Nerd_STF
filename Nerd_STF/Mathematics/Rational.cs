@@ -1,11 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics;
 
 public readonly record struct Rational : IAbsolute<Rational>, IAverage<Rational>, ICeiling<Rational, int>, IClamp<Rational>,
-    IComparable<Rational>, IComparable<float>, IDivide<Rational>, IEquatable<Rational>, IEquatable<float>,
+    IComparable<Rational>, IComparable<float>, IEquatable<Rational>, IEquatable<float>,
     IFloor<Rational, int>, IIndexGet<int>, IIndexRangeGet<int>, ILerp<Rational, float>, IMathOperators<Rational>,
-    IMax<Rational>, IMedian<Rational>, IMin<Rational>, IPresets1d<Rational>, IProduct<Rational>,
-    IRound<Rational, int>, ISplittable<Rational, (int[] nums, int[] dens)>, ISubtract<Rational>,
-    ISum<Rational>
+    IMax<Rational>, IMedian<Rational>, IMin<Rational>, IPresets1d<Rational>,
+    IRound<Rational, int>, ISplittable<Rational, (int[] nums, int[] dens)>
 {
     public static Rational One => new(1, 1);
     public static Rational Zero => new(0, 1);
@@ -90,26 +89,10 @@ public readonly record struct Rational : IAbsolute<Rational>, IAverage<Rational>
     }
     public static Rational Clamp(Rational val, Rational min, Rational max)
         => FromFloat(Mathf.Clamp(val.GetValue(), min.GetValue(), max.GetValue()));
-    public static Rational Divide(Rational val, params Rational[] vals) =>
-        val / Product(vals);
     public static int Floor(Rational val) => val.numerator / val.denominator;
     public static Rational Lerp(Rational a, Rational b, float t, bool clamp = true) =>
         FromFloat(Mathf.Lerp(a.GetValue(), b.GetValue(), t, clamp));
-    public static Rational Product(params Rational[] vals)
-    {
-        Rational res = One;
-        foreach (Rational r in vals) res *= r;
-        return res;
-    }
     public static int Round(Rational r) => (int)Mathf.Round(r.numerator, r.denominator) / r.denominator;
-    public static Rational Subtract(Rational val, params Rational[] vals) =>
-        val - Sum(vals);
-    public static Rational Sum(params Rational[] vals)
-    {
-        Rational sum = Zero;
-        foreach (Rational r in vals) sum += r;
-        return sum;
-    }
 
     public static (int[] nums, int[] dens) SplitArray(params Rational[] vals)
     {

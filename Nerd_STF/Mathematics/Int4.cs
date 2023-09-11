@@ -1,10 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics;
 
 public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClampMagnitude<Int4, int>,
-    IComparable<Int4>, IDivide<Int4>, IDot<Int4, int>, IEquatable<Int4>,
+    IComparable<Int4>, IDot<Int4, int>, IEquatable<Int4>,
     IFromTuple<Int4, (int x, int y, int z, int w)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>,
-    ILerp<Int4, float>, IMathOperators<Int4>, IMax<Int4>, IMedian<Int4>, IMin<Int4>, IPresets4d<Int4>,
-    IProduct<Int4>, ISplittable<Int4, (int[] Xs, int[] Ys, int[] Zs, int[] Ws)>, ISubtract<Int4>, ISum<Int4>
+    ILerp<Int4, float>, IMathOperators<Int4>, IMax<Int4>, IMedian<Int4>, IMin<Int4>, IPresets4d<Int4>, 
+    ISplittable<Int4, (int[] Xs, int[] Ys, int[] Zs, int[] Ws)>
 {
     public static Int4 Back => new(0, 0, -1, 0);
     public static Int4 Down => new(0, -1, 0, 0);
@@ -208,7 +208,6 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
         else if (mag > maxMag) val *= maxMag;
         return val;
     }
-    public static Int4 Divide(Int4 num, params Int4[] vals) => num / Product(vals);
     public static int Dot(Int4 a, Int4 b) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
     public static int Dot(params Int4[] vals)
     {
@@ -244,20 +243,6 @@ public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClam
         if (vals.Length < 1) return Zero;
         Int4 val = vals[0];
         foreach (Int4 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
-        return val;
-    }
-    public static Int4 Product(params Int4[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int4 val = One;
-        foreach (Int4 d in vals) val *= d;
-        return val;
-    }
-    public static Int4 Subtract(Int4 num, params Int4[] vals) => num - Sum(vals);
-    public static Int4 Sum(params Int4[] vals)
-    {
-        Int4 val = Zero;
-        foreach (Int4 d in vals) val += d;
         return val;
     }
 

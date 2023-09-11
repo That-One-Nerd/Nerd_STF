@@ -4,11 +4,11 @@ namespace Nerd_STF.Mathematics;
 
 public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
     ICeiling<Float3, Int3>, IClamp<Float3>, IClampMagnitude<Float3, float>, IComparable<Float3>,
-    ICross<Float3>, IDivide<Float3>, IDot<Float3, float>, IEquatable<Float3>,
+    ICross<Float3>, IDot<Float3, float>, IEquatable<Float3>,
     IFloor<Float3, Int3>, IFromTuple<Float3, (float x, float y, float z)>, IGroup<float>,
     IIndexAll<float>, IIndexRangeAll<float>, ILerp<Float3, float>, IMathOperators<Float3>, IMax<Float3>,
-    IMedian<Float3>, IMin<Float3>, IPresets3d<Float3>, IProduct<Float3>, IRound<Float3, Int3>,
-    ISplittable<Float3, (float[] Xs, float[] Ys, float[] Zs)>, ISubtract<Float3>, ISum<Float3>
+    IMedian<Float3>, IMin<Float3>, IPresets3d<Float3>, IRound<Float3, Int3>,
+    ISplittable<Float3, (float[] Xs, float[] Ys, float[] Zs)>
 {
     public static Float3 Back => new(0, 0, -1);
     public static Float3 Down => new(0, -1, 0);
@@ -144,7 +144,6 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
                           a.x * b.y - b.x * a.y);
         return normalized ? val.Normalized : val;
     }
-    public static Float3 Divide(Float3 num, params Float3[] vals) => num / Product(vals);
     public static float Dot(Float3 a, Float3 b) => a.x * b.x + a.y * b.y + a.z * b.z;
     public static float Dot(params Float3[] vals)
     {
@@ -182,22 +181,8 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
         foreach (Float3 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
         return val;
     }
-    public static Float3 Product(params Float3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float3 val = One;
-        foreach (Float3 d in vals) val *= d;
-        return val;
-    }
     public static Int3 Round(Float3 val) =>
         new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y), Mathf.RoundInt(val.z));
-    public static Float3 Subtract(Float3 num, params Float3[] vals) => num - Sum(vals);
-    public static Float3 Sum(params Float3[] vals)
-    {
-        Float3 val = Zero;
-        foreach (Float3 d in vals) val += d;
-        return val;
-    }
 
     public static (float[] Xs, float[] Ys, float[] Zs) SplitArray(params Float3[] vals)
     {

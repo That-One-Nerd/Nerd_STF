@@ -4,10 +4,10 @@ namespace Nerd_STF.Mathematics.NumberSystems;
 
 public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<Quaternion>, IAverage<Quaternion>,
     ICeiling<Quaternion>, IClamp<Quaternion>, IClampMagnitude<Quaternion, float>, IComparable<Quaternion>,
-    IDivide<Quaternion>, IDot<Quaternion, float>, IEquatable<Quaternion>, IFloor<Quaternion>, IGroup<float>,
+    IDot<Quaternion, float>, IEquatable<Quaternion>, IFloor<Quaternion>, IGroup<float>,
     IIndexAll<float>, IIndexRangeAll<float>, ILerp<Quaternion, float>, IMax<Quaternion>, IMedian<Quaternion>,
-    IMin<Quaternion>, IPresets4d<Quaternion>, IProduct<Quaternion>, IRound<Quaternion>,
-    ISplittable<Quaternion, (float[] Us, float[] Is, float[] Js, float[] Ks)>, ISum<Quaternion>
+    IMin<Quaternion>, IPresets4d<Quaternion>, IRound<Quaternion>,
+    ISplittable<Quaternion, (float[] Us, float[] Is, float[] Js, float[] Ks)>,
 {
     public static Quaternion Back => new(0, 0, -1, 0);
     public static Quaternion Down => new(0, -1, 0, 0);
@@ -117,12 +117,6 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
     public static Quaternion Clamp(Quaternion val, Quaternion min, Quaternion max) => Float4.Clamp(val, min, max);
     public static Quaternion ClampMagnitude(Quaternion val, float minMag, float maxMag) =>
         Float4.ClampMagnitude(val, minMag, maxMag);
-    public static Quaternion Divide(Quaternion num, params Quaternion[] vals)
-    {
-        List<Float4> floats = new();
-        foreach (Quaternion q in vals) floats.Add(q);
-        return Float4.Divide(num, floats.ToArray());
-    }
     public static float Dot(Quaternion a, Quaternion b) => a.u * b.u + a.i * b.i + a.j * b.j + a.k * b.k;
     public static float Dot(params Quaternion[] vals)
     {
@@ -150,25 +144,7 @@ public record struct Quaternion(float u, float i, float j, float k) : IAbsolute<
         foreach (Quaternion q in vals) floats.Add(q);
         return Float4.Min(floats.ToArray());
     }
-    public static Quaternion Product(params Quaternion[] vals)
-    {
-        List<Float4> floats = new();
-        foreach (Quaternion q in vals) floats.Add(q);
-        return Float4.Product(floats.ToArray());
-    }
     public static Quaternion Round(Quaternion val) => Float4.Round(val);
-    public static Quaternion Subtract(Quaternion num, params Quaternion[] vals)
-    {
-        List<Float4> floats = new();
-        foreach (Quaternion q in vals) floats.Add(q);
-        return Float4.Subtract(num, floats.ToArray());
-    }
-    public static Quaternion Sum(params Quaternion[] vals)
-    {
-        List<Float4> floats = new();
-        foreach (Quaternion q in vals) floats.Add(q);
-        return Float4.Sum(floats.ToArray());
-    }
 
     public static Quaternion FromAngles(Angle yaw, Angle pitch, Angle? roll = null)
     {

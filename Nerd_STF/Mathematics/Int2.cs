@@ -1,10 +1,10 @@
 ﻿namespace Nerd_STF.Mathematics;
 
 public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClampMagnitude<Int2, int>,
-    IComparable<Int2>, ICross<Int2, Int3>, IDivide<Int2>, IDot<Int2, int>, IEquatable<Int2>,
+    IComparable<Int2>, ICross<Int2, Int3>, IDot<Int2, int>, IEquatable<Int2>,
     IFromTuple<Int2, (int x, int y)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<Int2, float>,
-    IMathOperators<Int2>, IMax<Int2>, IMedian<Int2>, IMin<Int2>, IPresets2d<Int2>, IProduct<Int2>,
-    ISplittable<Int2, (int[] Xs, int[] Ys)>, ISubtract<Int2>, ISum<Int2>
+    IMathOperators<Int2>, IMax<Int2>, IMedian<Int2>, IMin<Int2>, IPresets2d<Int2>,
+    ISplittable<Int2, (int[] Xs, int[] Ys)>
 {
     public static Int2 Down => new(0, -1);
     public static Int2 Left => new(-1, 0);
@@ -94,7 +94,6 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
     }
     public static Int3 Cross(Int2 a, Int2 b, bool normalized = false) =>
         Int3.Cross(a, b, normalized);
-    public static Int2 Divide(Int2 num, params Int2[] vals) => num / Product(vals);
     public static int Dot(Int2 a, Int2 b) => a.x * b.x + a.y * b.y;
     public static int Dot(params Int2[] vals)
     {
@@ -127,20 +126,6 @@ public record struct Int2 : IAbsolute<Int2>, IAverage<Int2>, IClamp<Int2>, IClam
         if (vals.Length < 1) return Zero;
         Int2 val = vals[0];
         foreach (Int2 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
-        return val;
-    }
-    public static Int2 Product(params Int2[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int2 val = One;
-        foreach (Int2 d in vals) val *= d;
-        return val;
-    }
-    public static Int2 Subtract(Int2 num, params Int2[] vals) => num - Sum(vals);
-    public static Int2 Sum(params Int2[] vals)
-    {
-        Int2 val = Zero;
-        foreach (Int2 d in vals) val += d;
         return val;
     }
 

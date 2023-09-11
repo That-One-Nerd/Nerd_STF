@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public class Matrix2x2 : IStaticMatrix<Matrix2x2>
+public class Matrix2x2 : ICloneable, IStaticMatrix<Matrix2x2>
 {
     public static Matrix2x2 Identity => new(new[,]
     {
@@ -175,11 +175,6 @@ public class Matrix2x2 : IStaticMatrix<Matrix2x2>
     public static Matrix2x2 Clamp(Matrix2x2 val, Matrix2x2 min, Matrix2x2 max) =>
         new(Mathf.Clamp(val.r1c1, min.r1c1, max.r1c1), Mathf.Clamp(val.r1c2, min.r1c2, max.r1c2),
             Mathf.Clamp(val.r2c1, min.r2c1, max.r2c1), Mathf.Clamp(val.r2c2, min.r2c2, max.r2c2));
-    public static Matrix2x2 Divide(Matrix2x2 num, params Matrix2x2[] vals)
-    {
-        foreach (Matrix2x2 m in vals) num /= m;
-        return num;
-    }
     public static Matrix2x2 Floor(Matrix2x2 val) => new(Mathf.Floor(val.r1c1), Mathf.Floor(val.r1c2),
         Mathf.Floor(val.r2c1), Mathf.Floor(val.r2c2));
     public static Matrix2x2 Lerp(Matrix2x2 a, Matrix2x2 b, float t, bool clamp = true) =>
@@ -191,26 +186,8 @@ public class Matrix2x2 : IStaticMatrix<Matrix2x2>
         Matrix2x2 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
-    public static Matrix2x2 Product(params Matrix2x2[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Matrix2x2 val = Identity;
-        foreach (Matrix2x2 m in vals) val *= m;
-        return val;
-    }
     public static Matrix2x2 Round(Matrix2x2 val) => new(Mathf.Round(val.r1c1), Mathf.Round(val.r1c2),
         Mathf.Round(val.r2c1), Mathf.Round(val.r2c2));
-    public static Matrix2x2 Subtract(Matrix2x2 num, params Matrix2x2[] vals)
-    {
-        foreach (Matrix2x2 m in vals) num -= m;
-        return num;
-    }
-    public static Matrix2x2 Sum(params Matrix2x2[] vals)
-    {
-        Matrix2x2 val = Zero;
-        foreach (Matrix2x2 m in vals) val += m;
-        return val;
-    }
 
     public static (float[] r1c1s, float[] r1c2s, float[] r2c1s, float[] r2c2s) SplitArray(params Matrix2x2[] vals)
     {
@@ -318,7 +295,7 @@ public class Matrix2x2 : IStaticMatrix<Matrix2x2>
         else if (obj is Matrix2x2 m2x2) return Equals(m2x2);
         return false;
     }
-    public virtual bool Equals(Matrix2x2? other)
+    public bool Equals(Matrix2x2? other)
     {
         if (other is null) return false;
         return r1c1 == other.r1c1 && r1c2 == other.r1c2 && r2c1 == other.r2c1 && r2c2 == other.r2c2;
@@ -334,6 +311,8 @@ public class Matrix2x2 : IStaticMatrix<Matrix2x2>
         yield return r2c1;
         yield return r2c2;
     }
+
+    public object Clone() => new Matrix2x2(r1c1, r1c2, r2c1, r2c2);
 
     public float[] ToArray() => new[] { r1c1, r1c2, r2c1, r2c2 };
     public float[,] ToArray2D() => new[,]

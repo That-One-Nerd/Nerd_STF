@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Algebra;
 
-public class Matrix3x3 : IStaticMatrix<Matrix3x3>
+public class Matrix3x3 : ICloneable, IStaticMatrix<Matrix3x3>
 {
     public static Matrix3x3 Identity => new(new[,]
     {
@@ -268,11 +268,6 @@ public class Matrix3x3 : IStaticMatrix<Matrix3x3>
             Mathf.Clamp(val.r2c2, min.r2c2, max.r2c2), Mathf.Clamp(val.r2c3, min.r2c3, max.r2c3),
             Mathf.Clamp(val.r3c1, min.r3c1, max.r3c1), Mathf.Clamp(val.r3c2, min.r3c2, max.r3c2),
             Mathf.Clamp(val.r3c3, min.r3c3, max.r3c3));
-    public static Matrix3x3 Divide(Matrix3x3 num, params Matrix3x3[] vals)
-    {
-        foreach (Matrix3x3 m in vals) num /= m;
-        return num;
-    }
     public static Matrix3x3 Floor(Matrix3x3 val) =>
         new(Mathf.Floor(val.r1c1), Mathf.Floor(val.r1c2), Mathf.Floor(val.r1c3),
             Mathf.Floor(val.r2c1), Mathf.Floor(val.r2c2), Mathf.Floor(val.r2c3),
@@ -289,28 +284,10 @@ public class Matrix3x3 : IStaticMatrix<Matrix3x3>
         Matrix3x3 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
         return Average(valA, valB);
     }
-    public static Matrix3x3 Product(params Matrix3x3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Matrix3x3 val = Identity;
-        foreach (Matrix3x3 m in vals) val *= m;
-        return val;
-    }
     public static Matrix3x3 Round(Matrix3x3 val) =>
         new(Mathf.Round(val.r1c1), Mathf.Round(val.r1c2), Mathf.Round(val.r1c3),
             Mathf.Round(val.r2c1), Mathf.Round(val.r2c2), Mathf.Round(val.r2c3),
             Mathf.Round(val.r3c1), Mathf.Round(val.r3c2), Mathf.Round(val.r3c3));
-    public static Matrix3x3 Subtract(Matrix3x3 num, params Matrix3x3[] vals)
-    {
-        foreach (Matrix3x3 m in vals) num -= m;
-        return num;
-    }
-    public static Matrix3x3 Sum(params Matrix3x3[] vals)
-    {
-        Matrix3x3 val = Zero;
-        foreach (Matrix3x3 m in vals) val += m;
-        return val;
-    }
 
     public static (float[] r1c1s, float[] r1c2s, float[] r1c3s, float[] r2c1s, float[] r2c2s,
         float[] r2c3s, float[] r3c1s, float[] r3c2s, float[] r3c3s) SplitArray(params Matrix3x3[] vals)
@@ -338,7 +315,8 @@ public class Matrix3x3 : IStaticMatrix<Matrix3x3>
     {
         Matrix3x3 dets = Zero;
         Matrix2x2[,] minors = Minors();
-        for (int r = 0; r < 3; r++) for (int c = 0; c < 3; c++) dets[r, c] = minors[r, c].Determinant();
+        for (int r = 0; r < 3; r++) for (int c = 0; c < 3; c++)
+                dets[r, c] = minors[r, c].Determinant();
         return dets ^ SignGrid;
     }
     public float Determinant()
@@ -441,7 +419,7 @@ public class Matrix3x3 : IStaticMatrix<Matrix3x3>
         else if (obj is Matrix3x3 m3x3) return Equals(m3x3);
         return false;
     }
-    public virtual bool Equals(Matrix3x3? other)
+    public bool Equals(Matrix3x3? other)
     {
         if (other is null) return false;
         return r1c1 == other.r1c1 && r1c2 == other.r1c2 && r1c3 == other.r1c3 &&
@@ -467,6 +445,8 @@ public class Matrix3x3 : IStaticMatrix<Matrix3x3>
         yield return r3c2;
         yield return r3c3;
     }
+
+    public object Clone() => new Matrix3x3(r1c1, r1c2, r1c3, r2c1, r2c2, r2c3, r3c1, r3c2, r3c3);
 
     public float[] ToArray() => new[] { r1c1, r1c2, r1c3, r2c1, r2c2, r2c3, r3c1, r3c2, r3c3 };
     public float[,] ToArray2D() => new[,]

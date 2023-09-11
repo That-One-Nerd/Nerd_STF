@@ -65,14 +65,7 @@ public static class EquationExtension
     public static Equation Coth(this Equation equ) => x => Mathf.Coth(equ(x));
     public static Equation Csch(this Equation equ) => x => Mathf.Csch(equ(x));
 
-    public static Equation Divide(this Equation equ, params float[] dividends) =>
-        x => Mathf.Divide(equ(x), dividends);
-    public static Equation Divide(this Equation equ, params Equation[] dividends) => delegate (float x)
-    {
-        float[] dividendsAtValue = new float[dividends.Length];
-        for (int i = 0; i < dividends.Length; i++) dividendsAtValue[i] = dividends[i](x);
-        return Mathf.Divide(equ(x), dividendsAtValue);
-    };
+    // todo: add divide, multiply, add, subtract
 
     public static Equation Factorial(this Equation equ) => x => Mathf.Factorial((int)equ(x));
 
@@ -115,21 +108,6 @@ public static class EquationExtension
     public static Equation Power(this Equation equ, float pow) => x => Mathf.Power(equ(x), pow);
     public static Equation Power(this Equation equ, Equation pow) => x => Mathf.Power(equ(x), pow(x));
 
-    public static Equation Product(this Equation equ, params float[] vals) => delegate (float x)
-    {
-        float[] valsAtValue = new float[vals.Length + 1];
-        valsAtValue[0] = equ(x);
-        for (int i = 0; i < vals.Length; i++) valsAtValue[i + 1] = vals[i];
-        return Mathf.Product(valsAtValue);
-    };
-    public static Equation Product(this Equation equ, params Equation[] vals) => delegate (float x)
-    {
-        float[] valsAtValue = new float[vals.Length + 1];
-        valsAtValue[0] = equ(x);
-        for (int i = 0; i < vals.Length; i++) valsAtValue[i + 1] = vals[i](x);
-        return Mathf.Product(valsAtValue);
-    };
-
     public static Equation Root(this Equation equ, float index) => x => Mathf.Root(equ(x), index);
     public static Equation Root(this Equation equ, Equation index) => x => Mathf.Root(equ(x), index(x));
 
@@ -152,30 +130,6 @@ public static class EquationExtension
         Mathf.SolveNewton(equ, initial, tolerance, step, maxIterations);
 
     public static Equation Sqrt(this Equation equ) => x => Mathf.Sqrt(equ(x));
-
-    public static Equation Subtract(this Equation equ, params float[] vals) =>
-        x => Mathf.Subtract(equ(x), vals);
-    public static Equation Subtract(this Equation equ, params Equation[] vals) => delegate (float x)
-    {
-        float[] valsAtValue = new float[vals.Length];
-        for (int i = 0; i < vals.Length; i++) valsAtValue[i] = vals[i](x);
-        return Mathf.Subtract(equ(x), valsAtValue);
-    };
-
-    public static Equation Sum(this Equation equ, params float[] vals) => delegate (float x)
-    {
-        float[] valsAtValue = new float[vals.Length + 1];
-        valsAtValue[0] = equ(x);
-        for (int i = 0; i < vals.Length; i++) valsAtValue[i + 1] = vals[i];
-        return Mathf.Sum(valsAtValue);
-    };
-    public static Equation Sum(this Equation equ, params Equation[] vals) => delegate (float x)
-    {
-        float[] valsAtValue = new float[vals.Length + 1];
-        valsAtValue[0] = equ(x);
-        for (int i = 0; i < vals.Length; i++) valsAtValue[i + 1] = vals[i](x);
-        return Mathf.Sum(valsAtValue);
-    };
 
     public static Equation Tan(this Equation equ) => x => Mathf.Tan(equ(x));
 

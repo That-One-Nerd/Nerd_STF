@@ -166,35 +166,10 @@ public class Matrix : IMatrix<Matrix, Matrix>
     public static Matrix Ceiling(Matrix val) => new(val.Size, (r, c) => Mathf.Ceiling(val[r, c]));
     public static Matrix Clamp(Matrix val, Matrix min, Matrix max) =>
         new(val.Size, (r, c) => Mathf.Clamp(val[r, c], min[r, c], max[r, c]));
-    public static Matrix Divide(Matrix num, params Matrix[] vals)
-    {
-        foreach (Matrix m in vals) num /= m;
-        return num;
-    }
     public static Matrix Floor(Matrix val) => new(val.Size, (r, c) => Mathf.Floor(val[r, c]));
     public static Matrix Lerp(Matrix a, Matrix b, float t, bool clamp = true) =>
         new(a.Size, (r, c) => Mathf.Lerp(a[r, c], b[r, c], t, clamp));
-    public static Matrix Product(params Matrix[] vals)
-    {
-        if (vals.Length < 1) throw new InvalidSizeException("Array must contain at least one matrix.");
-        if (!CheckSize(vals)) throw new InvalidSizeException("All matricies must be the same size.");
-        Matrix val = Identity(vals[0].Size);
-        foreach (Matrix m in vals) val *= m;
-        return val;
-    }
     public static Matrix Round(Matrix val) => new(val.Size, (r, c) => Mathf.Round(val[r, c]));
-    public static Matrix Subtract(Matrix num, params Matrix[] vals)
-    {
-        foreach (Matrix m in vals) num -= m;
-        return num;
-    }
-    public static Matrix Sum(params Matrix[] vals)
-    {
-        if (!CheckSize(vals)) throw new InvalidSizeException("All matricies must be the same size.");
-        Matrix val = Zero(vals[0].Size);
-        foreach (Matrix m in vals) val += m;
-        return val;
-    }
 
     public void Apply(Modifier2d modifier)
     {
