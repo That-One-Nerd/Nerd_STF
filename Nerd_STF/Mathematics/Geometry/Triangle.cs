@@ -193,8 +193,8 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
               caDist = (caClosest - point).Magnitude;
 
         float min = Mathf.Min(abDist, bcDist, caDist);
-        if (abDist == min) return abClosest;
-        else if (bcDist == min) return bcClosest;
+        if (min == abDist) return abClosest;
+        else if (min == bcDist) return bcClosest;
         else return caClosest;
     }
 
@@ -207,6 +207,7 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
         return false;
     }
     public override int GetHashCode() => base.GetHashCode();
+    public override string ToString() => $"{nameof(Triangle)} {{ a: {a}, b: {b}, c: {c} }}";
 
     public bool Contains(Float3 point) => Contains(point, 0.05f);
     public bool Contains(Float3 point, float tolerance)
@@ -217,14 +218,24 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
         return Mathf.Absolute(Area - (pab.Area + pbc.Area + pca.Area)) < tolerance;
     }
     public bool Contains(Line line) => Contains(line, 0.05f);
-    public bool Contains(Line line, float tolerance) =>
-        Contains(line.a, tolerance) && Contains(line.b, tolerance);
+    public bool Contains(Line line, float tolerance, float step = Calculus.DefaultStep)
+    {
+        for (float t = 0; t <= 1; t += step)
+            if (!Contains(Float3.Lerp(line.a, line.b, t), tolerance)) return false;
+        return true;
+    }
 
     public bool ContainsPartially(Line line) => ContainsPartially(line, 0.05f);
-    public bool ContainsPartially(Line line, float tolerance) =>
-        Contains(line.a, tolerance) || Contains(line.b, tolerance);
+    public bool ContainsPartially(Line line, float tolerance, float step = Calculus.DefaultStep)
+    {
+        for (float t = 0; t <= 1; t += step)
+            if (Contains(Float3.Lerp(line.a, line.b, t), tolerance))
+                return true;
+        return false;
+    }
 
     public Float3[] GetAllVerts() => new[] { a, b, c };
+    public Line[] GetOutlines() => new[] { AB, BC, CA };
 
     public Triangle[] Subdivide()
     {
@@ -282,7 +293,7 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
 
     public float[] ToFloatArray() => new[] { a.x, a.y, a.z,
                                              b.x, b.y, b.z,
-                                             c.x, c.y, c.z};
+                                             c.x, c.y, c.z };
 
     public static Triangle operator +(Triangle t, Float3 offset) =>
         new(t.a + offset, t.b + offset, t.c + offset);
@@ -300,6 +311,7 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
     public static bool operator ==(Triangle a, Triangle b) => a.Equals(b);
     public static bool operator !=(Triangle a, Triangle b) => !a.Equals(b);
 
+    // TODO: explicit conversion from polygon, check if exactly three verts, then cast.
     public static implicit operator Triangle(Fill<Float3> fill) => new(fill);
     public static implicit operator Triangle(Fill<Int3> fill) => new(fill);
     public static implicit operator Triangle(Fill<Line> fill) => new(fill);

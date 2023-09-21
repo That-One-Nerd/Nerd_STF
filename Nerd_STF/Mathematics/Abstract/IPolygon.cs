@@ -10,6 +10,7 @@ public interface IPolygon<T> : IAverage<T>, IEquatable<T>,
     public float Perimeter { get; }
 
     public Float3[] GetAllVerts();
+    public Line[] GetOutlines();
     
     public static abstract T operator +(T poly, Float3 offset);
     public static abstract T operator -(T poly, Float3 offset);
