@@ -230,6 +230,14 @@ public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
         return new(yaw, pitch, mag);
     }
 
+    public Float2 GetCrossSection(CrossSection2d plane) => plane switch
+    {
+        CrossSection2d.XY => XY,
+        CrossSection2d.YZ => YZ,
+        CrossSection2d.ZX => XZ,
+        _ => throw new ArgumentException("Unknown cross section type.")
+    };
+
     private bool PrintMembers(StringBuilder builder)
     {
         builder.Append("x = ");

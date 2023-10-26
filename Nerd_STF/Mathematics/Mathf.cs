@@ -448,7 +448,7 @@ public static class Mathf
         else return CordicHelper.CalculateHyperTrig(value, 16).sinh;
     }
 
-    public static float SolveBisection(Equation equ, float initialA, float initialB, float tolerance = 1e-5f,
+    public static float SolveBisection(Equation equ, float initialA, float initialB, float tolerance = 1e-3f,
         int maxIterations = 1000)
     {
         if (equ(initialA) == 0) return initialA;
@@ -484,10 +484,10 @@ public static class Mathf
 
         return guessMid;
     }
-    public static float SolveEquation(Equation equ, float initial, float tolerance = 1e-5f,
+    public static float SolveEquation(Equation equ, float initial, float tolerance = 1e-3f,
         float step = Calculus.DefaultStep, int maxIterations = 1000) =>
         SolveNewton(equ, initial, tolerance, step, maxIterations);
-    public static float SolveNewton(Equation equ, float initial, float tolerance = 1e-5f,
+    public static float SolveNewton(Equation equ, float initial, float tolerance = 1e-3f,
         float step = Calculus.DefaultStep, int maxIterations = 1000)
     {
         if (equ(initial) == 0) return initial;
@@ -511,7 +511,7 @@ public static class Mathf
         return result;
     }
 
-    public static float Sqrt(float value) => SolveNewton(x => x * x - value, 1);
+    public static float Sqrt(float value, float tolerance = 1e-3f) => SolveNewton(x => x * x - value, value / 2, tolerance);
 
     // Known as stdev
     public static float StandardDeviation(params float[] vals) => Sqrt(Variance(vals));

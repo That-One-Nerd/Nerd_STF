@@ -2,6 +2,6 @@
 
 public interface ISubdivide<T>
 {
-    public T Subdivide();
-    public T Subdivide(int iterations);
+    public T[] Subdivide();
+    public T[] Subdivide(int iterations);
 }

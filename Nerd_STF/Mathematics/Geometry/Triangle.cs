@@ -1,9 +1,9 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<Line>,
+public class Triangle : IClosestTo<Float3>,
     IFromTuple<Triangle, (Float3 a, Float3 b, Float3 c)>, IPolygon<Triangle>,
     ISplittable<Triangle, (Float3[] As, Float3[] Bs, Float3[] Cs)>,
-    ISubdivide<Triangle[]>, IWithinRange<Float3, float>
+    ISubdivide<Triangle>, IWithinRange<Float3, float>
 {
     public float Area
     {
@@ -224,13 +224,53 @@ public class Triangle : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<
             if (!Contains(Float3.Lerp(line.a, line.b, t), tolerance)) return false;
         return true;
     }
+    public bool Contains(Box2d box)
+    {
+        (Float2 topLeft, Float2 topRight, Float2 bottomRight, Float2 bottomLeft) = box.GetCorners();
+        return Contains(topLeft) || Contains(topRight) ||
+               Contains(bottomRight) || Contains(bottomLeft);
+    }
+    public bool Contains(Triangle tri) => Contains(tri.a) && Contains(tri.b) && Contains(tri.c);
+    public bool Contains(IEnumerable<Float3> points)
+    {
+        foreach (Float3 point in points) if (!Contains(point)) return false;
+        return true;
+    }
+    public bool Contains(Fill<Float3> points, int count)
+    {
+        for (int i = 0; i < count; i++) if (!Contains(points(i))) return false;
+        return true;
+    }
 
-    public bool ContainsPartially(Line line) => ContainsPartially(line, 0.05f);
-    public bool ContainsPartially(Line line, float tolerance, float step = Calculus.DefaultStep)
+    public bool Intersects(Line line) => Intersects(line, 0.05f);
+    public bool Intersects(Line line, float tolerance, float step = Calculus.DefaultStep)
     {
         for (float t = 0; t <= 1; t += step)
             if (Contains(Float3.Lerp(line.a, line.b, t), tolerance))
                 return true;
+        return false;
+    }
+    public bool Intersects(Box2d box)
+    {
+        if (Contains(box) || box.Contains(this)) return true;
+
+        (Line top, Line right, Line bottom, Line left) = box.GetOutlines();
+        return Intersects(top) || Intersects(right) ||
+               Intersects(bottom) || Intersects(left);
+    }
+    public bool Intersects(Triangle tri)
+    {
+        if (Contains(tri) || tri.Contains(this)) return true;
+        return Intersects(tri.AB) || Intersects(tri.BC) || Intersects(tri.CA);
+    }
+    public bool Intersects(IEnumerable<Line> lines)
+    {
+        foreach (Line l in lines) if (Contains(l)) return true;
+        return false;
+    }
+    public bool Intersects(Fill<Line> lines, int count)
+    {
+        for (int i = 0; i < count; i++) if (Contains(lines(i))) return true;
         return false;
     }
 

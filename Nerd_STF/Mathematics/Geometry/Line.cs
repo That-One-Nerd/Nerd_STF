@@ -2,9 +2,9 @@
 
 public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEquatable<Line>,
     IFloatArray<Line>, IFromTuple<Line, (Float3 a, Float3 b)>, IGroup<Float3>,
-    IIndexAll<Float3>, IIndexRangeAll<Float3>, ILerp<Line, float>, IMedian<Line>,
-    IPresets3d<Line>, ISplittable<Line, (Float3[] As, Float3[] Bs)>, ISubdivide<Line[]>,
-    IWithinRange<Float3, float>
+    IIndexAll<Float3>, IIndexRangeAll<Float3>, ILerp<Line, float>, IIntersect<Line>,
+    IMedian<Line>, IPresets3d<Line>, ISplittable<Line, (Float3[] As, Float3[] Bs)>,
+    ISubdivide<Line>, IWithinRange<Float3, float>
 {
     public static Line Back => (Float3.Zero, Float3.Back);
     public static Line Down => (Float3.Zero, Float3.Down);
@@ -152,6 +152,9 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
         yield return b;
     }
 
+    public Float3 LerpAcross(float t, bool clamp = true) =>
+        Float3.Lerp(a, b, t, clamp);
+
     public bool Equals(Line? other) => other is not null && a == other.a && b == other.b;
     public override bool Equals(object? obj)
     {
@@ -198,6 +201,8 @@ public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEqua
         return left == right && point.x >= float.Min(a.x, b.x)
                              && point.x <= float.Max(a.x, b.x);
     }
+
+    public bool Intersects(Line line) => GeometryHelper.LineIntersects(this, line);
 
     public Line[] Subdivide()
     {

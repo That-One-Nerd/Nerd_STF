@@ -101,7 +101,7 @@ public record struct Vector2d : IAbsolute<Vector2d>, IAverage<Vector2d>,
     public override int GetHashCode() => base.GetHashCode();
     public override string ToString() => ToString(Angle.Type.Degrees);
     public string ToString(Angle.Type outputType) =>
-        nameof(Vector2d) + " { Mag = " + magnitude + ", Rot = " + theta.ToString(outputType) + " }";
+        $"{magnitude:0.000} @ {theta.ToString(outputType)}";
 
     public Float2 ToXYZ() => new Float2(Mathf.Cos(theta), Mathf.Sin(theta)) * magnitude;
 

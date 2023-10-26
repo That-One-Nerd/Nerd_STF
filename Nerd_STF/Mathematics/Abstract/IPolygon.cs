@@ -1,6 +1,6 @@
 ﻿namespace Nerd_STF.Mathematics.Abstract;
 
-public interface IPolygon<T> : IAverage<T>, IEquatable<T>,
+public interface IPolygon<T> : IAverage<T>, IContainsGeometry<T>, IEquatable<T>,
     IFloatArray<T>, IGroup<Float3>, IIndexAll<Float3>, IIndexRangeAll<Float3>,
     ILerp<T, float>, IMedian<T>, ITriangulate
     where T : IPolygon<T>
@@ -11,7 +11,7 @@ public interface IPolygon<T> : IAverage<T>, IEquatable<T>,
 
     public Float3[] GetAllVerts();
     public Line[] GetOutlines();
-    
+
     public static abstract T operator +(T poly, Float3 offset);
     public static abstract T operator -(T poly, Float3 offset);
     public static abstract T operator *(T poly, float scale);

@@ -1,9 +1,9 @@
 ﻿namespace Nerd_STF.Mathematics.Geometry;
 
-public class Quadrilateral : IClosestTo<Float3>, IContains<Float3>, IContainsPartial<Line>,
+public class Quadrilateral : IClosestTo<Float3>,
     IFromTuple<Quadrilateral, (Float3 a, Float3 b, Float3 c, Float3 d)>, IPolygon<Quadrilateral>,
     ISplittable<Quadrilateral, (Float3[] As, Float3[] Bs, Float3[] Cs, Float3[] Ds)>,
-    ISubdivide<Quadrilateral[]>, ITriangulate, IWithinRange<Float3, float>
+    ISubdivide<Quadrilateral>, ITriangulate, IWithinRange<Float3, float>
 {
     public float Area
     {
@@ -156,7 +156,7 @@ public class Quadrilateral : IClosestTo<Float3>, IContains<Float3>, IContainsPar
         float x3, float y3, float z3, float x4, float y4, float z4)
     {
         a = (x1, y1, z1);
-        b = (x2, y2, z3);
+        b = (x2, y2, z2);
         c = (x3, y3, z3);
         d = (x4, y4, z4);
     }
@@ -321,13 +321,61 @@ public class Quadrilateral : IClosestTo<Float3>, IContains<Float3>, IContainsPar
             if (!Contains(Float3.Lerp(line.a, line.b, t), tolerance)) return false;
         return true;
     }
-
-    public bool ContainsPartially(Line line) => ContainsPartially(line, 0.05f);
-    public bool ContainsPartially(Line line, float tolerance, float step = Calculus.DefaultStep)
+    public bool Contains(Triangle tri) => Contains(tri.a) && Contains(tri.b) && Contains(tri.c);
+    public bool Contains(Quadrilateral quad) => Contains(quad.a) && Contains(quad.b) &&
+        Contains(quad.c) && Contains(quad.d);
+    public bool Contains(Box2d box)
+    {
+        (Float2 topLeft, Float2 topRight, Float2 bottomRight, Float2 bottomLeft) = box.GetCorners();
+        return Contains(topLeft) || Contains(topRight) ||
+               Contains(bottomRight) || Contains(bottomLeft);
+    }
+    public bool Contains(IEnumerable<Float3> points)
+    {
+        foreach (Float3 point in points) if (!Contains(point)) return false;
+        return true;
+    }
+    public bool Contains(Fill<Float3> points, int count)
+    {
+        for (int i = 0; i < count; i++) if (!Contains(points(i))) return false;
+        return true;
+    }
+    
+    public bool Intersects(Line line) => Intersects(line, 0.05f);
+    public bool Intersects(Line line, float tolerance, float step = Calculus.DefaultStep)
     {
         for (float t = 0; t <= 1; t += step)
             if (Contains(Float3.Lerp(line.a, line.b, t), tolerance))
                 return true;
+        return false;
+    }
+    public bool Intersects(Quadrilateral quad)
+    {
+        if (Contains(quad) || quad.Contains(this)) return true;
+        return Intersects(quad.AB) || Intersects(quad.BC) ||
+               Intersects(quad.CD) || Intersects(quad.DA);
+    }
+    public bool Intersects(Box2d box)
+    {
+        if (Contains(box) || box.Contains(this)) return true;
+
+        (Line top, Line right, Line bottom, Line left) = box.GetOutlines();
+        return Intersects(top) || Intersects(right) ||
+               Intersects(bottom) || Intersects(left);
+    }
+    public bool Intersects(Triangle tri)
+    {
+        if (Contains(tri) || tri.Contains(this)) return true;
+        return Intersects(tri.AB) || Intersects(tri.BC) || Intersects(tri.CA);
+    }
+    public bool Intersects(IEnumerable<Line> lines)
+    {
+        foreach (Line l in lines) if (Contains(l)) return true;
+        return false;
+    }
+    public bool Intersects(Fill<Line> lines, int count)
+    {
+        for (int i = 0; i < count; i++) if (Contains(lines(i))) return true;
         return false;
     }
 
