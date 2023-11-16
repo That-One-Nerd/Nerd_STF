@@ -31,7 +31,7 @@ The last thing I did was add the ability to turn a matrix into its equivalent ro
 
 Anyway, that's everything in this update. Again, pretty small, but meaningful nonetheless. Unless I haven't screwed anything up, the next update I work on will be `2.5`, so I'll see you then!</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <SignAssembly>False</SignAssembly>
     <PackAsTool>False</PackAsTool>
     <Title>Nerd_STF</Title>
