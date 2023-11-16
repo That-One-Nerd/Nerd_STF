@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.Algebra;
+﻿using Nerd_STF.Mathematics.Algebra.Abstract;
+
+namespace Nerd_STF.Mathematics.Algebra;
 
 public class Matrix3x3 : ICloneable, IStaticMatrix<Matrix3x3>
 {

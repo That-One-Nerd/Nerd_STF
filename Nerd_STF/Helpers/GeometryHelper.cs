@@ -1,10 +1,11 @@
-﻿using Nerd_STF.Mathematics.Abstract;
+﻿using System;
+using System.Numerics;
 
 namespace Nerd_STF.Helpers;
 
 internal static class GeometryHelper
 { 
-    public static Float2 Box2dAlongRay(Box2d box, Float2 p)
+    public static Float2 Box2dAlongRay(in Box2d box, Float2 p)
     {
         // This is an approximate system. It's good enough for most purposes
         // but maybe not all of them. Basically it just makes a ray through the point
@@ -52,12 +53,11 @@ internal static class GeometryHelper
         else return option2;
     }
 
-    public static bool LineIntersects(Line a, Line b) =>
+    public static bool LineIntersects(in Line a, in Line b) =>
         LineIntersects2d(a, b, CrossSection2d.XY) &&
         LineIntersects2d(a, b, CrossSection2d.YZ) &&
         LineIntersects2d(a, b, CrossSection2d.ZX);
-
-    public static bool LineIntersects2d(Line a, Line b, CrossSection2d plane)
+    public static bool LineIntersects2d(in Line a, in Line b, CrossSection2d plane)
     {
         Float2 p1 = a.a.GetCrossSection(plane), q1 = a.b.GetCrossSection(plane),
                p2 = b.a.GetCrossSection(plane), q2 = b.b.GetCrossSection(plane);
@@ -72,6 +72,77 @@ internal static class GeometryHelper
                (o2 == OrientationType.Colinear && PointOnSegmentCo(p1, q2, q1)) ||
                (o3 == OrientationType.Colinear && PointOnSegmentCo(p2, p1, q2)) ||
                (o4 == OrientationType.Colinear && PointOnSegmentCo(p2, q1, q2));
+    }
+
+    public static float EllipsePerimeterInfiniteSeries(in Ellipse ellipse, int steps)
+    {
+        // Not gonna write out the infinite series because it's pretty big.
+        float a = ellipse.Radius.x,
+              e = ellipse.Eccentricity;
+
+        decimal sumPart = 0;
+        for (int i = 1; i <= steps; i++)
+        {
+            BigInteger num = Mathf.Factorial(2 * i);
+            num = num * num;
+
+            BigInteger den = Mathf.Power(2, i);
+            den *= Mathf.Factorial(i);
+            den = den * den * den * den;
+            den *= 2 * i - 1;
+
+            Rational ePart = Rational.FromFloat(Mathf.Power(e, 2 * i));
+            num *= ePart.numerator;
+            den *= ePart.denominator;
+
+            num *= 1_000_000_000;
+            sumPart += (decimal)(num / den) / 1_000_000_000;
+        }
+
+        return 2 * a * Constants.Pi * (1 - (float)sumPart);
+    }
+    public static float EllipsePerimeterParker1(in Ellipse ellipse)
+    {
+        // pi*( 53a/3 + 717b/35 - sqrt( 269a^2 + 667ab + 371b^2 ) )
+        // a must be larger than b
+        float a = float.Max(ellipse.Radius.x, ellipse.Radius.y),
+              b = float.Min(ellipse.Radius.x, ellipse.Radius.y);
+
+        float part1 = 53 * a / 3,
+              part2 = 717 * b / 35,
+              part3 = Mathf.Sqrt(269 * a * a + 667 * a * b + 371 * b * b);
+        return Constants.Pi * (part1 + part2 - part3);
+    }
+    public static float EllipsePerimeterParker2(in Ellipse ellipse)
+    {
+        // pi*( 6a/5 + 3b/4 )
+        // a must be larger than b
+        float a = float.Max(ellipse.Radius.x, ellipse.Radius.y),
+              b = float.Min(ellipse.Radius.x, ellipse.Radius.y);
+
+        return Constants.Pi * ((6 * a / 5) + (3 * b / 4));
+    }
+    public static float EllipsePerimeterRamanujan1(in Ellipse ellipse)
+    {
+        // pi*( 3*(a+b) - sqrt( (3a + b)(a + 3b) ) )
+        float a = ellipse.Radius.x,
+              b = ellipse.Radius.y;
+
+        float sqrtPart = Mathf.Sqrt((3 * a + b) * (a + 3 * b));
+        return Constants.Pi * (3 * (a + b) - sqrtPart);
+    }
+    public static float EllipsePerimeterRamanujan2(in Ellipse ellipse)
+    {
+        // pi*(a+b)*( 1 + 3h/(10 + sqrt(4 - 3h)) )
+        float a = ellipse.Radius.x,
+              b = ellipse.Radius.y,
+              h = ellipse.H;
+
+        float part1 = a + b,
+              part2a = Mathf.Sqrt(4 - 3 * h),
+              part2b = 10 + part2a,
+              part2 = 3 * h / part2b;
+        return Constants.Pi * part1 * (1 + part2);
     }
 
     private static bool PointOnSegmentCo(Float2 a, Float2 r, Float2 b)
@@ -96,5 +167,24 @@ internal static class GeometryHelper
         Colinear,
         Clockwise,
         CounterClockwise
+    }
+
+    public static Triangle[] EllipseTriangulateFan(in Ellipse ellipse, float step)
+    {
+        Float2[] points = new Float2[(int)(1 / step)];
+        float position = 0;
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i] = ellipse.LerpAcrossOutline(position);
+            position += step;
+        }
+
+        Triangle[] tris = new Triangle[points.Length];
+        for (int i = 0; i < tris.Length; i++)
+        {
+            int i1 = i, i2 = (i + 1) % points.Length;
+            tris[i] = (ellipse.Position, points[i1], points[i2]);
+        }
+        return tris;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using Nerd_STF.Mathematics.Geometry.Abstract;
+
+namespace Nerd_STF.Mathematics.Geometry;
 
 public class Triangle : IClosestTo<Float3>,
     IFromTuple<Triangle, (Float3 a, Float3 b, Float3 c)>, IPolygon<Triangle>,

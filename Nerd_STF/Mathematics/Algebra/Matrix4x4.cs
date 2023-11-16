@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using Nerd_STF.Mathematics.Algebra.Abstract;
 
 namespace Nerd_STF.Mathematics.Algebra;
 

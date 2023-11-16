@@ -1,12 +1,15 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using Nerd_STF.Mathematics.Geometry.Abstract;
 
-public class Box2d : IAverage<Box2d>, IClosestTo<Float2>, IContains<Box2d>, IContains<Float2>,
-    IContains<Line>, IContains<Triangle>, IIntersect<Box2d>, IIntersect<Line>,
-    IIntersect<Triangle>, IEquatable<Box2d>, ILerp<Box2d, float>, IMedian<Box2d>,
-    ISubdivide<Box2d>, ITriangulate, IWithinRange<Float2, float>
+namespace Nerd_STF.Mathematics.Geometry;
+
+public class Box2d : IAverage<Box2d>, IContainsGeometry2d<Box2d>, IEquatable<Box2d>,
+    ILerp<Box2d, float>, IMedian<Box2d>,
+    ISplittable<Box2d, (Float2[] centers, Float2[] extents)>, ISubdivide<Box2d>, ITriangulate,
+    IWithinRange<Float2, float>
 {
     public float Area => Size.x * Size.y;
     public float Perimeter => 2 * Size.x + 2 * Size.y;
+    public Float2 Midpoint => center;
 
     public float Height
     {
@@ -95,20 +98,22 @@ public class Box2d : IAverage<Box2d>, IClosestTo<Float2>, IContains<Box2d>, ICon
         Float2 diff = Float2.Absolute(point - center);
         return diff.x <= extents.x && diff.y <= extents.y;
     }
-    public bool Contains(Float3 point) => Contains((Float2)point);
 
-    public bool Contains(Box2d box) => Contains(box.Min) && Contains(box.Max);
-    public bool Contains(Line line) => Contains(line.a) && Contains(line.b);
-    public bool Contains(Triangle tri) =>
-        Contains(tri.a) && Contains(tri.b) & Contains(tri.c);
-    public bool Contains(IEnumerable<Float2> points)
+    public bool Contains<T>(T poly) where T : IPolygon<T>
     {
-        foreach (Float3 p in points) if (!Contains(p)) return false;
+        Float3[] verts = poly.GetAllVerts();
+        if (verts.Length < 1) return false;
+
+        foreach (Float3 v in verts) if (!Contains((Float2)v)) return false;
         return true;
     }
-    public bool Contains(IEnumerable<Float3> points)
+    public bool Contains(Box2d box) => Contains(box.Min) && Contains(box.Max);
+    public bool Contains(Line line) => Contains((Float2)line.a) && Contains((Float2)line.b);
+    public bool Contains(Triangle tri) =>
+        Contains((Float2)tri.a) && Contains((Float2)tri.b) & Contains((Float2)tri.c);
+    public bool Contains(IEnumerable<Float2> points)
     {
-        foreach (Float3 p in points) if (!Contains(p)) return false;
+        foreach (Float3 p in points) if (!Contains((Float2)p)) return false;
         return true;
     }
     public bool Contains(Fill<Float2> points, int count)
@@ -116,12 +121,81 @@ public class Box2d : IAverage<Box2d>, IClosestTo<Float2>, IContains<Box2d>, ICon
         for (int i = 0; i < count; i++) if (!Contains(points(i))) return false;
         return true;
     }
-    public bool Contains(Fill<Float3> points, int count)
+
+    public void Encapsulate(Float2 point)
     {
-        for (int i = 0; i < count; i++) if (!Contains(points(i))) return false;
-        return true;
+        if (Contains(point)) return;
+
+        // Pick which of the corners to extend.
+        Float2 min = Min, max = Max;
+        if (point.x > max.x) max.x = point.x;
+        else if (point.x < min.x) min.x = point.x;
+
+        if (point.y > max.y) max.y = point.y;
+        else if (point.y < min.y) min.y = point.y;
+
+        center = Float2.Average(min, max);
+        extents = (max - min) / 2;
     }
 
+    public void Encapsulate<T>(T poly) where T : IPolygon<T>
+    {
+        foreach (Float3 p in poly.GetAllVerts()) Encapsulate((Float2)p);
+    }
+    public void Encapsulate(Box2d box)
+    {
+        Encapsulate(box.Min);
+        Encapsulate(box.Max);
+    }
+    public void Encapsulate(Line line)
+    {
+        Encapsulate((Float2)line.a);
+        Encapsulate((Float2)line.b);
+    }
+    public void Encapsulate(Triangle tri)
+    {
+        Encapsulate((Float2)tri.a);
+        Encapsulate((Float2)tri.b);
+        Encapsulate((Float2)tri.c);
+    }
+    public void Encapsulate(IEnumerable<Float2> points)
+    {
+        foreach (Float2 p in points) Encapsulate(p);
+    }
+    public void Encapsulate(Fill<Float2> points, int count)
+    {
+        for (int i = 0; i < count; i++) Encapsulate(points(i));
+    }
+    public void Encapsulate(IEnumerable<Line> lines)
+    {
+        foreach (Line l in lines)
+        {
+            Encapsulate((Float2)l.a);
+            Encapsulate((Float2)l.b);
+        }
+    }
+    public void Encapsulate(Fill<Line> lines, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            Line l = lines(i);
+            Encapsulate((Float2)l.a);
+            Encapsulate((Float2)l.b);
+        }
+    }
+
+    public bool Intersects<T>(T poly) where T : IPolygon<T>
+    {
+        // For some odd reason, I have to cast backwards to IContains<Box2d>
+        // in order to use the Contains(Box2d) method, despite it being inherited by
+        // IContainsGeometry3d<IPolygon<T>> which is inherited by IPolygon<T>.
+        // Weird.
+        if (Contains(poly) || ((IContains<Box2d>)poly).Contains(this)) return true;
+
+        Line[] lines = poly.GetOutlines();
+        foreach (Line l in lines) if (Contains(l)) return true;
+        return false;
+    }
     public bool Intersects(Box2d box)
     {
         if (Contains(box) || box.Contains(this)) return true;
@@ -158,7 +232,8 @@ public class Box2d : IAverage<Box2d>, IClosestTo<Float2>, IContains<Box2d>, ICon
 
     public Float2 LerpAcrossOutline(float t, bool clamp = true)
     {
-        if (!clamp) return LerpAcrossOutline(Mathf.AbsoluteMod(t, 1), true);
+        if (clamp) t = Mathf.Clamp(t, 0, 1);
+        else t = Mathf.AbsoluteMod(t, 1);
 
         (Line top, Line right, Line bottom, Line left) = GetOutlines();
         float weightTB = top.Length / Perimeter, weightLR = left.Length / Perimeter;
@@ -180,10 +255,6 @@ public class Box2d : IAverage<Box2d>, IClosestTo<Float2>, IContains<Box2d>, ICon
     public override int GetHashCode() => base.GetHashCode();
     public override string ToString() => $"{nameof(Box2d)} {{ " +
         $"Min = {Min}, Max = {Max} }}";
-
-    // todo: lerp across the rectangle bounds.
-    // also todo: add contains and contains partially for the polygon interface.
-    // also also todo: add the encapsulate method
 
     public (Float2 topLeft, Float2 topRight, Float2 bottomRight, Float2 bottomLeft) GetCorners()
     {

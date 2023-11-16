@@ -1,4 +1,4 @@
-﻿namespace Nerd_STF.Mathematics.Abstract;
+﻿namespace Nerd_STF.Mathematics.Geometry.Abstract;
 
 public interface ISubdivide<T>
 {

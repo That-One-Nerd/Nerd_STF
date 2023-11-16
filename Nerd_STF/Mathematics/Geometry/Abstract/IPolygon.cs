@@ -1,8 +1,10 @@
-﻿namespace Nerd_STF.Mathematics.Abstract;
+﻿using Nerd_STF.Mathematics.Geometry.Abstract;
 
-public interface IPolygon<T> : IAverage<T>, IContainsGeometry<T>, IEquatable<T>,
-    IFloatArray<T>, IGroup<Float3>, IIndexAll<Float3>, IIndexRangeAll<Float3>,
-    ILerp<T, float>, IMedian<T>, ITriangulate
+namespace Nerd_STF.Mathematics.Abstract;
+
+public interface IPolygon<T> : IAverage<T>, IContainsGeometry3d<T>, IEquatable<T>,
+    IFloatArray<T>, IGeometricModifiers3d<T>, IGroup<Float3>, IIndexAll<Float3>,
+    IIndexRangeAll<Float3>, ILerp<T, float>, IMedian<T>, ITriangulate
     where T : IPolygon<T>
 {
     public float Area { get; }

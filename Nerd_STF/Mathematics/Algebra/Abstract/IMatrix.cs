@@ -1,4 +1,4 @@
-﻿namespace Nerd_STF.Mathematics.Abstract;
+﻿namespace Nerd_STF.Mathematics.Algebra.Abstract;
 
 public interface IMatrix<T> : IAbsolute<T>, ICeiling<T>, IClamp<T>,
     IEquatable<T>, IFloor<T>, IGroup2d<float>, ILerp<T, float>, IRound<T>

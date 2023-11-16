@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using Nerd_STF.Mathematics.Geometry.Abstract;
+
+namespace Nerd_STF.Mathematics.Geometry;
 
 public class Line : IAverage<Line>, IClosestTo<Float3>, IContains<Float3>, IEquatable<Line>,
     IFloatArray<Line>, IFromTuple<Line, (Float3 a, Float3 b)>, IGroup<Float3>,

@@ -1,4 +1,6 @@
-﻿namespace Nerd_STF.Mathematics.Geometry;
+﻿using Nerd_STF.Mathematics.Geometry.Abstract;
+
+namespace Nerd_STF.Mathematics.Geometry;
 
 public class Quadrilateral : IClosestTo<Float3>,
     IFromTuple<Quadrilateral, (Float3 a, Float3 b, Float3 c, Float3 d)>, IPolygon<Quadrilateral>,

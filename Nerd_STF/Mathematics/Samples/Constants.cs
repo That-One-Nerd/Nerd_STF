@@ -29,6 +29,7 @@ public static class Constants
     public const float Cbrt3 = 1.44224957031f;
     public const float Cbrt5 = 1.70997594668f;
     public const float Cbrt10 = 2.15443469003f;
+    public const float HalfSqrt2 = 0.707106781187f;
     public const float Sqrt2 = 1.4142135624f;
     public const float Sqrt3 = 1.7320508076f;
     public const float Sqrt5 = 2.2360679775f;

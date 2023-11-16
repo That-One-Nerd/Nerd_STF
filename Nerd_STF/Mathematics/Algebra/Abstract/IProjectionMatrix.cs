@@ -1,4 +1,4 @@
-﻿namespace Nerd_STF.Mathematics.Abstract;
+﻿namespace Nerd_STF.Mathematics.Algebra.Abstract;
 
 public interface IProjectionMatrix<TThis, TBaseMatrix, TDim> : IMatrix<TThis>
     where TThis : IProjectionMatrix<TThis, TBaseMatrix, TDim>

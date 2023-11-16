@@ -1,4 +1,4 @@
-﻿namespace Nerd_STF.Mathematics.Abstract;
+﻿namespace Nerd_STF.Mathematics.Algebra.Abstract;
 
 public interface IMatrixPresets<T> where T : IMatrix<T>, IMatrixPresets<T>
 {
