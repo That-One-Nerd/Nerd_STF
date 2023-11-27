@@ -1,16 +1,49 @@
 ﻿namespace Nerd_STF.Mathematics;
 
+/// <summary>
+/// A class that contains various mathematical methods using <see cref="float"/>s.
+/// </summary>
 public static class Mathf
 {
+    /// <summary>
+    /// Calculate the absolute value of a <see cref="float"/>.
+    /// </summary>
+    /// <param name="val">The <see cref="float"/> to calculate the absolute value of.</param>
+    /// <returns></returns>
+    /// <remarks>Runs in <c>O(1)</c> time.</remarks>
     public static float Absolute(float val) => val < 0 ? -val : val;
+    /// <summary>
+    /// Calculate the absolute value of a <see cref="int"/>.
+    /// </summary>
+    /// <param name="val">The <see cref="int"/> to calculate the absolute value of.</param>
+    /// <returns></returns>
+    /// <remarks>Runs in <c>O(1)</c> time.</remarks>
     public static int Absolute(int val) => val < 0 ? -val : val;
 
+    /// <summary>
+    /// Calculates the absolute modulus value of a number. In C# by default, getting
+    /// the modulus of a negative number returns a negative value, while in math
+    /// that number is usually positive. This method ensures the number is positive.
+    /// </summary>
+    /// <param name="val">The value to apply the modulus to.</param>
+    /// <param name="mod">The number to modulus by.</param>
+    /// <returns>The smallest positive number that can be added to <paramref name="val"/> to create a multiple of <paramref name="mod"/>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static float AbsoluteMod(float val, float mod)
     {
         while (val >= mod) val -= mod;
         while (val < 0) val += mod;
         return val;
     }
+    /// <summary>
+    /// Calculates the absolute modulus value of a number. In C# by default, getting
+    /// the modulus of a negative number returns a negative value, while in math
+    /// that number is usually positive. This method ensures the number is positive.
+    /// </summary>
+    /// <param name="val">The value to apply the modulus to.</param>
+    /// <param name="mod">The number to modulus by.</param>
+    /// <returns>The smallest positive number that can be added to <paramref name="val"/> to create a multiple of <paramref name="mod"/>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static int AbsoluteMod(int val, int mod)
     {
         while (val >= mod) val -= mod;
@@ -18,15 +51,76 @@ public static class Mathf
         return val;
     }
 
+    /// <summary>
+    /// Calculates the inverse cosine of the value <paramref name="value"/>, such that
+    /// <c>cos(arccos(<paramref name="value"/>)) = <paramref name="value"/></c>.
+    /// 
+    /// Since <c>cos(x)</c> only returns a value between -1 and 1, the domain of
+    /// <c>arccos(x)</c> is [-1, 1], and its range is [0, π].
+    /// </summary>
+    /// <param name="value">The value to calculate the inverse cosine of.</param>
+    /// <returns>The angle θ representing <c>cos(θ) = <paramref name="value"/></c>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static Angle ArcCos(float value) => ArcSin(-value) + Angle.Quarter;
+    /// <summary>
+    /// Calculates the inverse cotangent of the value <paramref name="value"/>, such that
+    /// <c>cot(arccot(<paramref name="value"/>)) = <paramref name="value"/></c>.
+    /// 
+    /// Since <c>cot(x)</c> returns any real number value, the domain of <c>arccot(x)</c>
+    /// is (-∞, ∞), and its range is (0, π).
+    /// </summary>
+    /// <param name="value">The value to calculate the inverse cotangent of.</param>
+    /// <returns>The angle θ representing <c>cot(θ) = <paramref name="value"/></c>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static Angle ArcCot(float value) => ArcCos(value / Sqrt(1 + value * value));
+    /// <summary>
+    /// Calculates the invese cosecant of the value <paramref name="value"/>, such that
+    /// <c>csc(arccsc(<paramref name="value"/>)) = <paramref name="value"/></c>.
+    /// 
+    /// Since <c>csc(x)</c> returns any real number value such that <c>|csc(x)| >= 1</c>,
+    /// the domain of <c>arccsc(x)</c> is (-∞, 1] ∪ [1, ∞) and its range is [-π/2, π/2].
+    /// </summary>
+    /// <param name="value">The value to calculate the inverse cosecant of.</param>
+    /// <returns>The angle θ representing <c>csc(θ) = <paramref name="value"/></c>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static Angle ArcCsc(float value) => ArcSin(1 / value);
+    /// <summary>
+    /// Calculates the inverse secant of the value <paramref name="value"/>, such that
+    /// <c>sec(arcsec(<paramref name="value"/>)) = <paramref name="value"/></c>.
+    /// 
+    /// Since <c>sec(x)</c> returns any real number value such that <c>|sec(x)| >= 1</c>,
+    /// the domain of <c>arcsec(x)</c> is (-∞, 1] ∪ [1, ∞) and its range is [0, π].
+    /// </summary>
+    /// <param name="value">The value to calculate the inverse secant of.</param>
+    /// <returns>The angle θ representing <c>sec(θ) = <paramref name="value"/></c>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static Angle ArcSec(float value) => ArcCos(1 / value);
+    /// <summary>
+    /// Calculates the inverse sine of the value <paramref name="value"/>, such that
+    /// <c>sin(arcsin(<paramref name="value"/>)) = <paramref name="value"/></c>.
+    /// 
+    /// Since <c>sin(x)</c> returns a value between [-1, 1], the domain of <c>arcsin(x)</c>
+    /// is [-1, 1] and its range is [-π/2, π/2].
+    /// </summary>
+    /// <param name="value">The value to calculate the inverse sine of.</param>
+    /// <returns>The angle θ representing <c>sin(θ) = <paramref name="value"/></c>.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the input is out of the domain of [-1, 1].</exception>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static Angle ArcSin(float value)
     {
         if (value > 1 || value < -1) throw new ArgumentOutOfRangeException(nameof(value));
         return (SolveNewton(x => Sin(x) - value, 0), Angle.Type.Radians);
-    }    
+    }
+    /// <summary>
+    /// Calculates the inverse tangent of the value <paramref name="value"/>, such that
+    /// <c>tan(arctan(<paramref name="value"/>)) = <paramref name="value"/></c>.
+    /// 
+    /// Since <c>tan(x)</c> returns any real number value, the domain of <c>arctan(x)</c>
+    /// is (-∞, ∞), and its range is (-π/2, π/2).
+    /// </summary>
+    /// <param name="value">The value to calculate the inverse cotangent of.</param>
+    /// <returns>The angle θ representing <c>tan(θ) = <paramref name="value"/></c>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static Angle ArcTan(float value) => ArcSin(value / Sqrt(1 + value * value));
     public static Angle ArcTan2(float a, float b) => ArcTan(a / b);
 
@@ -47,12 +141,26 @@ public static class Mathf
         for (float x = min; x <= max; x += step) vals.Add(equ(x));
         return Average(vals.ToArray());
     }
+    /// <summary>
+    /// Calculates the average of an array of <see cref="float"/>s.
+    /// </summary>
+    /// <param name="vals">The array to calculate the average of.</param>
+    /// <returns>The average of the array.</returns>
+    /// <remarks>Runs in O(n) time.</remarks>
     public static float Average(params float[] vals)
     {
         float sum = 0;
         foreach (float f in vals) sum += f;
         return sum / vals.Length;
     }
+    /// <summary>
+    /// Calculates the average of an array of <see cref="int"/>s.
+    /// Because the return type is also an <see cref="int"/>, the average
+    /// will be rounded down to the nearest whole number.
+    /// </summary>
+    /// <param name="vals">The array to calculate the average of.</param>
+    /// <returns>The average of the array, rounded down to the nearest <see cref="int"/>.</returns>
+    /// <remarks>Runs in <c>O(n)</c> time.</remarks>
     public static int Average(params int[] vals)
     {
         int sum = 0;
@@ -63,6 +171,12 @@ public static class Mathf
     public static float Binomial(int n, int total, float successRate) =>
         Combinations(total, n) * Power(successRate, n) * Power(1 - successRate, total - n);
 
+    /// <summary>
+    /// Calculates the cube root of a number.
+    /// </summary>
+    /// <param name="value">The number to calculate the cube root of.</param>
+    /// <returns>The cube root of <paramref name="value"/>.</returns>
+    /// <remarks>Runs in O(n) time.</remarks>
     public static float Cbrt(float value) => SolveNewton(x => x * x * x - value, 1);
 
     public static int Ceiling(float val)
@@ -200,6 +314,15 @@ public static class Mathf
         else return CordicHelper.LogAnyBase(@base, val, 16, 16);
     }
 
+    /// <summary>
+    /// Creates an <see cref="Equation"/> out of a <see cref="Dictionary{TKey, TValue}"/>
+    /// of XY points. This equation has a domain of all real numbers and linearly
+    /// interpolates between points.
+    /// </summary>
+    /// <param name="vals">The <see cref="Dictionary{TKey, TValue}"/> of XY points to include in the <see cref="Equation"/>.</param>
+    /// <returns>An equation that interpolates between each point in <paramref name="vals"/>.</returns>
+    /// <exception cref="UndefinedException">Thrown when no points are contained in <paramref name="vals"/> or when two points in the dictionary cannot be joined together.</exception>
+    /// <remarks>Generates the <see cref="Equation"/> in <c>O(1)</c> time, however invoking that equation returns a result in <c>O(n)</c> time where <c>n</c> is the amount of points in <paramref name="vals"/>.</remarks>
     public static Equation MakeEquation(Dictionary<float, float> vals) => delegate (float x)
     {
         if (vals.Count < 1) throw new UndefinedException();
@@ -335,6 +458,15 @@ public static class Mathf
     // nPr (n = total, r = size)
     public static int Permutations(int total, int size) => Factorial(total) / Factorial(total - size);
 
+    /// <summary>
+    /// Returns an <see cref="Array"/> that contains all prime factors of the number
+    /// <paramref name="num"/>. A prime factor is defined as a prime number that
+    /// <paramref name="num"/> is divisible by at least once. Any counting number can
+    /// be represented as a unique collection of prime factors. Duplicate factors are
+    /// included.
+    /// </summary>
+    /// <param name="num">The number to calculate the prime factors of.</param>
+    /// <returns>An <see cref="Array"/> of prime factors.</returns>
     public static int[] PrimeFactors(int num)
     {
         List<int> factors = new();

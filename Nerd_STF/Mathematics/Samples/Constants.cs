@@ -1,25 +1,101 @@
 ﻿namespace Nerd_STF.Mathematics.Samples;
 
+/// <summary>
+/// A container of various mathematical constants.
+/// </summary>
 public static class Constants
 {
+    /// <summary>
+    /// The ratio between a degree and a radian. This constant is intended to be used
+    /// as follows:
+    /// <code>degrees = radians * <see cref="DegToRad"/></code>
+    /// This is the reciprocal of <see cref="RadToDeg"/>.
+    /// </summary>
     public const float DegToRad = Pi / 180;
+    /// <summary>
+    /// Exactly one half of the constant <see cref="Pi"/>. While this constant has many
+    /// uses, most of them are just a shorthand for <c><see cref="Pi"/> / 2</c>, unlike
+    /// <see cref="Tau"/>.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Pi">Pi - Wikipedia</see></remarks>
     public const float HalfPi = Pi / 2;
+    /// <summary>
+    /// The ratio between a circle's circumference and its diameter. This constant has
+    /// many uses.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Pi">Pi - Wikipedia</see></remarks>
     public const float Pi = 3.14159265359f;
+    /// <summary>
+    /// The ratio between a radian and a degree. This constant is intended to be used
+    /// as follows:
+    /// <code>radians = degrees * <see cref="RadToDeg"/></code>
+    /// This is the reciprocal of <see cref="DegToRad"/>.
+    /// </summary>
     public const float RadToDeg = 180 / Pi;
+    /// <summary>
+    /// Exactly double the value of the constant <see cref="Pi"/>. Unlike
+    /// <see cref="HalfPi"/>, there are circumstances where this constant is preferrable
+    /// over its actual value of <c><see cref="Pi"/> * 2</c>.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Pi">Pi - Wikipedia</see></remarks>
     public const float Tau = Pi * 2;
 
+    /// <summary>
+    /// <c>E</c> is also known as Euler's number or the natural number. This constant
+    /// has a very large number of interpretations and uses.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/E_(mathematical_constant)">e (mathematical constant) - Wikipedia</see></remarks>
     public const float E = 2.71828182846f;
+    /// <summary>
+    /// The limit of the summed error between the harmonic series and the natural logarithm.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Euler%27s_constant">Euler's constant - Wikipedia</see></remarks>
     public const float EulerConstant = 0.5772156649f;
+    /// <summary>
+    /// The natural logarithm of 2. It is a trancendental number.
+    /// </summary>
+    /// <remarks>
+    /// See also: <see href="https://en.wikipedia.org/wiki/Natural_logarithm_of_2">Natural logarithm of 2 - Wikipedia</see><br/>
+    /// See also: <see href="https://en.wikipedia.org/wiki/Natural_logarithm">Natural logarithm - Wikipedia</see>
+    /// </remarks>
     public const float Ln2 = 0.69314718056f;
+    /// <summary>
+    /// The natural logarithm of 3. It is a trancendental number.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Natural_logarithm">Natural logarithm - Wikipedia</see></remarks>
     public const float Ln3 = 1.09861228867f;
+    /// <summary>
+    /// The natural logarithm of 5. It is a trancendental number.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Natural_logarithm">Natural logarithm - Wikipedia</see></remarks>
     public const float Ln5 = 1.60943791243f;
+    /// <summary>
+    /// The natural logarithm of 10. It is a trancendental number.
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Natural_logarithm">Natural logarithm - Wikipedia</see></remarks>
     public const float Ln10 = 2.30258509299f;
 
+    /// <summary>
+    /// The logarithm (base 10) of 2.
+    /// </summary>
     public const float Log2 = 0.301029995664f;
+    /// <summary>
+    /// The logarithm (base 10) of 3.
+    /// </summary>
     public const float Log3 = 0.47712125472f;
+    /// <summary>
+    /// The logarithm (base 10) of 5.
+    /// </summary>
     public const float Log5 = 0.698970004336f;
+    /// <summary>
+    /// The logarithm (base 10) of 10.
+    /// </summary>
     public const float Log10 = 1;
 
+    /// <summary>
+    /// The resulting smallest angle when you apply the golden ratio to a circle (in degrees).
+    /// </summary>
+    /// <remarks>See also: <see href="https://en.wikipedia.org/wiki/Golden_angle">Golden angle - Wikipedia</see></remarks>
     public const float GoldenAngle = 180 * (3 - Sqrt5);
     public const float GoldenRatio = (1 + Sqrt5) / 2;
     public const float SilverRatio = Sqrt2 + 1;
