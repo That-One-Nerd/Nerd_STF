@@ -1,219 +1,285 @@
-﻿namespace Nerd_STF.Mathematics;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Abstract;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Linq;
 
-public record struct Float2 : IAbsolute<Float2>, IAverage<Float2>, ICeiling<Float2, Int2>,
-    IClamp<Float2>, IClampMagnitude<Float2, float>, IComparable<Float2>,
-    ICross<Float2, Float3>, IDivide<Float2>, IDot<Float2, float>, IEquatable<Float2>,
-    IFloor<Float2, Int2>, IFromTuple<Float2, (float x, float y)>, IGroup<float>,
-    ILerp<Float2, float>, IMathOperators<Float2>, IMax<Float2>, IMedian<Float2>, IMin<Float2>,
-    IIndexAll<float>, IIndexRangeAll<float>, IPresets2d<Float2>, IProduct<Float2>, IRound<Float2, Int2>,
-    ISplittable<Float2, (float[] Xs, float[] Ys)>, ISubtract<Float2>, ISum<Float2>
+namespace Nerd_STF.Mathematics
 {
-    public static Float2 Down => new(0, -1);
-    public static Float2 Left => new(-1, 0);
-    public static Float2 Right => new(1, 0);
-    public static Float2 Up => new(0, 1);
-
-    public static Float2 One => new(1, 1);
-    public static Float2 Zero => new(0, 0);
-
-    public float Magnitude => Mathf.Sqrt(x * x + y * y);
-    public Float2 Normalized => this * Mathf.InverseSqrt(x * x + y * y);
-
-    public float x, y;
-
-    public Float2(float all) : this(all, all) { }
-    public Float2(Fill<float> fill) : this(fill(0), fill(1)) { }
-    public Float2(Fill<int> fill) : this(fill(0), fill(1)) { }
-    public Float2(float x, float y)
+    public struct Float2 : INumberGroup<Float2, double>
+#if CS11_OR_GREATER
+                          ,IFromTuple<Float2, (double, double)>,
+                           IPresets2d<Float2>,
+                           ISplittable<Float2, (double[] Xs, double[] Ys)>
+#endif
     {
-        this.x = x;
-        this.y = y;
-    }
-    public float this[int index]
-    {
-        get => index switch
+        public static Float2 Down => new Float2(0, -1);
+        public static Float2 Left => new Float2(-1, 0);
+        public static Float2 Right => new Float2(1, 0);
+        public static Float2 Up => new Float2(0, 1);
+
+        public static Float2 One => new Float2(1, 1);
+        public static Float2 Zero => new Float2(0, 0);
+
+        public double InverseMagnitude => MathE.InverseSqrt(x * x + y * y);
+        public double Magnitude => MathE.Sqrt(x * x + y * y);
+        public Float2 Normalized => this * InverseMagnitude;
+
+        public double x, y;
+
+        public Float2(double x, double y)
         {
-            0 => x,
-            1 => y,
-            _ => throw new IndexOutOfRangeException(nameof(index)),
-        };
-        set
+            this.x = x;
+            this.y = y;
+        }
+        public Float2(IEnumerable<double> nums)
         {
-            switch (index)
+            x = 0;
+            y = 0;
+
+            int index = 0;
+            foreach (double item in nums)
             {
-                case 0:
-                    x = value;
-                    break;
-
-                case 1:
-                    y = value;
-                    break;
-
-                default: throw new IndexOutOfRangeException(nameof(index));
+                this[index] = item;
+                index++;
+                if (index >= 2) break;
             }
         }
-    }
-    public float this[Index index]
-    {
-        get => this[index.IsFromEnd ? 2 - index.Value : index.Value];
-        set => this[index.IsFromEnd ? 2 - index.Value : index.Value] = value;
-    }
-    public float[] this[Range range]
-    {
-        get
+
+        public double this[int index]
         {
-            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
-            List<float> res = new();
-            for (int i = start; i < end; i++) res.Add(this[i]);
-            return res.ToArray();
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
         }
-        set
+        public IEnumerable<double> this[string key]
         {
-            int start = range.Start.IsFromEnd ? 2 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 2 - range.End.Value : range.End.Value;
-            for (int i = start; i < end; i++) this[i] = value[i];
+            get
+            {
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    switch (c)
+                    {
+                        case 'x': yield return x; break;
+                        case 'y': yield return y; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+            }
+            set
+            {
+                IEnumerator<double> stepper = value.GetEnumerator();
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    stepper.MoveNext();
+                    switch (c)
+                    {
+                        case 'x': x = stepper.Current; break;
+                        case 'y': y = stepper.Current; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+            }
         }
-    }
 
-    public static Float2 Absolute(Float2 val) =>
-        new(Mathf.Absolute(val.x), Mathf.Absolute(val.y));
-    public static Float2 Average(params Float2[] vals) => Sum(vals) / vals.Length;
-    public static Int2 Ceiling(Float2 val) =>
-        new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y));
-    public static Float2 Clamp(Float2 val, Float2 min, Float2 max) =>
-        new(Mathf.Clamp(val.x, min.x, max.x),
-            Mathf.Clamp(val.y, min.y, max.y));
-    public static Float2 ClampMagnitude(Float2 val, float minMag, float maxMag)
-    {
-        if (maxMag < minMag) throw new ArgumentOutOfRangeException(nameof(maxMag),
-            nameof(maxMag) + " must be greater than or equal to " + nameof(minMag));
-        float mag = val.Magnitude;
-        if (mag >= minMag && mag <= maxMag) return val;
-        val = val.Normalized;
-        if (mag < minMag) val *= minMag;
-        else if (mag > maxMag) val *= maxMag;
-        return val;
-    }
-    public static Float3 Cross(Float2 a, Float2 b, bool normalized = false) =>
-        Float3.Cross(a, b, normalized);
-    public static Float2 Divide(Float2 num, params Float2[] vals) => num / Product(vals);
-    public static float Dot(Float2 a, Float2 b) => a.x * b.x + a.y * b.y;
-    public static float Dot(params Float2[] vals)
-    {
-        if (vals.Length < 1) return 0;
-        float x = 1, y = 1;
-        foreach (Float2 f in vals)
+        public static Float2 Average(IEnumerable<Float2> values)
         {
-            x *= f.x;
-            y *= f.y;
+            Float2 total = Zero;
+            int count = 0;
+            foreach (Float2 val in values)
+            {
+                total += val;
+                count++;
+            }
+            return total / count;
         }
-        return x + y;
-    }
-    public static Int2 Floor(Float2 val) =>
-        new(Mathf.Floor(val.x), Mathf.Floor(val.y));
-    public static Float2 Lerp(Float2 a, Float2 b, float t, bool clamp = true) =>
-        new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp));
-    public static Float2 Median(params Float2[] vals)
-    {
-        float index = (vals.Length - 1) * 0.5f;
-        Float2 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return (valA + valB) * 0.5f;
-    }
-    public static Float2 Max(params Float2[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float2 val = vals[0];
-        foreach (Float2 f in vals) val = f.Magnitude > val.Magnitude ? f : val;
-        return val;
-    }
-    public static Float2 Min(params Float2[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float2 val = vals[0];
-        foreach (Float2 f in vals) val = f.Magnitude < val.Magnitude ? f : val;
-        return val;
-    }
-    public static Float2 Product(params Float2[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float2 val = One;
-        foreach (Float2 f in vals) val *= f;
-        return val;
-    }
-    public static Int2 Round(Float2 val) =>
-        new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y));
-    public static Float2 Subtract(Float2 num, params Float2[] vals) => num - Sum(vals);
-    public static Float2 Sum(params Float2[] vals)
-    {
-        Float2 val = Zero;
-        foreach (Float2 f in vals) val += f;
-        return val;
-    }
-
-    public static (float[] Xs, float[] Ys) SplitArray(params Float2[] vals)
-    {
-        float[] Xs = new float[vals.Length], Ys = new float[vals.Length];
-        for (int i = 0; i < vals.Length; i++)
+        public static Int2 Ceiling(Float2 val) =>
+            new Int2(MathE.Ceiling(val.x),
+                     MathE.Ceiling(val.y));
+        public static void Ceiling(ref Float2 val)
         {
-            Xs[i] = vals[i].x;
-            Ys[i] = vals[i].y;
+            MathE.Ceiling(ref val.x);
+            MathE.Ceiling(ref val.y);
         }
-        return (Xs, Ys);
+        public static Float2 Clamp(Float2 value, Float2 min, Float2 max) =>
+            new Float2(MathE.Clamp(value.x, min.x, max.x),
+                       MathE.Clamp(value.y, min.y, max.y));
+        public static void Clamp(ref Float2 value, Float2 min, Float2 max)
+        {
+            MathE.Clamp(ref value.x, min.x, max.x);
+            MathE.Clamp(ref value.y, min.y, max.y);
+        }
+        public static Float2 ClampMagnitude(Float2 value, double minMag, double maxMag)
+        {
+            Float2 copy = value;
+            ClampMagnitude(ref copy, minMag, maxMag);
+            return copy;
+        }
+        public static void ClampMagnitude(ref Float2 value, double minMag, double maxMag)
+        {
+            if (minMag > maxMag) throw new ClampOrderMismatchException(nameof(minMag), nameof(maxMag));
+            double mag = value.Magnitude;
+
+            if (mag < minMag)
+            {
+                double factor = minMag / mag;
+                value.x *= factor;
+                value.y *= factor;
+            }
+            else if (mag > maxMag)
+            {
+                double factor = maxMag / mag;
+                value.x *= factor;
+                value.y *= factor;
+            }
+        }
+        public static Float3 Cross(Float2 a, Float2 b) => Float3.Cross(a, b);
+        public static double Dot(Float2 a, Float2 b) => a.x * b.x + a.y * b.y;
+        public static double Dot(IEnumerable<Float2> values)
+        {
+            double x = 1, y = 1;
+            foreach (Float2 val in values)
+            {
+                x *= val.x;
+                y *= val.y;
+            }
+            return x + y;
+        }
+        public static Int2 Floor(Float2 value) =>
+            new Int2(MathE.Floor(value.x),
+                     MathE.Floor(value.y));
+        public static void Floor(ref Float2 value)
+        {
+            MathE.Floor(ref value.x);
+            MathE.Floor(ref value.y);
+        }
+        public static Float2 Lerp(Float2 a, Float2 b, double t, bool clamp = true) =>
+            new Float2(MathE.Lerp(a.x, b.x, t, clamp),
+                       MathE.Lerp(a.y, b.y, t, clamp));
+        public static Float2 Product(IEnumerable<Float2> values)
+        {
+            bool any = false;
+            Float2 result = One;
+            foreach (Float2 val in values)
+            {
+                any = true;
+                result *= val;
+            }
+            return any ? result : Zero;
+        }
+        public static Int2 Round(Float2 value) =>
+            new Int2(MathE.Round(value.x),
+                     MathE.Round(value.y));
+        public static void Round(ref Float2 value)
+        {
+            MathE.Round(ref value.x);
+            MathE.Round(ref value.y);
+        }
+        public static Float2 Sum(IEnumerable<Float2> values)
+        {
+            Float2 result = Zero;
+            foreach (Float2 val in values) result += val;
+            return result;
+        }
+        
+        public static (double[] Xs, double[] Ys) SplitArray(IEnumerable<Float2> values)
+        {
+            int count = values.Count();
+            double[] Xs = new double[count], Ys = new double[count];
+            int index = 0;
+            foreach (Float2 val in values)
+            {
+                Xs[index] = val.x;
+                Ys[index] = val.y;
+                index++;
+            }
+            return (Xs, Ys);
+        }
+
+        public void Normalize()
+        {
+            double invMag = InverseMagnitude;
+            x *= invMag;
+            y *= invMag;
+        }
+
+        public IEnumerator<double> GetEnumerator()
+        {
+            yield return x;
+            yield return y;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Deconstruct(out double x, out double y)
+        {
+            x = this.x;
+            y = this.y;
+        }
+
+        public bool Equals(Float2 other) => x == other.x && y == other.y;
+#if CS8_OR_GREATER
+        public override bool Equals(object? obj)
+#else
+        public override bool Equals(object obj)
+#endif
+        {
+            if (obj is null) return false;
+            else if (obj is Float2 objFloat2) return Equals(objFloat2);
+            else if (obj is Int2 objInt2) return Equals(objInt2);
+            else return false;
+        }
+        public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode();
+        public override string ToString() => $"({x}, {y})";
+        public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)})";
+
+        public double[] ToArray() => new double[] { x, y };
+        public List<double> ToList() => new List<double> { x, y };
+
+        public static Float2 operator +(Float2 a, Float2 b) => new Float2(a.x + b.x, a.y + b.y);
+        public static Float2 operator -(Float2 a) => new Float2(-a.x, -a.y);
+        public static Float2 operator -(Float2 a, Float2 b) => new Float2(a.x - b.x, a.y - b.y);
+        public static Float2 operator *(Float2 a, double b) => new Float2(a.x * b, a.y * b);
+        public static Float2 operator *(Float2 a, Float2 b) => new Float2(a.x * b.x, a.y * b.y);
+        public static Float2 operator /(Float2 a, double b) => new Float2(a.x / b, a.y / b);
+        public static Float2 operator /(Float2 a, Float2 b) => new Float2(a.x / b.x, a.y / b.y);
+        public static bool operator ==(Float2 a, Float2 b) => a.Equals(b);
+        public static bool operator !=(Float2 a, Float2 b) => !a.Equals(b);
+
+        public static explicit operator Float2(Float3 floats) => new Float2(floats.x, floats.y);
+        public static explicit operator Float2(Float4 floats) => new Float2(floats.x, floats.y);
+        public static implicit operator Float2(Int2 ints) => new Float2(ints.x, ints.y);
+        public static explicit operator Float2(Int3 ints) => new Float2(ints.x, ints.y);
+        public static explicit operator Float2(Int4 ints) => new Float2(ints.x, ints.y);
+        public static implicit operator Float2(Point point) => new Float2(point.X, point.Y);
+        public static implicit operator Float2(PointF point) => new Float2(point.X, point.Y);
+        public static implicit operator Float2(Size point) => new Float2(point.Width, point.Height);
+        public static implicit operator Float2(SizeF size) => new Float2(size.Width, size.Height);
+        public static implicit operator Float2((double, double) tuple) => new Float2(tuple.Item1, tuple.Item2);
+
+        public static explicit operator Point(Float2 group) => new Point((int)group.x, (int)group.y);
+        public static implicit operator PointF(Float2 group) => new PointF((float)group.x, (float)group.y);
+        public static explicit operator Size(Float2 group) => new Size((int)group.x, (int)group.y);
+        public static implicit operator SizeF(Float2 group) => new SizeF((float)group.x, (float)group.y);
+        public static implicit operator ValueTuple<double, double>(Float2 group) => (group.x, group.y);
     }
-
-    public int CompareTo(Float2 other) => Magnitude.CompareTo(other.Magnitude);
-    public bool Equals(Float2 other) => x == other.x && y == other.y;
-    public override int GetHashCode() => base.GetHashCode();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<float> GetEnumerator()
-    {
-        yield return x;
-        yield return y;
-    }
-
-    public float[] ToArray() => new[] { x, y };
-    public Fill<float> ToFill()
-    {
-        Float2 @this = this;
-        return i => @this[i];
-    }
-    public List<float> ToList() => new() { x, y };
-
-    public Vector2d ToVector() => new(Mathf.ArcTan(y / x), Magnitude);
-
-    private bool PrintMembers(StringBuilder builder)
-    {
-        builder.Append("x = ");
-        builder.Append(x);
-        builder.Append(", y = ");
-        builder.Append(y);
-        return true;
-    }
-
-    public static Float2 operator +(Float2 a, Float2 b) => new(a.x + b.x, a.y + b.y);
-    public static Float2 operator -(Float2 d) => new(-d.x, -d.y);
-    public static Float2 operator -(Float2 a, Float2 b) => new(a.x - b.x, a.y - b.y);
-    public static Float2 operator *(Float2 a, Float2 b) => new(a.x * b.x, a.y * b.y);
-    public static Float2 operator *(Float2 a, float b) => new(a.x * b, a.y * b);
-    public static Float2 operator *(Float2 a, Matrix b) => (Float2)((Matrix)a * b);
-    public static Quaternion operator *(Float2 a, Quaternion b) => (Quaternion)a * b;
-    public static Float2 operator /(Float2 a, Float2 b) => new(a.x / b.x, a.y / b.y);
-    public static Float2 operator /(Float2 a, float b) => new(a.x / b, a.y / b);
-    public static Float2 operator /(Float2 a, Matrix b) => (Float2)((Matrix)a / b);
-
-    public static implicit operator Float2(Complex val) => new(val.u, val.i);
-    public static explicit operator Float2(Quaternion val) => new(val.u, val.i);
-    public static explicit operator Float2(Float3 val) => new(val.x, val.y);
-    public static explicit operator Float2(Float4 val) => new(val.x, val.y);
-    public static implicit operator Float2(Int2 val) => new(val.x, val.y);
-    public static explicit operator Float2(Int3 val) => new(val.x, val.y);
-    public static explicit operator Float2(Int4 val) => new(val.x, val.y);
-    public static explicit operator Float2(Matrix m) => new(m[0, 0], m[1, 0]);
-    public static explicit operator Float2(Vector2d val) => val.ToXYZ();
-    public static explicit operator Float2(Vert val) => new(val.position.x, val.position.y);
-    public static implicit operator Float2(Fill<float> fill) => new(fill);
-    public static implicit operator Float2(Fill<int> fill) => new(fill);
-    public static implicit operator Float2((float x, float y) val) => new(val.x, val.y);
 }

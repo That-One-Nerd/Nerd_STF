@@ -2,6 +2,9 @@
 .vs/
 /Nerd_STF/.vs/
 /Nerd_STF/Nerd_STF.csproj.user
+
+# I don't want to include my test project.
+/Testing/
 *.sln
 
 # Build Stuff
@@ -10,13 +13,7 @@
 *.dll
 *.pdb
 
-# Testing project
-/Testing
-
 # Nuget
 /Nerd_STF/LICENSE
 *.nupkg
 *.snupkg
-
-# Personal
-/Nerd_STF/TODO.md

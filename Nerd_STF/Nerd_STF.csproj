@@ -1,69 +1,215 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>Nerd_STF</RootNamespace>
-    <AssemblyName>Nerd_STF</AssemblyName>
+    <TargetFrameworks>netstandard1.1;netstandard1.3;netstandard2.1;netcoreapp3.0;net5.0;net7.0</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    <DebugType>embedded</DebugType>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Nerd_STF</Title>
+    <Version>3.0.0-beta1</Version>
     <Authors>That_One_Nerd</Authors>
-    <Description>Nerd_STF is a general-purpose .NET library for .NET 7.0.</Description>
-    <Copyright>Copyright (c) 2023 That_One_Nerd</Copyright>
+    <Description>A general-purpose mathematics library for C#.</Description>
+    <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
+    <PackageIcon>Logo Square.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/That-One-Nerd/Nerd_STF</RepositoryUrl>
-    <AssemblyVersion>2.4.1</AssemblyVersion>
-    <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers</PackageTags>
-    <Version>2.4.1</Version>
-    <Product>Nerd_STF</Product>
-    <PackageId>Nerd_STF</PackageId>
+    <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation</PackageTags>
+    <PackageReleaseNotes># Nerd_STF v3.0-beta1
+
+Hi! Pretty much nothing has remained the same from version 2. There are plenty of breaking changes, and the betas will have plenty of missing features from 2.4.1. The betas will continue until every feature from 2.4.1 has been added to 3.0 or scrapped.
+
+In the mean time, here's what's new.
+
+## More Compatibility
+
+Nerd_STF now targets several versions of .NET and .NET Standard, making it basically run anywhere. You can use [this website](https://dotnet.microsoft.com/en-us/platform/dotnet-standard#versions) to see what different versions of .NET Standard support, but if your project uses a version of .NET that was released in the last 10 years, chances are Nerd_STF supports it.
+
+In addition, Nerd_STF uses some of the new C# features while still retaining older compatibility. If you want to use Nerd_STF in your .NET 8.0 project, you will reference the version of Nerd_STF compiled for .NET 7.0 and retain those fancy new interface features (among others) found in C# 11. Nullability support has been added to all versions of .NET that use C# 8 and above. And if I decide to use more new C# features for Nerd_STF, I'll just target another version of .NET.
+
+## Committed to Doubles
+
+Nerd_STF is a precision library, not one meant to be highly optimized at the sacrifice of precision. So I've decided to fully commit to doubles. The double groups are still called `Float2`, `Float3` and `Float4`, because `Double2` doesn't have quite the same ring to it now, does it? Hope it doesn't get too confusing.
+
+But all math functions are now using doubles (with a few exceptions).
+
+## 'w' Goes in Front Now
+
+I think this is how it should have been. I was really breaking the rules of the alphabet before. Previously in a `Float4`, the `w` component was fourth. Now it is first. The order goes w, x, y, z. You know, how it should.
+
+This means though that casting a `Float3` to a `Float4` will put the extra zero at the start, not the end (because `x` -&gt; `x` in the cast).
+```csharp
+Float3  xyz = (5, 6, 7);
+Float4 wxyz = xyz;       // Gives (0, 5, 6, 7)
+```
+This also means that truncating a `Float4` removes the front `w` first, giving some odd results.
+```csharp
+Float2  xy  = (10, 9);
+Float4 wxyz = xy;       // Gives (0, 10, 9, 0)
+```
+```csharp
+Float4 wxyz = (9, 8, 7, 6);
+Float2  xy  = (Float2)wxyz; // Must be explicitly stated. Yields (8, 7)
+```
+
+But `x` always goes to `x` when casting between groups, same with the other variables. Hopefully that'll make more sense.
+
+## Combination Indexers
+
+One thing I've always been envious of was HLSL's ability to easily make a subset of a group.
+```c++
+float3 group = float3(1, 2, 3);
+float2 part = group.yz;         // Like this.
+```
+And I had a crude version of this in Nerd_STF before, with properties for `XY`, `YZW`, and stuff like that. But you couldn't do things out of order (for example, you could never do `.ZY`). Also, the naming scheme would not make very much sense. `x` was always the first item Now, you can do it with an indexer.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable&lt;double&gt; zyx = wxyz["zyx"]; // Yields [ 4, 3, 2 ]
+```
+
+I think you get it, it makes sense. It returns an IEnumerable though, so support has been added in the group constructors to read data from an IEnumerable. You can also set things this way.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+wxyz["xy"] = [ 9, 8 ];      // Yields (9, 8, 3, 4)
+```
+
+You can also have duplicates. Why you would want duplicates is beyond me. And the order can be whatever you'd like.
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable&lt;double&gt; nums = wxyz["wyyxzzwy"]; // Yields [ 1, 3, 3, 2, 4, 4, 1, 3 ]
+```
+
+## Better Equations
+
+The previous equation system was just a delegate to a method. While it worked for unoptimized things, it won't automatically give precise results. So that system has been overhauled.
+
+Now, every equation derives from the `IEquation` interface, which defines a few operators (most importantly the `Get(double)` method, which is intended to evaluate the equation at the given input). And there are multiple types. There's the base `Equation` type that replicates the method delegate it used to be, but there are also now `Polynomial` equations which specialize in... uh... polynomials, including `Quadratic` and `Linear` along with the dynamic `Polynomial` type.
+
+The indexer is equivalent to calling the `Get(double)` method.
+
+Creating your own is easy, simply derive from the interface and implement the methods required. You should never throw an exception if the two equations you are adding (or multiplying or whatever) are not the same type. If they cannot be combined in a nice way, you should default to the delegate-based approach. Here is an example:
+```csharp
+public IEquation Add(IEquation other) {
+    if (other is YourEquation yourEqu) {
+        // Properly add your two equations.
+    } else {
+        // Unknown other equation type, do a basic addition system.
+        return new Equation(x =&gt; Get(x) + other.Get(x));
+    }
+}
+```
+
+And in practice, you should avoid referring to a general equation by its type. Go by the interface operators instead.
+```csharp
+double Fun(double x) =&gt; 0.5 * MathE.Sin(x);
+Equation a = (Equation)Fun; // The traditional delegate approach from previous versions.
+Polynomial b = new Polynomial(1, 5, 4); // x^2 + 5x + 4
+
+IEquation c = a.Add(b).Multiply(2); // Result is technically an `Equation`, but we should not cast here.
+```
+
+## Renamed the `Mathf` class.
+
+I chose that name because I thought Unity did it well, but I also intend for this project to be compatible with Unity. So I've renamed it to `MathE`. I'm still iffy on that name. I'll commit to one before this project goes out of beta, but it might change until then. Other ideas I'm considering are `Mathe` and `Math2`. Feel free to give your input!
+
+## Support for `System.Drawing` types.
+
+I've tried to use this library when working with Windows Forms a few times. Problem is, it sucks having to manually set the variables from `Point` and `Size`. So Nerd_STF 3.0 now does that for you, with implicit casts to and from both, along with their float variations.
+
+**It's worth mentioning that `Float2` is a double group, while `PointF` is a float group. Data *will* be lost slightly when implicitly casting. Watch out!**
+
+---
+
+Anyway, that's most of the big changes! I don't know if I'll do the full changelog like I have before. It takes a really long time to compile for large updates. We'll see. Thanks for checking out the update and I hope you use it well (or wait for the release version, that's fine too)!</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>Logo Square.png</PackageIcon>
-    <PackageReleaseNotes>Hey everyone! This is one of the larger small updates, and I'm pretty proud of what I got done in a week.
-
-Along with adding setters to parts like `Float3.XY` and fixing a few bugs, almost all improvements in this update are related to matricies. First of all, I've added a bunch of new items to the `IMatrix` interface. Now, any deriving matrix has more requirements that fit the regular `Matrix` type. I don't know why one would use the `IMatrix` interface rather than a specific matrix type, but now the options are more sophisticated.
-
-I've added some new stuff to all the matrix types, including row operations. You can now scale a row, add a row to another, and swap two rows. If I become aware of any more commonly-used row operations, I'll add then in a `2.4.2` update. But I think I've got all the good ones. There is also a mutable version of each operation which, rather than returning a new matrix with changes made, instead applies the changes to itself.
-
-Did you know I made two seperate blunders in the `Cofactor()` method? For the `Matrix2x2` version of the `Cofactor()` method, I had the diagonal elements swapped. Whoops. For the `Matrix` version of the `Cofactor()` method, matricies with even column count would break because of the alternating sign pattern I was using. Now, as far as I know, that bug is fixed.
-
-The last thing I did was add the ability to turn a matrix into its equivalent row-echelon form. This is applicable only to the `Matrix` type (the dynamic one), and works with some levels of success. It's a little weird and tends to give results with lots of negative zeroes, but overall it's fine, I think. As far as I know there aren't any obvious bugs. We'll see though.
-
-Anyway, that's everything in this update. Again, pretty small, but meaningful nonetheless. Unless I haven't screwed anything up, the next update I work on will be `2.5`, so I'll see you then!</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <SignAssembly>False</SignAssembly>
-    <PackAsTool>False</PackAsTool>
-    <Title>Nerd_STF</Title>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
-    <AssemblyOriginatorKeyFile>C:\Users\kyley\Desktop\Misc Items\Private Keys\SNA\Nerd_STF.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>False</DelaySign>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <WarningLevel>9999</WarningLevel>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <DefineConstants>$(DefineConstants);CS8_OR_GREATER</DefineConstants>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <WarningLevel>9999</WarningLevel>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+    <DefineConstants>$(DefineConstants);CS8_OR_GREATER</DefineConstants>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net5.0'">
+    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;CS9_OR_GREATER</DefineConstants>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net7.0'">
+    <DefineConstants>$(DefineConstants);CS10_OR_GREATER;CS11_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER</DefineConstants>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.1|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.3|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.1|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.3|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
     <None Include="..\Extras\Logo Square.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
 
 </Project>

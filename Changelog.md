@@ -1,118 +1,108 @@
-# Nerd_STF v2.4.1
+# Nerd_STF v3.0-beta1
 
-Hey everyone! This is one of the larger small updates, and I'm pretty proud of what I got done in a week.
+Hi! Pretty much nothing has remained the same from version 2. There are plenty of breaking changes, and the betas will have plenty of missing features from 2.4.1. The betas will continue until every feature from 2.4.1 has been added to 3.0 or scrapped.
 
-Along with adding setters to parts like `Float3.XY` and fixing a few bugs, almost all improvements in this update are related to matricies. First of all, I've added a bunch of new items to the `IMatrix` interface. Now, any deriving matrix has more requirements that fit the regular `Matrix` type. I don't know why one would use the `IMatrix` interface rather than a specific matrix type, but now the options are more sophisticated.
+In the mean time, here's what's new.
 
-I've added some new stuff to all the matrix types, including row operations. You can now scale a row, add a row to another, and swap two rows. If I become aware of any more commonly-used row operations, I'll add then in a `2.4.2` update. But I think I've got all the good ones. There is also a mutable version of each operation which, rather than returning a new matrix with changes made, instead applies the changes to itself.
+## More Compatibility
 
-Did you know I made two seperate blunders in the `Cofactor()` method? For the `Matrix2x2` version of the `Cofactor()` method, I had the diagonal elements swapped. Whoops. For the `Matrix` version of the `Cofactor()` method, matricies with even column count would break because of the alternating sign pattern I was using. Now, as far as I know, that bug is fixed.
+Nerd_STF now targets several versions of .NET and .NET Standard, making it basically run anywhere. You can use [this website](https://dotnet.microsoft.com/en-us/platform/dotnet-standard#versions) to see what different versions of .NET Standard support, but if your project uses a version of .NET that was released in the last 10 years, chances are Nerd_STF supports it.
 
-The last thing I did was add the ability to turn a matrix into its equivalent row-echelon form. This is applicable only to the `Matrix` type (the dynamic one), and works with some levels of success. It's a little weird and tends to give results with lots of negative zeroes, but overall it's fine, I think. As far as I know there aren't any obvious bugs. We'll see though.
+In addition, Nerd_STF uses some of the new C# features while still retaining older compatibility. If you want to use Nerd_STF in your .NET 8.0 project, you will reference the version of Nerd_STF compiled for .NET 7.0 and retain those fancy new interface features (among others) found in C# 11. Nullability support has been added to all versions of .NET that use C# 8 and above. And if I decide to use more new C# features for Nerd_STF, I'll just target another version of .NET.
 
-Anyway, that's everything in this update. Again, pretty small, but meaningful nonetheless. Unless I haven't screwed anything up, the next update I work on will be `2.5`, so I'll see you then!
+## Committed to Doubles
 
-Here's the full changelog:
+Nerd_STF is a precision library, not one meant to be highly optimized at the sacrifice of precision. So I've decided to fully commit to doubles. The double groups are still called `Float2`, `Float3` and `Float4`, because `Double2` doesn't have quite the same ring to it now, does it? Hope it doesn't get too confusing.
+
+But all math functions are now using doubles (with a few exceptions).
+
+## 'w' Goes in Front Now
+
+I think this is how it should have been. I was really breaking the rules of the alphabet before. Previously in a `Float4`, the `w` component was fourth. Now it is first. The order goes w, x, y, z. You know, how it should.
+
+This means though that casting a `Float3` to a `Float4` will put the extra zero at the start, not the end (because `x` -> `x` in the cast).
+```csharp
+Float3  xyz = (5, 6, 7);
+Float4 wxyz = xyz;       // Gives (0, 5, 6, 7)
 ```
-* Nerd_STF
-    * Mathematics
-        * Abstract
-            * IMatrix
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + Cofactor()
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-                + this[int, int]
-                + this[Index, Index]
-        * Algebra
-            * Matrix
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-                = Fixed a blunder in `SignGrid(Int2)` with signs being incorrectly placed on matrixes with even column count.
-            * Matrix2x2
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-                = Fixed a blunder in `Cofactor()` with the position of elements.
-            * Matrix3x3
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-            * Matrix4x4
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-        * NumberSystems
-            * Complex
-                + operator Complex(SystemComplex)
-                + operator SystemComplex(Complex)
-            * Quaternion
-                + operator Quaternion(SystemQuaternion)
-                + operator SystemQuaternion(Quaternion)
-        * Float3
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YZ`
-        * Float4
-            = Added a setter to `XW`
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YW`
-            = Added a setter to `YZ`
-            = Added a setter to `ZW`
-            = Added a setter to `XYW`
-            = Added a setter to `XYZ`
-            = Added a setter to `XZW`
-            = Added a setter to `YZW`
-        * Int3
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YZ`
-        * Int4
-            = Added a setter to `XW`
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YW`
-            = Added a setter to `YZ`
-            = Added a setter to `ZW`
-            = Added a setter to `XYW`
-            = Added a setter to `XYZ`
-            = Added a setter to `XZW`
-            = Added a setter to `YZW`
+This also means that truncating a `Float4` removes the front `w` first, giving some odd results.
+```csharp
+Float2  xy  = (10, 9);
+Float4 wxyz = xy;       // Gives (0, 10, 9, 0)
 ```
+```csharp
+Float4 wxyz = (9, 8, 7, 6);
+Float2  xy  = (Float2)wxyz; // Must be explicitly stated. Yields (8, 7)
+```
+
+But `x` always goes to `x` when casting between groups, same with the other variables. Hopefully that'll make more sense.
+
+## Combination Indexers
+
+One thing I've always been envious of was HLSL's ability to easily make a subset of a group.
+```c++
+float3 group = float3(1, 2, 3);
+float2 part = group.yz;         // Like this.
+```
+And I had a crude version of this in Nerd_STF before, with properties for `XY`, `YZW`, and stuff like that. But you couldn't do things out of order (for example, you could never do `.ZY`). Also, the naming scheme would not make very much sense. `x` was always the first item Now, you can do it with an indexer.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable<double> zyx = wxyz["zyx"]; // Yields [ 4, 3, 2 ]
+```
+
+I think you get it, it makes sense. It returns an IEnumerable though, so support has been added in the group constructors to read data from an IEnumerable. You can also set things this way.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+wxyz["xy"] = [ 9, 8 ];      // Yields (9, 8, 3, 4)
+```
+
+You can also have duplicates. Why you would want duplicates is beyond me. And the order can be whatever you'd like.
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable<double> nums = wxyz["wyyxzzwy"]; // Yields [ 1, 3, 3, 2, 4, 4, 1, 3 ]
+```
+
+## Better Equations
+
+The previous equation system was just a delegate to a method. While it worked for unoptimized things, it won't automatically give precise results. So that system has been overhauled.
+
+Now, every equation derives from the `IEquation` interface, which defines a few operators (most importantly the `Get(double)` method, which is intended to evaluate the equation at the given input). And there are multiple types. There's the base `Equation` type that replicates the method delegate it used to be, but there are also now `Polynomial` equations which specialize in... uh... polynomials, including `Quadratic` and `Linear` along with the dynamic `Polynomial` type.
+
+The indexer is equivalent to calling the `Get(double)` method.
+
+Creating your own is easy, simply derive from the interface and implement the methods required. You should never throw an exception if the two equations you are adding (or multiplying or whatever) are not the same type. If they cannot be combined in a nice way, you should default to the delegate-based approach. Here is an example:
+```csharp
+public IEquation Add(IEquation other) {
+    if (other is YourEquation yourEqu) {
+        // Properly add your two equations.
+    } else {
+        // Unknown other equation type, do a basic addition system.
+        return new Equation(x => Get(x) + other.Get(x));
+    }
+}
+```
+
+And in practice, you should avoid referring to a general equation by its type. Go by the interface operators instead.
+```csharp
+double Fun(double x) => 0.5 * MathE.Sin(x);
+Equation a = (Equation)Fun; // The traditional delegate approach from previous versions.
+Polynomial b = new Polynomial(1, 5, 4); // x^2 + 5x + 4
+
+IEquation c = a.Add(b).Multiply(2); // Result is technically an `Equation`, but we should not cast here.
+```
+
+## Renamed the `Mathf` class.
+
+I chose that name because I thought Unity did it well, but I also intend for this project to be compatible with Unity. So I've renamed it to `MathE`. I'm still iffy on that name. I'll commit to one before this project goes out of beta, but it might change until then. Other ideas I'm considering are `Mathe` and `Math2`. Feel free to give your input!
+
+## Support for `System.Drawing` types.
+
+I've tried to use this library when working with Windows Forms a few times. Problem is, it sucks having to manually set the variables from `Point` and `Size`. So Nerd_STF 3.0 now does that for you, with implicit casts to and from both, along with their float variations.
+
+**It's worth mentioning that `Float2` is a double group, while `PointF` is a float group. Data *will* be lost slightly when implicitly casting. Watch out!**
+
+---
+
+Anyway, that's most of the big changes! I don't know if I'll do the full changelog like I have before. It takes a really long time to compile for large updates. We'll see. Thanks for checking out the update and I hope you use it well (or wait for the release version, that's fine too)!
