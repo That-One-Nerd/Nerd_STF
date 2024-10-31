@@ -79,6 +79,8 @@ namespace Nerd_STF.Mathematics.Equations
         public IEquation Add(IEquation other)
         {
             if (other is Polynomial otherPoly) return Add(otherPoly);
+            else if (other is Quadratic otherQuad) return Add((Polynomial)otherQuad);
+            else if (other is Linear otherLinear) return Add((Polynomial)otherLinear);
             else return new Equation((double x) => Get(x) + other.Get(x));
         }
         public Polynomial Add(double constant)

@@ -1,5 +1,5 @@
-﻿using Nerd_STF.Exceptions;
-using Nerd_STF.Mathematics.Abstract;
+﻿using Nerd_STF.Abstract;
+using Nerd_STF.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -120,27 +120,27 @@ namespace Nerd_STF.Mathematics
             MathE.Clamp(ref value.x, min.x, max.x);
             MathE.Clamp(ref value.y, min.y, max.y);
         }
-        public static Int2 ClampMagnitude(Int2 value, int minMag, int maxMag)
+        public static Int2 ClampMagnitude(Int2 value, double minMag, double maxMag)
         {
             Int2 copy = value;
             ClampMagnitude(ref copy, minMag, maxMag);
             return copy;
         }
-        public static void ClampMagnitude(ref Int2 value, int minMag, int maxMag)
+        public static void ClampMagnitude(ref Int2 value, double minMag, double maxMag)
         {
             if (minMag > maxMag) throw new ClampOrderMismatchException(nameof(minMag), nameof(maxMag));
             double mag = value.Magnitude;
             if (mag < minMag)
             {
                 double factor = minMag / mag;
-                value.x = (int)(value.x * factor);
-                value.y = (int)(value.y * factor);
+                value.x = MathE.Ceiling(value.x * factor);
+                value.y = MathE.Ceiling(value.y * factor);
             }
             else if (mag > maxMag)
             {
                 double factor = maxMag / mag;
-                value.x = (int)(value.x * factor);
-                value.y = (int)(value.y * factor);
+                value.x = MathE.Floor(value.x * factor);
+                value.y = MathE.Floor(value.y * factor);
             }
         }
         public static Int3 Cross(Int2 a, Int2 b) => Int3.Cross(a, b);
@@ -155,6 +155,10 @@ namespace Nerd_STF.Mathematics
             }
             return x + y;
         }
+#if CS11_OR_GREATER
+        static double IVectorOperations<Int2>.Dot(Int2 a, Int2 b) => Dot(a, b);
+        static double IVectorOperations<Int2>.Dot(IEnumerable<Int2> vals) => Dot(vals);
+#endif
         public static Int2 Lerp(Int2 a, Int2 b, double t, bool clamp = true) =>
             new Int2(MathE.Lerp(a.x, b.x, t, clamp),
                      MathE.Lerp(a.y, b.y, t, clamp));
@@ -202,6 +206,8 @@ namespace Nerd_STF.Mathematics
             x = this.x;
             y = this.y;
         }
+
+        public void Modify(Action<Int2> action) => action(this);
 
         public bool Equals(Int2 other) => x == other.x && y == other.y;
 #if CS8_OR_GREATER

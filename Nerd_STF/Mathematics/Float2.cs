@@ -1,9 +1,8 @@
-﻿using Nerd_STF.Exceptions;
-using Nerd_STF.Mathematics.Abstract;
+﻿using Nerd_STF.Abstract;
+using Nerd_STF.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Linq;
 
@@ -13,6 +12,7 @@ namespace Nerd_STF.Mathematics
 #if CS11_OR_GREATER
                           ,IFromTuple<Float2, (double, double)>,
                            IPresets2d<Float2>,
+                           IRoundable<Float2, Int2>,
                            ISplittable<Float2, (double[] Xs, double[] Ys)>
 #endif
     {
@@ -235,6 +235,8 @@ namespace Nerd_STF.Mathematics
             x = this.x;
             y = this.y;
         }
+
+        public void Modify(Action<Float2> action) => action(this);
 
         public bool Equals(Float2 other) => x == other.x && y == other.y;
 #if CS8_OR_GREATER

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Nerd_STF.Mathematics.Abstract
+namespace Nerd_STF.Abstract
 {
     public interface ICombinationIndexer<TItem>
     {

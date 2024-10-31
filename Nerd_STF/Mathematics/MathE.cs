@@ -435,7 +435,7 @@ namespace Nerd_STF.Mathematics
                 }
                 else if (val > best) best = val;
             }
-            return any ? best : 0;
+            return best;
         }
         public static double Max(IEnumerable<double> values)
         {
@@ -488,7 +488,7 @@ namespace Nerd_STF.Mathematics
                 }
                 else if (val < best) best = val;
             }
-            return any ? best : 0;
+            return best;
         }
         public static double Min(IEnumerable<double> values)
         {

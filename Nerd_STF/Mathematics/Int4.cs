@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Nerd_STF.Abstract;
+using Nerd_STF.Exceptions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Nerd_STF.Exceptions;
-using Nerd_STF.Mathematics.Abstract;
 
 namespace Nerd_STF.Mathematics
 {
@@ -152,18 +152,18 @@ namespace Nerd_STF.Mathematics
             if (mag < minMag)
             {
                 double factor = minMag / mag;
-                value.w = (int)(value.w * factor);
-                value.x = (int)(value.x * factor);
-                value.y = (int)(value.y * factor);
-                value.z = (int)(value.z * factor);
+                value.w = MathE.Ceiling(value.w * factor);
+                value.x = MathE.Ceiling(value.x * factor);
+                value.y = MathE.Ceiling(value.y * factor);
+                value.z = MathE.Ceiling(value.z * factor);
             }
             else if (mag > maxMag)
             {
                 double factor = maxMag / mag;
-                value.w = (int)(value.w * factor);
-                value.x = (int)(value.x * factor);
-                value.y = (int)(value.y * factor);
-                value.z = (int)(value.z * factor);
+                value.w = MathE.Floor(value.w * factor);
+                value.x = MathE.Floor(value.x * factor);
+                value.y = MathE.Floor(value.y * factor);
+                value.z = MathE.Floor(value.z * factor);
             }
         }
         public static int Dot(Int4 a, Int4 b) => a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
@@ -179,6 +179,10 @@ namespace Nerd_STF.Mathematics
             }
             return w + x + y + z;
         }
+#if CS11_OR_GREATER
+        static double IVectorOperations<Int4>.Dot(Int4 a, Int4 b) => Dot(a, b);
+        static double IVectorOperations<Int4>.Dot(IEnumerable<Int4> vals) => Dot(vals);
+#endif
         public static Int4 Lerp(Int4 a, Int4 b, double t, bool clamp = true) =>
             new Int4(MathE.Lerp(a.w, b.w, t, clamp),
                      MathE.Lerp(a.x, b.x, t, clamp),
@@ -234,6 +238,8 @@ namespace Nerd_STF.Mathematics
             y = this.y;
             z = this.z;
         }
+
+        public void Modify(Action<Int4> action) => action(this);
 
         public bool Equals(Int4 other) => w == other.w && x == other.x && y == other.y && z == other.z;
 #if CS8_OR_GREATER

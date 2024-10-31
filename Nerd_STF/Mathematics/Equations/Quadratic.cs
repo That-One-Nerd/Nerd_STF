@@ -183,6 +183,7 @@ namespace Nerd_STF.Mathematics.Equations
         public static Polynomial operator *(Quadratic a, double b) => a.Multiply(b);
         public static IEquation operator /(Quadratic a, IEquation b) => a.Divide(b);
         public static Quadratic operator /(Quadratic a, double b) => a.Divide(b);
+
         public static bool operator ==(Quadratic a, Quadratic b) => a.Equals(b);
         public static bool operator ==(Quadratic a, Polynomial b) => a.Equals(b);
         public static bool operator !=(Quadratic a, Quadratic b) => !a.Equals(b);

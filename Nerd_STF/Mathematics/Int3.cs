@@ -1,5 +1,5 @@
-﻿using Nerd_STF.Exceptions;
-using Nerd_STF.Mathematics.Abstract;
+﻿using Nerd_STF.Abstract;
+using Nerd_STF.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -129,13 +129,13 @@ namespace Nerd_STF.Mathematics
             MathE.Clamp(ref value.y, min.y, max.y);
             MathE.Clamp(ref value.z, min.z, max.z);
         }
-        public static Int3 ClampMagnitude(Int3 value, int minMag, int maxMag)
+        public static Int3 ClampMagnitude(Int3 value, double minMag, double maxMag)
         {
             Int3 copy = value;
             ClampMagnitude(ref copy, minMag, maxMag);
             return copy;
         }
-        public static void ClampMagnitude(ref Int3 value, int minMag, int maxMag)
+        public static void ClampMagnitude(ref Int3 value, double minMag, double maxMag)
         {
             if (minMag > maxMag) throw new ClampOrderMismatchException(nameof(minMag), nameof(maxMag));
             double mag = value.Magnitude;
@@ -143,16 +143,16 @@ namespace Nerd_STF.Mathematics
             if (mag < minMag)
             {
                 double factor = minMag / mag;
-                value.x = (int)(value.x * factor);
-                value.y = (int)(value.y * factor);
-                value.z = (int)(value.z * factor);
+                value.x = MathE.Ceiling(value.x * factor);
+                value.y = MathE.Ceiling(value.y * factor);
+                value.z = MathE.Ceiling(value.z * factor);
             }
             else if (mag > maxMag)
             {
                 double factor = maxMag / mag;
-                value.x = (int)(value.x * factor);
-                value.y = (int)(value.y * factor);
-                value.z = (int)(value.z * factor);
+                value.x = MathE.Floor(value.x * factor);
+                value.y = MathE.Floor(value.y * factor);
+                value.z = MathE.Floor(value.z * factor);
             }
         }
         public static Int3 Cross(Int3 a, Int3 b) =>
@@ -171,6 +171,10 @@ namespace Nerd_STF.Mathematics
             }
             return x + y + z;
         }
+#if CS11_OR_GREATER
+        static double IVectorOperations<Int3>.Dot(Int3 a, Int3 b) => Dot(a, b);
+        static double IVectorOperations<Int3>.Dot(IEnumerable<Int3> vals) => Dot(vals);
+#endif
         public static Int3 Lerp(Int3 a, Int3 b, double t, bool clamp = true) =>
             new Int3(MathE.Lerp(a.x, b.x, t, clamp),
                      MathE.Lerp(a.y, b.y, t, clamp),
@@ -222,6 +226,8 @@ namespace Nerd_STF.Mathematics
             y = this.y;
             z = this.z;
         }
+
+        public void Modify(Action<Int3> action) => action(this);
 
         public bool Equals(Int3 other) => x == other.x && y == other.y && z == other.z;
 #if CS8_OR_GREATER

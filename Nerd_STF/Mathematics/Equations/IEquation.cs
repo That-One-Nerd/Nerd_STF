@@ -23,5 +23,17 @@ namespace Nerd_STF.Mathematics.Equations
         double Integrate(double lower, double upper);
 
         // TODO: Solve
+
+#if CS8_OR_GREATER
+        static IEquation operator +(IEquation a, IEquation b) => a.Add(b);
+        static IEquation operator +(IEquation a, double b) => a.Add(b);
+        static IEquation operator -(IEquation a) => a.Negate();
+        static IEquation operator -(IEquation a, IEquation b) => a.Subtract(b);
+        static IEquation operator -(IEquation a, double b) => a.Subtract(b);
+        static IEquation operator *(IEquation a, IEquation b) => a.Multiply(b);
+        static IEquation operator *(IEquation a, double b) => a.Multiply(b);
+        static IEquation operator /(IEquation a, IEquation b) => a.Divide(b);
+        static IEquation operator /(IEquation a, double b) => a.Divide(b);
+#endif
     }
 }

@@ -1,11 +1,11 @@
 ﻿#if CS11_OR_GREATER
-namespace Nerd_STF.Mathematics.Abstract
+namespace Nerd_STF.Abstract
 {
     public interface IPresets4d<TSelf> : IPresets3d<TSelf>
         where TSelf : IPresets4d<TSelf>
     {
-        public static abstract TSelf LowW { get; }
-        public static abstract TSelf HighW { get; }
+        static abstract TSelf LowW { get; }
+        static abstract TSelf HighW { get; }
     }
 }
 #endif
