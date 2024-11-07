@@ -10,33 +10,12 @@ namespace Nerd_STF.Mathematics
 {
     public static class MathE
     {
-        public static int Absolute(int value) => value < 0 ? -value : value;
-        public static double Absolute(double value) => value < 0 ? -value : value;
+        public static int Abs(int value) => value < 0 ? -value : value;
+        public static double Abs(double value) => value < 0 ? -value : value;
 #if CS11_OR_GREATER
-        public static T Absolute<T>(T num) where T : INumber<T>
+        public static T Abs<T>(T num) where T : INumber<T>
         {
             return num < T.Zero ? -num : num;
-        }
-#endif
-
-        public static int AbsoluteMod(int value, int mod)
-        {
-            while (value >= mod) value -= mod;
-            while (value < 0) value += mod;
-            return value;
-        }
-        public static double AbsoluteMod(double value, double mod)
-        {
-            while (value >= mod) value -= mod;
-            while (value < 0) value += mod;
-            return value;
-        }
-#if CS11_OR_GREATER
-        public static T AbsoluteMod<T>(T value, T mod) where T : INumber<T>
-        {
-            while (value >= mod) value -= mod;
-            while (value < T.Zero) value += mod;
-            return value;
         }
 #endif
 
@@ -78,7 +57,7 @@ namespace Nerd_STF.Mathematics
         public static double Average(IEquation equ, double lowerBound, double upperBound, double epsilon = 1e-3)
         {
             double sum = 0;
-            double steps = Absolute(upperBound - lowerBound) / epsilon;
+            double steps = Abs(upperBound - lowerBound) / epsilon;
             for (double x = lowerBound; x <= upperBound; x += epsilon) sum += equ[x];
             return sum / steps;
         }
@@ -234,6 +213,9 @@ namespace Nerd_STF.Mathematics
 
         public static IEquation DynamicIntegral(IEquation equ, IEquation lower, IEquation upper) =>
             new Equation((double x) => equ.Integrate(lower[x], upper[x]));
+
+        public static double EulersMethod(IEquation equ, double refX, double deltaX) =>
+            equ.Derive()[refX] * deltaX + equ[refX];
 
         // TODO: Gamma function at some point.
         public static BigInteger FactorialBig(int num)
@@ -521,6 +503,27 @@ namespace Nerd_STF.Mathematics
             return best;
         }
 
+        public static int ModAbs(int value, int mod)
+        {
+            while (value >= mod) value -= mod;
+            while (value < 0) value += mod;
+            return value;
+        }
+        public static double ModAbs(double value, double mod)
+        {
+            while (value >= mod) value -= mod;
+            while (value < 0) value += mod;
+            return value;
+        }
+#if CS11_OR_GREATER
+        public static T ModAbs<T>(T value, T mod) where T : INumber<T>
+        {
+            while (value >= mod) value -= mod;
+            while (value < T.Zero) value += mod;
+            return value;
+        }
+#endif
+
         public static BigInteger NprBig(int n, int r) => FactorialBig(n - r + 1, n);
         public static int Npr(int n, int r) => (int)Factorial(n - r + 1, n);
 
@@ -623,6 +626,13 @@ namespace Nerd_STF.Mathematics
         public static IEquation Round(IEquation equ) =>
             new Equation((double x) => Round(equ.Get(x)));
 
+#if CS11_OR_GREATER
+        public static int Sign<T>(T num) where T : INumber<T> =>
+            num > T.Zero ? 1 : num < T.Zero ? -1 : 0;
+#endif
+        public static int Sign(double num) => num > 0 ? 1 : num < 0 ? -1 : 0;
+        public static int Sign(int num) => num > 0 ? 1 : num < 0 ? -1 : 0;
+
         public static double Sin(double rad, int terms = 8)
         {
             bool flip = false;
@@ -701,6 +711,12 @@ namespace Nerd_STF.Mathematics
             return sum;
         }
 #endif
+
+        public static Linear TangentLine(IEquation equ, double x)
+        {
+            double slope = equ.Derive()[x];
+            return new Linear(slope, equ[x] - slope * x);
+        }
 
         public static Polynomial TaylorSeries(IEquation equ, double x, int terms)
         {

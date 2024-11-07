@@ -6,8 +6,7 @@ using System.Linq;
 namespace Nerd_STF.Mathematics
 {
     public struct Angle : IComparable<Angle>,
-                          IEquatable<Angle>,
-                          IModifiable<Angle>
+                          IEquatable<Angle>
 #if CS11_OR_GREATER
                          ,IPresets2d<Angle>,
                           IFromTuple<Angle, (double, Angle.Unit)>
@@ -48,10 +47,10 @@ namespace Nerd_STF.Mathematics
             set => revTheta = value;
         }
 
-        public Angle Complimentary => new Angle(0.25 - MathE.AbsoluteMod(revTheta, 1));
-        public Angle Supplimentary => new Angle(0.5 - MathE.AbsoluteMod(revTheta, 1));
-        public Angle Normalized => new Angle(MathE.AbsoluteMod(revTheta, 1));
-        public Angle Reflected => new Angle(MathE.AbsoluteMod(-revTheta, 1));
+        public Angle Complimentary => new Angle(0.25 - MathE.ModAbs(revTheta, 1));
+        public Angle Supplimentary => new Angle(0.5 - MathE.ModAbs(revTheta, 1));
+        public Angle Normalized => new Angle(MathE.ModAbs(revTheta, 1));
+        public Angle Reflected => new Angle(MathE.ModAbs(-revTheta, 1));
 
         private double revTheta;
 
@@ -123,12 +122,12 @@ namespace Nerd_STF.Mathematics
                 if (!any)
                 {
                     best = ang;
-                    if (normalize) bestNormalized = MathE.AbsoluteMod(ang.revTheta, 1);
+                    if (normalize) bestNormalized = MathE.ModAbs(ang.revTheta, 1);
                     any = true;
                 }
                 else if (normalize)
                 {
-                    double angNormalized = MathE.AbsoluteMod(ang.revTheta, 1);
+                    double angNormalized = MathE.ModAbs(ang.revTheta, 1);
                     if (angNormalized > bestNormalized)
                     {
                         best = ang;
@@ -150,12 +149,12 @@ namespace Nerd_STF.Mathematics
                 if (!any)
                 {
                     best = ang;
-                    if (normalize) bestNormalized = MathE.AbsoluteMod(ang.revTheta, 1);
+                    if (normalize) bestNormalized = MathE.ModAbs(ang.revTheta, 1);
                     any = true;
                 }
                 else if (normalize)
                 {
-                    double angNormalized = MathE.AbsoluteMod(ang.revTheta, 1);
+                    double angNormalized = MathE.ModAbs(ang.revTheta, 1);
                     if (angNormalized < bestNormalized)
                     {
                         best = ang;
@@ -185,8 +184,6 @@ namespace Nerd_STF.Mathematics
             }
             return angles;
         }
-
-        public void Modify(Action<Angle> action) => action(this);
 
         public int CompareTo(Angle other) => revTheta.CompareTo(other.revTheta);
         public bool Equals(Angle other) => revTheta == other.revTheta;

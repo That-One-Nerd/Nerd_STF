@@ -10,10 +10,6 @@ namespace Nerd_STF.Abstract
         static abstract TOut Ceiling(TSelf val);
         static abstract TOut Floor(TSelf val);
         static abstract TOut Round(TSelf val);
-
-        static abstract void Ceiling(ref TSelf val);
-        static abstract void Floor(ref TSelf val);
-        static abstract void Round(ref TSelf val);
     }
 }
 #endif

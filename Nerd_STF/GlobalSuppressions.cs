@@ -5,7 +5,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0066:Use 'switch' expression", Justification = "Only available for C#8+.")]
-[assembly: SuppressMessage("Style", "IDE0083:Use pattern matching",    Justification = "Only available for C#9+")]
-[assembly: SuppressMessage("Style", "IDE0090:Use 'new(...)'",          Justification = "Only available for C#9+")]
-[assembly: SuppressMessage("Style", "IDE0251:Make member 'readonly'",  Justification = "Only available for C#8+. Also, what does applying 'readonly' to a method even do?")]
+[assembly: SuppressMessage("Style",       "IDE0066:Use 'switch' expression",         Justification = "Only available for C#8+.")]
+[assembly: SuppressMessage("Style",       "IDE0083:Use pattern matching",            Justification = "Only available for C#9+")]
+[assembly: SuppressMessage("Style",       "IDE0090:Use 'new(...)'",                  Justification = "Only available for C#9+")]
+[assembly: SuppressMessage("Style",       "IDE0251:Make member 'readonly'",          Justification = "Only available for C#8+. Also, what does applying 'readonly' to a method even do?")]
+[assembly: SuppressMessage("Style",       "IDE0057:Use range operator",              Justification = "Not supported in .NET Standard 1.1 and 1.3.")]
+[assembly: SuppressMessage("Performance", "CA1846:Prefer 'AsSpan' over 'Substring'", Justification = "Not supported in .NET Standard 1.1 and 1.3.")]

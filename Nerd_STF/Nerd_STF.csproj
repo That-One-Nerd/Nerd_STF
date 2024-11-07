@@ -1,11 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- General stuff -->
+  
   <PropertyGroup>
     <TargetFrameworks>netstandard1.1;netstandard1.3;netstandard2.1;netcoreapp3.0;net5.0;net7.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+  
+  <!-- NuGet package customization. -->
+  
+  <PropertyGroup>
     <Title>Nerd_STF</Title>
     <Version>3.0.0-beta2</Version>
     <Authors>That_One_Nerd</Authors>
@@ -14,7 +21,12 @@
     <PackageIcon>Logo Square.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/That-One-Nerd/Nerd_STF</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation</PackageTags>
+    
+    <!-- Sorry this is stupidly long, wish I could have linked a markdown file instead. -->
     <PackageReleaseNotes># Nerd_STF v3.0-beta1
 
 Hi! Pretty much nothing has remained the same from version 2. There are plenty of breaking changes, and the betas will have plenty of missing features from 2.4.1. The betas will continue until every feature from 2.4.1 has been added to 3.0 or scrapped.
@@ -123,78 +135,48 @@ I've tried to use this library when working with Windows Forms a few times. Prob
 ---
 
 Anyway, that's most of the big changes! I don't know if I'll do the full changelog like I have before. It takes a really long time to compile for large updates. We'll see. Thanks for checking out the update and I hope you use it well (or wait for the release version, that's fine too)!</PackageReleaseNotes>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <IncludeSymbols>True</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
+  <!-- ItemGroup customization based on framework. -->
+  <!-- Mostly used to reference system packages that are not included in this version of .NET Standard. -->
+  <!-- TODO: Maybe this isn't good practice, and we should define environment variables for specific features (tuples, drawing, etc) instead? -->
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.1'">
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+  
+  <!-- PropertyGroup customization based on framework. -->
+  <!-- Used to define environment variables based on features the framework supports. -->
+
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
-    <DefineConstants>$(DefineConstants);CS8_OR_GREATER</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;SPAN_SUPPORT</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <DefineConstants>$(DefineConstants);CS8_OR_GREATER</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;SPAN_SUPPORT</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net5.0'">
-    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;CS9_OR_GREATER</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;CS9_OR_GREATER;SPAN_SUPPORT</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net7.0'">
-    <DefineConstants>$(DefineConstants);CS10_OR_GREATER;CS11_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS10_OR_GREATER;CS11_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER;SPAN_SUPPORT</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.1|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.3|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.1|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.3|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.0|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
+  
+  <!-- Pack extra stuff into the NuGet package. -->
 
   <ItemGroup>
     <None Include="..\Extras\Logo Square.png">
@@ -205,11 +187,14 @@ Anyway, that's most of the big changes! I don't know if I'll do the full changel
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <None Include="..\Changelog.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

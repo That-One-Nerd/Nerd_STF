@@ -6,8 +6,7 @@ namespace Nerd_STF.Abstract
 {
     public interface INumberGroup<TSelf, TItem> : ICombinationIndexer<TItem>,
                                                   IEnumerable<TItem>,
-                                                  IEquatable<TSelf>,
-                                                  IModifiable<TSelf>
+                                                  IEquatable<TSelf>
 #if CS11_OR_GREATER
                                                  ,IInterpolable<TSelf>,
                                                   ISimpleMathOperations<TSelf>,

@@ -262,8 +262,6 @@ namespace Nerd_STF.Mathematics
             z = this.z;
         }
 
-        public void Modify(Action<Float3> action) => action(this);
-
         public bool Equals(Float3 other) => x == other.x && y == other.y && z == other.z;
 #if CS8_OR_GREATER
         public override bool Equals(object? obj)
