@@ -1,7 +1,7 @@
 ﻿#if CS11_OR_GREATER
 using System.Runtime.CompilerServices;
 
-namespace Nerd_STF.Abstract
+namespace Nerd_STF
 {
     public interface IFromTuple<TSelf, TTuple>
         where TSelf : IFromTuple<TSelf, TTuple>

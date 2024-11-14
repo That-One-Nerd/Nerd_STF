@@ -1,7 +1,7 @@
 ﻿#if CS11_OR_GREATER
 using System.Collections.Generic;
 
-namespace Nerd_STF.Abstract
+namespace Nerd_STF.Mathematics.Algebra
 {
     public interface IVectorOperations<TSelf> : ISimpleMathOperations<TSelf>
         where TSelf : IVectorOperations<TSelf>

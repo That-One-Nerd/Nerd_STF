@@ -3,11 +3,12 @@
   <!-- General stuff -->
   
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.1;netstandard1.3;netstandard2.1;netcoreapp3.0;net5.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1;netstandard1.3;netstandard2.1;net471;netcoreapp3.0;net5.0;net7.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <DebugType>portable</DebugType>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <CheckNotRecommendedTargetFramework>false</CheckNotRecommendedTargetFramework>
   </PropertyGroup>
   
   <!-- NuGet package customization. -->
@@ -141,6 +142,10 @@ Anyway, that's most of the big changes! I don't know if I'll do the full changel
   <!-- Mostly used to reference system packages that are not included in this version of .NET Standard. -->
   <!-- TODO: Maybe this isn't good practice, and we should define environment variables for specific features (tuples, drawing, etc) instead? -->
 
+  <ItemGroup Condition="'$(TargetFramework)'=='net471'">
+    <PackageReference Include="System.Memory" Version="4.6.0" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.1'">
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
@@ -156,23 +161,35 @@ Anyway, that's most of the big changes! I don't know if I'll do the full changel
   <!-- PropertyGroup customization based on framework. -->
   <!-- Used to define environment variables based on features the framework supports. -->
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
-    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;SPAN_SUPPORT</DefineConstants>
-    <Nullable>enable</Nullable>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net471'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;SPAN_SUPPORT</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net5.0'">
-    <DefineConstants>$(DefineConstants);CS8_OR_GREATER;CS9_OR_GREATER;SPAN_SUPPORT</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net7.0'">
-    <DefineConstants>$(DefineConstants);CS10_OR_GREATER;CS11_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER;SPAN_SUPPORT</DefineConstants>
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER;CS10_OR_GREATER;CS11_OR_GREATER</DefineConstants>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.1'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   

@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Nerd_STF.Abstract;
 using Nerd_STF.Exceptions;
 
 namespace Nerd_STF.Mathematics
@@ -12,6 +11,7 @@ namespace Nerd_STF.Mathematics
                           ,IFromTuple<Float4, (double, double, double, double)>,
                            IPresets4d<Float4>,
                            IRoundable<Float4, Int4>,
+                           IRefRoundable<Float4>,
                            ISplittable<Float4, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>
 #endif
     {
@@ -81,22 +81,24 @@ namespace Nerd_STF.Mathematics
                 }
             }
         }
-        public IEnumerable<double> this[string key]
+        public ListTuple<double> this[string key]
         {
             get
             {
+                double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
                     char c = key[i];
                     switch (c)
                     {
-                        case 'w': yield return w; break;
-                        case 'x': yield return x; break;
-                        case 'y': yield return y; break;
-                        case 'z': yield return z; break;
+                        case 'w': items[i] = w; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
                         default: throw new ArgumentException("Invalid key.", nameof(key));
                     }
                 }
+                return new ListTuple<double>(items);
             }
             set
             {
@@ -316,8 +318,12 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float4(Int4 ints) => new Float4(ints.w, ints.x, ints.y, ints.z);
         public static implicit operator Float4(Float2 floats) => new Float4(0, floats.x, floats.y, 0);
         public static implicit operator Float4(Float3 floats) => new Float4(0, floats.x, floats.y, floats.z);
+        public static implicit operator Float4(ListTuple<double> tuple) => new Float4(tuple[0], tuple[1], tuple[2], tuple[3]);
+        public static implicit operator Float4(ListTuple<int> tuple) => new Float4(tuple[0], tuple[1], tuple[2], tuple[3]);
         public static implicit operator Float4((double, double, double, double) tuple) => new Float4(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
 
+        public static implicit operator ListTuple<double>(Float4 group) => new ListTuple<double>(group.w, group.x, group.y, group.z);
+        public static explicit operator ListTuple<int>(Float4 group) => new ListTuple<int>((int)group.w, (int)group.x, (int)group.y, (int)group.z);
         public static implicit operator ValueTuple<double, double, double, double>(Float4 group) => (group.w, group.x, group.y, group.z);
     }
 }

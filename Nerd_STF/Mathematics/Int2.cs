@@ -1,5 +1,5 @@
-﻿using Nerd_STF.Abstract;
-using Nerd_STF.Exceptions;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -69,20 +69,22 @@ namespace Nerd_STF.Mathematics
                 }
             }
         }
-        public IEnumerable<int> this[string key]
+        public ListTuple<int> this[string key]
         {
             get
             {
+                int[] items = new int[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
                     char c = key[i];
                     switch (c)
                     {
-                        case 'x': yield return x; break;
-                        case 'y': yield return y; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
                         default: throw new ArgumentException("Invalid key.", nameof(key));
                     }
                 }
+                return new ListTuple<int>(items);
             }
             set
             {
@@ -248,12 +250,16 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int2(PointF point) => new Int2((int)point.X, (int)point.Y);
         public static implicit operator Int2(Size size) => new Int2(size.Width, size.Height);
         public static explicit operator Int2(SizeF size) => new Int2((int)size.Width, (int)size.Height);
+        public static explicit operator Int2(ListTuple<double> tuple) => new Int2((int)tuple[0], (int)tuple[1]);
+        public static implicit operator Int2(ListTuple<int> tuple) => new Int2(tuple[0], tuple[1]);
         public static implicit operator Int2((int, int) tuple) => new Int2(tuple.Item1, tuple.Item2);
 
         public static implicit operator Point(Int2 group) => new Point(group.x, group.y);
         public static explicit operator PointF(Int2 group) => new PointF(group.x, group.y);
         public static implicit operator Size(Int2 group) => new Size(group.x, group.y);
         public static explicit operator SizeF(Int2 group) => new SizeF(group.x, group.y);
+        public static implicit operator ListTuple<double>(Int2 group) => new ListTuple<double>(group.x, group.y);
+        public static implicit operator ListTuple<int>(Int2 group) => new ListTuple<int>(group.x, group.y);
         public static implicit operator ValueTuple<int, int>(Int2 group) => (group.x, group.y);
     }
 }

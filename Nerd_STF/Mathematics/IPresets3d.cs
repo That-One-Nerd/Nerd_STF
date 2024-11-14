@@ -1,5 +1,5 @@
 ﻿#if CS11_OR_GREATER
-namespace Nerd_STF.Abstract
+namespace Nerd_STF.Mathematics
 {
     public interface IPresets3d<TSelf> : IPresets2d<TSelf>
         where TSelf : IPresets3d<TSelf>

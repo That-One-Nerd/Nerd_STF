@@ -1,15 +1,15 @@
-﻿using Nerd_STF.Abstract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Nerd_STF.Mathematics
 {
-    public struct Angle : IComparable<Angle>,
-                          IEquatable<Angle>
+    // Maybe move to .Numbers and add inheritance to INumber? Does this make sense?
+    public readonly struct Angle : IComparable<Angle>,
+                                   IEquatable<Angle>
 #if CS11_OR_GREATER
-                         ,IPresets2d<Angle>,
-                          IFromTuple<Angle, (double, Angle.Unit)>
+                                  ,IFromTuple<Angle, (double, Angle.Units)>,
+                                   IPresets2d<Angle>
 #endif
     {
         public static Angle Down => new Angle(0.75);
@@ -23,45 +23,29 @@ namespace Nerd_STF.Mathematics
         public static Angle Zero => new Angle(0);
 
 #if CS11_OR_GREATER
-        static Angle IPresets1d<Angle>.One => new Angle(1, Unit.Degrees);
+        static Angle IPresets1d<Angle>.One => new Angle(1, Units.Degrees);
 #endif
 
-        public double Degrees
-        {
-            get => revTheta * 360;
-            set => revTheta = value / 360;
-        }
-        public double Gradians
-        {
-            get => revTheta * 400;
-            set => revTheta = value / 400;
-        }
-        public double Radians
-        {
-            get => revTheta * Constants.Tau;
-            set => revTheta = value / Constants.Tau;
-        }
-        public double Revolutions
-        {
-            get => revTheta;
-            set => revTheta = value;
-        }
+        public double Degrees => revTheta * 360;
+        public double Gradians => revTheta * 400;
+        public double Radians => revTheta * Constants.Tau;
+        public double Revolutions => revTheta;
 
         public Angle Complimentary => new Angle(0.25 - MathE.ModAbs(revTheta, 1));
         public Angle Supplimentary => new Angle(0.5 - MathE.ModAbs(revTheta, 1));
         public Angle Normalized => new Angle(MathE.ModAbs(revTheta, 1));
         public Angle Reflected => new Angle(MathE.ModAbs(-revTheta, 1));
 
-        private double revTheta;
+        private readonly double revTheta;
 
-        public Angle(double theta, Unit unit)
+        public Angle(double theta, Units unit)
         {
             switch (unit)
             {
-                case Unit.Revolutions: revTheta = theta; break;
-                case Unit.Degrees: revTheta = theta / 360; break;
-                case Unit.Radians: revTheta = theta / Constants.Tau; break;
-                case Unit.Gradians: revTheta = theta / 400; break;
+                case Units.Revolutions: revTheta = theta; break;
+                case Units.Degrees: revTheta = theta / 360; break;
+                case Units.Radians: revTheta = theta / Constants.Tau; break;
+                case Units.Gradians: revTheta = theta / 400; break;
                 default: throw new ArgumentException($"Unknown angle unit \"{unit}.\"", nameof(unit));
             }
         }
@@ -70,30 +54,64 @@ namespace Nerd_STF.Mathematics
             this.revTheta = revTheta;
         }
 
-        public double this[Unit unit]
+        public double this[Units unit]
         {
             get
             {
                 switch (unit)
                 {
-                    case Unit.Revolutions: return revTheta;
-                    case Unit.Degrees: return revTheta * 360;
-                    case Unit.Radians: return revTheta * Constants.Tau;
-                    case Unit.Gradians: return revTheta * 400;
+                    case Units.Revolutions: return revTheta;
+                    case Units.Degrees: return revTheta * 360;
+                    case Units.Radians: return revTheta * Constants.Tau;
+                    case Units.Gradians: return revTheta * 400;
                     default: throw new ArgumentException($"Unknown angle unit \"{unit}.\"", nameof(unit));
                 }
             }
-            set
+        }
+
+        public static double Convert(double value, Units from, Units to)
+        {
+            switch (from)
             {
-                switch (unit)
-                {
-                    case Unit.Revolutions: revTheta = value; break;
-                    case Unit.Degrees: revTheta = value / 360; break;
-                    case Unit.Radians: revTheta = value / Constants.Tau; break;
-                    case Unit.Gradians: revTheta = value / 400; break;
-                    default: throw new ArgumentException($"Unknown angle unit \"{unit}.\"", nameof(unit));
-                }
+                case Units.Revolutions:
+                    switch (to)
+                    {
+                        case Units.Revolutions: return value;
+                        case Units.Degrees:     return value * 360;
+                        case Units.Radians:     return value * 6.28318530718;
+                        case Units.Gradians:    return value * 400;
+                        default: goto _fail;
+                    }
+                case Units.Degrees:
+                    switch (to)
+                    {
+                        case Units.Revolutions: return value * 0.00277777777778;
+                        case Units.Degrees:     return value;
+                        case Units.Radians:     return value * 0.0174532925199;
+                        case Units.Gradians:    return value * 1.11111111111;
+                        default: goto _fail;
+                    }
+                case Units.Radians:
+                    switch (to)
+                    {
+                        case Units.Revolutions: return value * 0.159154943092;
+                        case Units.Degrees:     return value * 57.2957795131;
+                        case Units.Radians:     return value;
+                        case Units.Gradians:    return value * 63.6619772368;
+                        default: goto _fail;
+                    }
+                case Units.Gradians:
+                    switch (to)
+                    {
+                        case Units.Revolutions: return value * 0.0025;
+                        case Units.Degrees:     return value * 0.9;
+                        case Units.Radians:     return value * 0.0157079632679;
+                        case Units.Gradians:    return value;
+                        default: goto _fail;
+                    }
+                default: goto _fail;
             }
+        _fail: throw new ArgumentException($"Invalid conversion: {from} -> {to}.");
         }
 
         public static Angle Average(IEnumerable<Angle> angles)
@@ -109,8 +127,6 @@ namespace Nerd_STF.Mathematics
         }
         public static Angle Clamp(Angle value, Angle min, Angle max) =>
             new Angle(MathE.Clamp(value.revTheta, min.revTheta, max.revTheta));
-        public static void Clamp(ref Angle value, Angle min, Angle max) =>
-            MathE.Clamp(ref value.revTheta, min.revTheta, max.revTheta);
         public static Angle Max(IEnumerable<Angle> values) => Max(false, values);
         public static Angle Max(bool normalize, IEnumerable<Angle> values)
         {
@@ -172,7 +188,7 @@ namespace Nerd_STF.Mathematics
             return sum;
         }
 
-        public static double[] SplitArray(Unit unit, IEnumerable<Angle> values)
+        public static double[] SplitArray(Units unit, IEnumerable<Angle> values)
         {
             int count = values.Count();
             double[] angles = new double[count];
@@ -184,6 +200,8 @@ namespace Nerd_STF.Mathematics
             }
             return angles;
         }
+
+        public Angle Coterminal(int turns) => new Angle(revTheta + turns);
 
         public int CompareTo(Angle other) => revTheta.CompareTo(other.revTheta);
         public bool Equals(Angle other) => revTheta == other.revTheta;
@@ -198,26 +216,26 @@ namespace Nerd_STF.Mathematics
             else return false;
         }
         public override int GetHashCode() => revTheta.GetHashCode();
-        public override string ToString() => ToString(Unit.Degrees, null);
-        public string ToString(Unit unit) => ToString(unit, null);
+        public override string ToString() => ToString(Units.Degrees, null);
+        public string ToString(Units unit) => ToString(unit, null);
 #if CS8_OR_GREATER
         public string ToString(string? format) =>
 #else
         public string ToString(string format) =>
 #endif
-            ToString(Unit.Degrees, format);
+            ToString(Units.Degrees, format);
 #if CS8_OR_GREATER
-        public string ToString(Unit unit, string? format)
+        public string ToString(Units unit, string? format)
 #else
-        public string ToString(Unit unit, string format)
+        public string ToString(Units unit, string format)
 #endif
         {
             switch (unit)
             {
-                case Unit.Revolutions: return $"{revTheta.ToString(format)} rev";
-                case Unit.Degrees: return $"{(revTheta * 360).ToString(format)} deg";
-                case Unit.Radians: return $"{(revTheta * Constants.Tau).ToString(format)} rad";
-                case Unit.Gradians: return $"{(revTheta * 400).ToString(format)} grad";
+                case Units.Revolutions: return $"{revTheta.ToString(format)} rev";
+                case Units.Degrees: return $"{(revTheta * 360).ToString(format)} deg";
+                case Units.Radians: return $"{(revTheta * Constants.Tau).ToString(format)} rad";
+                case Units.Gradians: return $"{(revTheta * 400).ToString(format)} grad";
                 default: throw new ArgumentException($"Unknown angle unit \"{unit}.\"", nameof(unit));
             }
         }
@@ -234,12 +252,12 @@ namespace Nerd_STF.Mathematics
         public static bool operator >=(Angle a, Angle b) => a.CompareTo(b) >= 0;
         public static bool operator <=(Angle a, Angle b) => a.CompareTo(b) <= 0;
 
-        public static implicit operator Angle((double, Unit) tuple) => new Angle(tuple.Item1, tuple.Item2);
+        public static implicit operator Angle((double, Units) tuple) => new Angle(tuple.Item1, tuple.Item2);
 #if CS11_OR_GREATER
-        static implicit IFromTuple<Angle, (double, Unit)>.operator ValueTuple<double, Unit>(Angle angle) => (angle.revTheta, Unit.Revolutions);
+        static implicit IFromTuple<Angle, (double, Units)>.operator ValueTuple<double, Units>(Angle angle) => (angle.revTheta, Units.Revolutions);
 #endif
 
-        public enum Unit
+        public enum Units
         {
             Revolutions,
             Degrees,

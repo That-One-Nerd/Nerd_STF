@@ -1,5 +1,5 @@
 ﻿#if CS11_OR_GREATER
-namespace Nerd_STF.Abstract
+namespace Nerd_STF.Mathematics
 {
     public interface IRoundable<TSelf> : IRoundable<TSelf, TSelf>
         where TSelf : IRoundable<TSelf> { }

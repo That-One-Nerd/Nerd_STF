@@ -1,5 +1,4 @@
-﻿using Nerd_STF.Abstract;
-using Nerd_STF.Exceptions;
+﻿using Nerd_STF.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ namespace Nerd_STF.Mathematics
                           ,IFromTuple<Float3, (double, double, double)>,
                            IPresets2d<Float3>,
                            IRoundable<Float3, Int3>,
+                           IRefRoundable<Float3>,
                            ISplittable<Float3, (double[] Xs, double[] Ys, double[] Zs)>
 #endif
     {
@@ -75,21 +75,23 @@ namespace Nerd_STF.Mathematics
                 }
             }
         }
-        public IEnumerable<double> this[string key]
+        public ListTuple<double> this[string key]
         {
             get
             {
+                double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
                     char c = key[i];
                     switch (c)
                     {
-                        case 'x': yield return x; break;
-                        case 'y': yield return y; break;
-                        case 'z': yield return z; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
                         default: throw new ArgumentException("Invalid key.", nameof(key));
                     }
                 }
+                return new ListTuple<double>(items);
             }
             set
             {
@@ -296,8 +298,12 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float3(Int2 ints) => new Float3(ints.x, ints.y, 0);
         public static implicit operator Float3(Int3 ints) => new Float3(ints.x, ints.y, ints.z);
         public static explicit operator Float3(Int4 ints) => new Float3(ints.x, ints.y, ints.z);
+        public static implicit operator Float3(ListTuple<double> tuple) => new Float3(tuple[0], tuple[1], tuple[2]);
+        public static implicit operator Float3(ListTuple<int> tuple) => new Float3(tuple[0], tuple[1], tuple[2]);
         public static implicit operator Float3((double, double, double) tuple) => new Float3(tuple.Item1, tuple.Item2, tuple.Item3);
 
+        public static implicit operator ListTuple<double>(Float3 group) => new ListTuple<double>(group.x, group.y, group.z);
+        public static explicit operator ListTuple<int>(Float3 group) => new ListTuple<int>((int)group.x, (int)group.y, (int)group.z);
         public static implicit operator ValueTuple<double, double, double>(Float3 group) => (group.x, group.y, group.z);
     }
 }

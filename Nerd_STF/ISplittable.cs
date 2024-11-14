@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Nerd_STF.Abstract
+namespace Nerd_STF
 {
     public interface ISplittable<TSelf, TTuple>
         where TSelf : ISplittable<TSelf, TTuple>

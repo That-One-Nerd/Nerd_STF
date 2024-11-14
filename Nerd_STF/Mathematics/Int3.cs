@@ -1,5 +1,5 @@
-﻿using Nerd_STF.Abstract;
-using Nerd_STF.Exceptions;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,21 +74,23 @@ namespace Nerd_STF.Mathematics
                 }
             }
         }
-        public IEnumerable<int> this[string key]
+        public ListTuple<int> this[string key]
         {
             get
             {
+                int[] items = new int[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
                     char c = key[i];
                     switch (c)
                     {
-                        case 'x': yield return x; break;
-                        case 'y': yield return y; break;
-                        case 'z': yield return z; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
                         default: throw new ArgumentException("Invalid key.", nameof(key));
                     }
                 }
+                return new ListTuple<int>(items);
             }
             set
             {
@@ -264,8 +266,12 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int3(Float2 floats) => new Int3((int)floats.x, (int)floats.y, 0);
         public static explicit operator Int3(Float3 floats) => new Int3((int)floats.x, (int)floats.y, (int)floats.z);
         public static explicit operator Int3(Float4 floats) => new Int3((int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int3(ListTuple<double> tuple) => new Int3((int)tuple[0], (int)tuple[1], (int)tuple[2]);
+        public static implicit operator Int3(ListTuple<int> tuple) => new Int3(tuple[0], tuple[1], tuple[2]);
         public static implicit operator Int3((int, int, int) tuple) => new Int3(tuple.Item1, tuple.Item2, tuple.Item3);
 
+        public static implicit operator ListTuple<double>(Int3 group) => new ListTuple<double>(group.x, group.y, group.z);
+        public static implicit operator ListTuple<int>(Int3 group) => new ListTuple<int>(group.x, group.y, group.z);
         public static implicit operator ValueTuple<int, int, int>(Int3 group) => (group.x, group.y, group.z);
     }
 }

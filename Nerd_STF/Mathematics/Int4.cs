@@ -1,5 +1,5 @@
-﻿using Nerd_STF.Abstract;
-using Nerd_STF.Exceptions;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,22 +80,24 @@ namespace Nerd_STF.Mathematics
                 }
             }
         }
-        public IEnumerable<int> this[string key]
+        public ListTuple<int> this[string key]
         {
             get
             {
+                int[] items = new int[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
                     char c = key[i];
                     switch (c)
                     {
-                        case 'w': yield return w; break;
-                        case 'x': yield return x; break;
-                        case 'y': yield return y; break;
-                        case 'z': yield return z; break;
+                        case 'w': items[i] = w; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
                         default: throw new ArgumentException("Invalid key.", nameof(key));
                     }
                 }
+                return new ListTuple<int>(items);
             }
             set
             {
@@ -276,8 +278,12 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int4(Float2 floats) => new Int4(0, (int)floats.x, (int)floats.y, 0);
         public static explicit operator Int4(Float3 floats) => new Int4(0, (int)floats.x, (int)floats.y, (int)floats.z);
         public static explicit operator Int4(Float4 floats) => new Int4((int)floats.w, (int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int4(ListTuple<double> tuple) => new Int4((int)tuple[0], (int)tuple[1], (int)tuple[2], (int)tuple[3]);
+        public static implicit operator Int4(ListTuple<int> tuple) => new Int4(tuple[0], tuple[1], tuple[2], tuple[3]);
         public static implicit operator Int4((int, int, int, int) tuple) => new Int4(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
 
+        public static implicit operator ListTuple<double>(Int4 group) => new ListTuple<double>(group.w, group.x, group.y, group.z);
+        public static implicit operator ListTuple<int>(Int4 group) => new ListTuple<int>(group.w, group.x, group.y, group.z);
         public static implicit operator ValueTuple<int, int, int, int>(Int4 group) => (group.w, group.x, group.y, group.z);
     }
 }

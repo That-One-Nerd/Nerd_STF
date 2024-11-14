@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Nerd_STF.Mathematics.Algebra;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Nerd_STF.Abstract
+namespace Nerd_STF.Mathematics
 {
     public interface INumberGroup<TSelf, TItem> : ICombinationIndexer<TItem>,
                                                   IEnumerable<TItem>,
                                                   IEquatable<TSelf>
 #if CS11_OR_GREATER
-                                                 ,IInterpolable<TSelf>,
+                                                 , IInterpolable<TSelf>,
                                                   ISimpleMathOperations<TSelf>,
                                                   IVectorOperations<TSelf>
 #endif

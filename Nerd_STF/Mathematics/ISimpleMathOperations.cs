@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Nerd_STF.Abstract
+namespace Nerd_STF.Mathematics
 {
     public interface ISimpleMathOperations<TSelf> : IAdditionOperators<TSelf, TSelf, TSelf>,
                                                     ISubtractionOperators<TSelf, TSelf, TSelf>,
-                                                    IMultiplyOperators<TSelf, TSelf, TSelf>,
-                                                    IDivisionOperators<TSelf, TSelf, TSelf>
+                                                    IMultiplyOperators<TSelf, TSelf, TSelf>
         where TSelf : ISimpleMathOperations<TSelf>
     {
         static abstract TSelf Product(IEnumerable<TSelf> vals);

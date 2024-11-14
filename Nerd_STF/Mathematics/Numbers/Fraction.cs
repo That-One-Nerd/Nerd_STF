@@ -1,5 +1,4 @@
-﻿using Nerd_STF.Abstract;
-using Nerd_STF.Helpers;
+﻿using Nerd_STF.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -474,7 +473,8 @@ namespace Nerd_STF.Mathematics.Numbers
             else return false;
         }
         public override int GetHashCode() =>
-            (int)(((uint)num.GetHashCode() & 0xFFFF0000u) | ((uint)den.GetHashCode() & 0x0000FFFFu));
+            (int)((uint)num.GetHashCode() & 0xFFFF0000 |
+                  (uint)den.GetHashCode() & 0x0000FFFF);
 #if CS8_OR_GREATER
         public override string ToString() => ToString(null, null);
         public string ToString(string? format) => ToString(format, null);

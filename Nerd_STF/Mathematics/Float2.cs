@@ -1,5 +1,4 @@
-﻿using Nerd_STF.Abstract;
-using Nerd_STF.Exceptions;
+﻿using Nerd_STF.Exceptions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +12,7 @@ namespace Nerd_STF.Mathematics
                           ,IFromTuple<Float2, (double, double)>,
                            IPresets2d<Float2>,
                            IRoundable<Float2, Int2>,
+                           IRefRoundable<Float2>,
                            ISplittable<Float2, (double[] Xs, double[] Ys)>
 #endif
     {
@@ -70,20 +70,22 @@ namespace Nerd_STF.Mathematics
                 }
             }
         }
-        public IEnumerable<double> this[string key]
+        public ListTuple<double> this[string key]
         {
             get
             {
+                double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
                     char c = key[i];
                     switch (c)
                     {
-                        case 'x': yield return x; break;
-                        case 'y': yield return y; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
                         default: throw new ArgumentException("Invalid key.", nameof(key));
                     }
                 }
+                return new ListTuple<double>(items);
             }
             set
             {
@@ -274,12 +276,16 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float2(PointF point) => new Float2(point.X, point.Y);
         public static implicit operator Float2(Size point) => new Float2(point.Width, point.Height);
         public static implicit operator Float2(SizeF size) => new Float2(size.Width, size.Height);
+        public static implicit operator Float2(ListTuple<double> tuple) => new Float2(tuple[0], tuple[1]);
+        public static implicit operator Float2(ListTuple<int> tuple) => new Float2(tuple[0], tuple[1]);
         public static implicit operator Float2((double, double) tuple) => new Float2(tuple.Item1, tuple.Item2);
 
         public static explicit operator Point(Float2 group) => new Point((int)group.x, (int)group.y);
         public static implicit operator PointF(Float2 group) => new PointF((float)group.x, (float)group.y);
         public static explicit operator Size(Float2 group) => new Size((int)group.x, (int)group.y);
         public static implicit operator SizeF(Float2 group) => new SizeF((float)group.x, (float)group.y);
+        public static implicit operator ListTuple<double>(Float2 group) => new ListTuple<double>(group.x, group.y);
+        public static explicit operator ListTuple<int>(Float2 group) => new ListTuple<int>((int)group.x, (int)group.y);
         public static implicit operator ValueTuple<double, double>(Float2 group) => (group.x, group.y);
     }
 }
