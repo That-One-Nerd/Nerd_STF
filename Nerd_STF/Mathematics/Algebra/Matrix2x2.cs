@@ -9,140 +9,116 @@ namespace Nerd_STF.Mathematics.Algebra
     public class Matrix2x2 : IMatrix<Matrix2x2>,
                              ISquareMatrix<Matrix2x2>
 #if CS11_OR_GREATER
-                            ,ISplittable<Matrix2x2, (double[] r1c1, double[] r1c2, double[] r2c1, double[] r2c2)>,
+                            ,ISplittable<Matrix2x2, (double[] r0c0, double[] r0c1, double[] r1c0, double[] r1c1)>,
                              IStaticMatrix<Matrix2x2>
 #endif
     {
-        public static Matrix2x2 Identity => new Matrix2x2(1, 0, 0, 1);
-        public static Matrix2x2 SignField => new Matrix2x2(1, -1, -1, 1);
+        public static Matrix2x2 Identity =>
+            new Matrix2x2(1, 0,
+                          0, 1);
+        public static Matrix2x2 SignField =>
+            new Matrix2x2(+1, -1,
+                          -1, +1);
 
         public static Matrix2x2 One => new Matrix2x2(1, 1, 1, 1);
         public static Matrix2x2 Zero => new Matrix2x2(0, 0, 0, 0);
 
         public Int2 Size => (2, 2);
 
-        public double r1c1, r1c2,
-                      r2c1, r2c2;
+        public double r0c0, r0c1,
+                      r1c0, r1c1;
 
         public Matrix2x2()
         {
-            r1c1 = 0;
-            r1c2 = 0;
-            r2c1 = 0;
-            r2c2 = 0;
+            r0c0 = 0; r0c1 = 0;
+            r1c0 = 0; r1c1 = 0;
         }
         public Matrix2x2(Matrix2x2 copy)
         {
-            r1c1 = copy.r1c1;
-            r1c2 = copy.r1c2;
-            r2c1 = copy.r2c1;
-            r2c2 = copy.r2c2;
+            r0c0 = copy.r0c0; r0c1 = copy.r0c1;
+            r1c0 = copy.r1c0; r1c1 = copy.r1c1;
         }
-        public Matrix2x2(double r1c1, double r1c2, double r2c1, double r2c2)
+        public Matrix2x2(double r0c0, double r0c1, double r1c0, double r1c1)
         {
+            this.r0c0 = r0c0;
+            this.r0c1 = r0c1;
+            this.r1c0 = r1c0;
             this.r1c1 = r1c1;
-            this.r1c2 = r1c2;
-            this.r2c1 = r2c1;
-            this.r2c2 = r2c2;
         }
         /// <param name="byRows"><see langword="true"/> if the array is of the form [c, r], <see langword="false"/> if the array is of the form [r, c].</param>
         public Matrix2x2(double[,] vals, bool byRows = true)
         {
             if (byRows) // Collection of rows ([c, r])
             {
-                r1c1 = vals[0, 0]; r1c2 = vals[0, 1];
-                r2c1 = vals[1, 0]; r2c2 = vals[1, 1];
+                r0c0 = vals[0, 0]; r0c1 = vals[0, 1];
+                r1c0 = vals[1, 0]; r1c1 = vals[1, 1];
             }
             else        // Collection of columns ([r, c])
             {
-                r1c1 = vals[0, 0]; r1c2 = vals[1, 0];
-                r2c1 = vals[0, 1]; r2c2 = vals[1, 1];
+                r0c0 = vals[0, 0]; r0c1 = vals[1, 0];
+                r1c0 = vals[0, 1]; r1c1 = vals[1, 1];
             }
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
         public Matrix2x2(IEnumerable<IEnumerable<double>> vals, bool byRows = true)
         {
-            int x = 0;
-            foreach (IEnumerable<double> part in vals)
-            {
-                int y = 0;
-                foreach (double v in part)
-                {
-                    this[byRows ? (x, y) : (y, x)] = v;
-                    y++;
-                    if (y >= 2) break;
-                }
-                x++;
-                if (x >= 2) break;
-            }
+            MatrixHelper.SetMatrixValues(this, vals, byRows);
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
         public Matrix2x2(IEnumerable<ListTuple<double>> vals, bool byRows = true)
         {
-            int x = 0;
-            foreach (IEnumerable<double> part in vals)
-            {
-                int y = 0;
-                foreach (double v in part)
-                {
-                    this[byRows ? (x, y) : (y, x)] = v;
-                    y++;
-                    if (y >= 2) break;
-                }
-                x++;
-                if (x >= 2) break;
-            }
+            MatrixHelper.SetMatrixValues(this, vals, byRows);
         }
         
         public double this[int r, int c]
         {
-            get => this[(r, c)];
-            set => this[(r, c)] = value;
-        }
-        public double this[Int2 index]
-        {
             get
             {
-                switch (index.x)         // (r, c)
+                switch (r)
                 {
                     case 0:
-                        switch (index.y)
+                        switch (c)
                         {
-                            case 0: return r1c1;
-                            case 1: return r1c2;
-                            default: throw new ArgumentOutOfRangeException(nameof(index));
+                            case 0: return r0c0;
+                            case 1: return r0c1;
+                            default: throw new ArgumentOutOfRangeException(nameof(c));
                         }
                     case 1:
-                        switch (index.y)
+                        switch (c)
                         {
-                            case 0: return r2c1;
-                            case 1: return r2c2;
-                            default: throw new ArgumentOutOfRangeException(nameof(index));
+                            case 0: return r1c0;
+                            case 1: return r1c1;
+                            default: throw new ArgumentOutOfRangeException(nameof(c));
                         }
-                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                    default: throw new ArgumentOutOfRangeException(nameof(r));
                 }
             }
             set
             {
-                switch (index.x)         // (r, c)
+                switch (r)
                 {
                     case 0:
-                        switch (index.y)
+                        switch (c)
                         {
-                            case 0: r1c1 = value; return;
-                            case 1: r1c2 = value; return;
-                            default: throw new ArgumentOutOfRangeException(nameof(index));
+                            case 0: r0c0 = value; return;
+                            case 1: r0c1 = value; return;
+                            default: throw new ArgumentOutOfRangeException(nameof(c));
                         }
                     case 1:
-                        switch (index.y)
+                        switch (c)
                         {
-                            case 0: r2c1 = value; return;
-                            case 1: r2c2 = value; return;
-                            default: throw new ArgumentOutOfRangeException(nameof(index));
+                            case 0: r1c0 = value; return;
+                            case 1: r1c1 = value; return;
+                            default: throw new ArgumentOutOfRangeException(nameof(c));
                         }
-                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                    default: throw new ArgumentOutOfRangeException(nameof(r));
                 }
             }
+        }
+        public double this[Int2 index]
+        {
+            get => this[index.x, index.y];
+            set => this[index.x, index.y] = value;
         }
         public ListTuple<double> this[int index, RowColumn direction]
         {
@@ -178,8 +154,8 @@ namespace Nerd_STF.Mathematics.Algebra
             return sum / count;
         }
         public static Matrix2x2 Lerp(Matrix2x2 a, Matrix2x2 b, double t, bool clamp = true) =>
-            new Matrix2x2(MathE.Lerp(a.r1c1, b.r1c1, t, clamp), MathE.Lerp(a.r1c2, b.r1c2, t, clamp),
-                          MathE.Lerp(a.r2c1, b.r2c1, t, clamp), MathE.Lerp(a.r2c2, b.r2c2, t, clamp));
+            new Matrix2x2(MathE.Lerp(a.r0c0, b.r0c0, t, clamp), MathE.Lerp(a.r0c1, b.r0c1, t, clamp),
+                          MathE.Lerp(a.r1c0, b.r1c0, t, clamp), MathE.Lerp(a.r1c1, b.r1c1, t, clamp));
         public static Matrix2x2 Product(IEnumerable<Matrix2x2> vals)
         {
             bool any = false;
@@ -198,20 +174,19 @@ namespace Nerd_STF.Mathematics.Algebra
             return result;
         }
 
-        public static (double[] r1c1, double[] r1c2, double[] r2c1, double[] r2c2) SplitArray(IEnumerable<Matrix2x2> vals)
+        public static (double[] r0c0, double[] r0c1, double[] r1c0, double[] r1c1) SplitArray(IEnumerable<Matrix2x2> vals)
         {
             int count = vals.Count();
-            double[] r1c1 = new double[count], r1c2 = new double[count],
-                     r2c1 = new double[count], r2c2 = new double[count];
+            double[] r0c0 = new double[count], r0c1 = new double[count],
+                     r1c0 = new double[count], r1c1 = new double[count];
             int index = 0;
             foreach (Matrix2x2 m in vals)
             {
-                r1c1[index] = m.r1c1;
-                r1c2[index] = m.r1c2;
-                r2c1[index] = m.r2c1;
-                r2c2[index] = m.r2c2;
+                r0c0[index] = m.r0c0; r0c1[index] = m.r0c1;
+                r1c0[index] = m.r1c0; r1c1[index] = m.r1c1;
             }
-            return (r1c1, r1c2, r2c1, r2c2);
+            return (r0c0, r0c1,
+                    r1c0, r1c1);
         }
 
         public ListTuple<double> GetRow(int row)
@@ -219,8 +194,8 @@ namespace Nerd_STF.Mathematics.Algebra
             double[] vals;
             switch (row)
             {
-                case 0: vals = new double[] { r1c1, r1c2 }; break;
-                case 1: vals = new double[] { r2c1, r2c2 }; break;
+                case 0: vals = new double[] { r0c0, r0c1 }; break;
+                case 1: vals = new double[] { r1c0, r1c1 }; break;
                 default: throw new ArgumentOutOfRangeException(nameof(row));
             }
             return new ListTuple<double>(vals);
@@ -230,60 +205,56 @@ namespace Nerd_STF.Mathematics.Algebra
             double[] vals;
             switch (column)
             {
-                case 0: vals = new double[] { r1c1, r2c1 }; break;
-                case 1: vals = new double[] { r1c2, r2c2 }; break;
+                case 0: vals = new double[] { r0c0, r1c0 }; break;
+                case 1: vals = new double[] { r0c1, r1c1 }; break;
                 default: throw new ArgumentOutOfRangeException(nameof(column));
             }
             return new ListTuple<double>(vals);
         }
-        public void SetRow(int row, IEnumerable<double> vals)
+        public void SetRow(int row, IEnumerable<double> vals) => MatrixHelper.SetRow(this, row, vals);
+        public void SetColumn(int column, IEnumerable<double> vals) => MatrixHelper.SetColumn(this, column, vals);
+        public void SetRow(int row, ListTuple<double> vals)
         {
-            int col = 0;
-            foreach (double v in vals)
+            switch (row)
             {
-                this[(row, col)] = v;
-                col++;
-                if (col >= 2) return;
+                case 0: r0c0 = vals[0]; r0c1 = vals[1]; break;
+                case 1: r1c0 = vals[0]; r1c1 = vals[1]; break;
+                default: throw new ArgumentOutOfRangeException(nameof(row));
             }
         }
-        public void SetColumn(int column, IEnumerable<double> vals)
+        public void SetColumn(int column, ListTuple<double> vals)
         {
-            int row = 0;
-            foreach (double v in vals)
+            switch (column)
             {
-                this[(row, column)] = v;
-                row++;
-                if (row >= 2) return;
+                case 0: r0c0 = vals[0]; r1c0 = vals[1]; break;
+                case 1: r0c1 = vals[0]; r1c1 = vals[1]; break;
+                default: throw new ArgumentOutOfRangeException(nameof(column));
             }
         }
-        public void SetRow(int row, ListTuple<double> vals) => SetRow(row, (IEnumerable<double>)vals);
-        public void SetColumn(int row, ListTuple<double> vals) => SetColumn(row, (IEnumerable<double>)vals);
 
-        public double Determinant() => r1c1 * r2c2 - r1c2 * r2c1;
+        public double Determinant() => r0c0 * r1c1 - r0c1 * r1c0;
 
         public Matrix2x2 Adjoint() =>
-            new Matrix2x2( r2c2, -r1c2,
-                          -r2c1,  r1c1);
+            new Matrix2x2( r1c1, -r0c1,
+                          -r1c0,  r0c0);
         public Matrix2x2 Cofactor() =>
-            new Matrix2x2( r2c2, -r2c1,
-                          -r1c2,  r1c1);
+            new Matrix2x2( r1c1, -r1c0,
+                          -r0c1,  r0c0);
         public Matrix2x2 Inverse()
         {
             double invDet = 1 / Determinant();
-            return new Matrix2x2( r2c2 * invDet, -r1c2 * invDet,
-                                 -r2c1 * invDet,  r1c1 * invDet);
+            return new Matrix2x2( r1c1 * invDet, -r0c1 * invDet,
+                                 -r1c0 * invDet,  r0c0 * invDet);
         }
         public Matrix2x2 Transpose() =>
-            new Matrix2x2(r1c1, r2c1,
-                          r1c2, r2c2);
-        public double Trace() => r1c1 + r2c2;
+            new Matrix2x2(r0c0, r1c0,
+                          r0c1, r1c1);
+        public double Trace() => r0c0 + r1c1;
 
         public IEnumerator<double> GetEnumerator()
         {
-            yield return r1c1;
-            yield return r1c2;
-            yield return r2c1;
-            yield return r2c2;
+            yield return r0c0; yield return r0c1;
+            yield return r1c0; yield return r1c1;
         }
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -293,8 +264,8 @@ namespace Nerd_STF.Mathematics.Algebra
         public bool Equals(Matrix2x2 other) =>
 #endif
             !(other is null) &&
-            r1c1 == other.r1c1 && r1c2 == other.r1c2 &&
-            r2c1 == other.r2c1 && r2c2 == other.r2c2;
+            r0c0 == other.r0c0 && r0c1 == other.r0c1 &&
+            r1c0 == other.r1c0 && r1c1 == other.r1c1;
 #if CS8_OR_GREATER
         public override bool Equals(object? other)
 #else
@@ -306,46 +277,52 @@ namespace Nerd_STF.Mathematics.Algebra
             else return false;
         }
         public override int GetHashCode() =>
-            (int)((uint)r1c1.GetHashCode() & 0xFF000000 |
-                  (uint)r1c2.GetHashCode() & 0x00FF0000 |
-                  (uint)r2c1.GetHashCode() & 0x0000FF00 |
-                  (uint)r2c2.GetHashCode() & 0x000000FF);
+            (int)((uint)r0c0.GetHashCode() & 0xFF000000 |
+                  (uint)r0c1.GetHashCode() & 0x00FF0000 |
+                  (uint)r1c0.GetHashCode() & 0x0000FF00 |
+                  (uint)r1c1.GetHashCode() & 0x000000FF);
         public override string ToString() => ToStringHelper.MatrixToString(this, null);
 #if CS8_OR_GREATER
         public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-#else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-#endif
-#if CS8_OR_GREATER
         public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
 #else
+        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
         public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
 #endif
 
         public static Matrix2x2 operator +(Matrix2x2 a) =>
-            new Matrix2x2(a.r1c1, a.r1c2,
-                          a.r2c1, a.r2c2);
+            new Matrix2x2(a.r0c0, a.r0c1,
+                          a.r1c0, a.r1c1);
         public static Matrix2x2 operator +(Matrix2x2 a, Matrix2x2 b) =>
-            new Matrix2x2(a.r1c1 + b.r1c1, a.r1c2 + b.r1c2,
-                          a.r2c1 + b.r2c1, a.r2c2 + b.r2c2);
+            new Matrix2x2(a.r0c0 + b.r0c0, a.r0c1 + b.r0c1,
+                          a.r1c0 + b.r1c0, a.r1c1 + b.r1c1);
         public static Matrix2x2 operator -(Matrix2x2 a) =>
-            new Matrix2x2(-a.r1c1, -a.r1c2,
-                          -a.r2c1, -a.r2c2);
+            new Matrix2x2(-a.r0c0, -a.r0c1,
+                          -a.r1c0, -a.r1c1);
         public static Matrix2x2 operator -(Matrix2x2 a, Matrix2x2 b) =>
-            new Matrix2x2(a.r1c1 - b.r1c1, a.r1c2 - b.r1c2,
-                          a.r2c1 - b.r2c1, a.r2c2 - b.r2c2);
-        public static Matrix2x2 operator *(Matrix2x2 a, Matrix2x2 b) =>
-            new Matrix2x2(a.r1c1 * b.r1c1 + a.r1c2 * b.r2c1, a.r1c1 * b.r1c2 + a.r1c2 * b.r2c2,
-                          a.r2c1 * b.r1c1 + a.r2c2 * b.r2c1, a.r2c1 * b.r1c2 + a.r2c2 * b.r2c2);
+            new Matrix2x2(a.r0c0 - b.r0c0, a.r0c1 - b.r0c1,
+                          a.r1c0 - b.r1c0, a.r1c1 - b.r1c1);
         public static Matrix2x2 operator *(Matrix2x2 a, double b) =>
-            new Matrix2x2(a.r1c1 * b, a.r1c2 * b,
-                          a.r2c1 * b, a.r2c2 * b);
+            new Matrix2x2(a.r0c0 * b, a.r0c1 * b,
+                          a.r1c0 * b, a.r1c1 * b);
         public static Float2 operator *(Matrix2x2 a, Float2 b) =>
-            new Float2(a.r1c1 * b.x + a.r1c2 * b.y,
-                       a.r2c1 * b.x + a.r2c2 * b.y);
+            new Float2(a.r0c0 * b.x + a.r0c1 * b.y,
+                       a.r1c0 * b.x + a.r1c1 * b.y);
+        public static Matrix2x2 operator *(Matrix2x2 a, Matrix2x2 b) =>
+            new Matrix2x2(a.r0c0 * b.r0c0 + a.r0c1 * b.r1c0, a.r0c0 * b.r0c1 + a.r0c1 * b.r1c1,
+                          a.r1c0 * b.r0c0 + a.r1c1 * b.r1c0, a.r1c0 * b.r0c1 + a.r1c1 * b.r1c1);
         public static Matrix2x2 operator /(Matrix2x2 a, double b) =>
-            new Matrix2x2(a.r1c1 / b, a.r1c2 / b,
-                          a.r2c1 / b, a.r2c2 / b);
+            new Matrix2x2(a.r0c0 / b, a.r0c1 / b,
+                          a.r1c0 / b, a.r1c1 / b);
         public static Matrix2x2 operator ~(Matrix2x2 a) => a.Inverse();
+        public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => a.Equals(b);
+        public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !a.Equals(b);
+
+        public static explicit operator Matrix2x2(Matrix3x3 mat) =>
+            new Matrix2x2(mat.r0c0, mat.r0c1,
+                          mat.r1c0, mat.r1c1);
+        public static explicit operator Matrix2x2(Matrix4x4 mat) =>
+            new Matrix2x2(mat.r0c0, mat.r0c1,
+                          mat.r1c0, mat.r1c1);
     }
 }

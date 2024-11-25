@@ -342,22 +342,8 @@ namespace Nerd_STF.Mathematics
             return -1; // Will only get here if there are negative numbers in the collection.
         }
 
-        public static unsafe double InverseSqrt(double num)
-        {
-            return InverseSqrt((float)num); // temp while I fix this.
-
-            // My variation of the method below for doubles.
-            // Not much has changed, just the funny constant.
-
-            long raw = *(long*)&num;
-            double half = num * 0.5;
-            raw = 0x5FE6EB3BDFFFFF36L - (raw >> 1);
-            num = *(double*)&raw;
-
-            num *= 1.5 * (half * num * num); // Newton's method.
-            return num;
-        }
-        public static unsafe float InverseSqrt(float num)
+        public static double InverseSqrt(double num) => 1 / Sqrt(num);
+        public static unsafe float InverseSqrtFast(float num)
         {
             // I think we all know this function. Code structure
             // has changed (ported), but the idea is exactly the
@@ -685,7 +671,7 @@ namespace Nerd_STF.Mathematics
         public static IEquation Cot(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Cot(inputRad[x], terms));
 
-        public static double Sqrt(double num) => 1 / InverseSqrt(num); // !!TODO!!: Bring back Newton's
+        public static double Sqrt(double num) => 1 / InverseSqrtFast((float)num); // !!TODO!!: Bring back Newton's
         public static IEquation Sqrt(IEquation equ) =>
             new Equation((double x) => Sqrt(equ.Get(x)));
 
