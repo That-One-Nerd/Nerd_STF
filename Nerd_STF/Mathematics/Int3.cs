@@ -50,6 +50,12 @@ namespace Nerd_STF.Mathematics
                 if (index >= 2) break;
             }
         }
+        public Int3(Fill<int> fill)
+        {
+            x = fill(0);
+            y = fill(1);
+            z = fill(2);
+        }
 
         public int this[int index]
         {

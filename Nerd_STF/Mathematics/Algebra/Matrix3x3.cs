@@ -51,30 +51,62 @@ namespace Nerd_STF.Mathematics.Algebra
             this.r2c0 = r2c0; this.r2c1 = r2c1; this.r2c2 = r2c2;
         }
         /// <param name="byRows"><see langword="true"/> if the array is of the form [c, r], <see langword="false"/> if the array is of the form [r, c].</param>
-        public Matrix3x3(double[,] vals, bool byRows = true)
+        public Matrix3x3(double[,] vals, bool byRows = false)
         {
             if (byRows) // Collection of rows ([c, r])
-            {
-                r0c0 = vals[0, 0]; r0c1 = vals[0, 1]; r0c2 = vals[0, 2];
-                r1c0 = vals[1, 0]; r1c1 = vals[1, 1]; r1c2 = vals[1, 2];
-                r2c0 = vals[2, 0]; r2c1 = vals[2, 1]; r2c2 = vals[2, 2];
-            }
-            else        // Collection of columns ([r, c])
             {
                 r0c0 = vals[0, 0]; r0c1 = vals[1, 0]; r0c2 = vals[2, 0];
                 r1c0 = vals[0, 1]; r1c1 = vals[1, 1]; r1c2 = vals[2, 1];
                 r2c0 = vals[0, 2]; r2c1 = vals[1, 2]; r2c2 = vals[2, 2];
             }
+            else        // Collection of columns ([r, c])
+            {
+                r0c0 = vals[0, 0]; r0c1 = vals[0, 1]; r0c2 = vals[0, 2];
+                r1c0 = vals[1, 0]; r1c1 = vals[1, 1]; r1c2 = vals[1, 2];
+                r2c0 = vals[2, 0]; r2c1 = vals[2, 1]; r2c2 = vals[2, 2];
+            }
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
-        public Matrix3x3(IEnumerable<IEnumerable<double>> vals, bool byRows = true)
+        public Matrix3x3(IEnumerable<IEnumerable<double>> vals, bool byRows = false)
         {
             MatrixHelper.SetMatrixValues(this, vals, byRows);
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
-        public Matrix3x3(IEnumerable<ListTuple<double>> vals, bool byRows = true)
+        public Matrix3x3(IEnumerable<ListTuple<double>> vals, bool byRows = false)
         {
             MatrixHelper.SetMatrixValues(this, vals, byRows);
+        }
+        /// <param name="byRows"><see langword="true"/> if the fill goes through columns for each row, <see langword="false"/> if the fill goes through rows for each column.</param>
+        public Matrix3x3(Fill<double> fill, bool byRows = false)
+        {
+            if (byRows)
+            {
+                r0c0 = fill(0); r0c1 = fill(3); r0c2 = fill(6);
+                r1c0 = fill(1); r1c1 = fill(4); r1c2 = fill(7);
+                r2c0 = fill(2); r2c1 = fill(5); r2c2 = fill(8);
+            }
+            else
+            {
+                r0c0 = fill(0); r0c1 = fill(1); r0c2 = fill(2);
+                r1c0 = fill(3); r1c1 = fill(4); r1c2 = fill(5);
+                r2c0 = fill(6); r2c1 = fill(7); r2c2 = fill(8);
+            }
+        }
+        /// <param name="byRows"><see langword="true"/> if the fill is a collection of rows (form [c, r]), <see langword="false"/> if the fill is a collection of columns (form [r, c]).</param>
+        public Matrix3x3(Fill2d<double> fill, bool byRows = false)
+        {
+            if (byRows)
+            {
+                r0c0 = fill(0, 0); r0c1 = fill(1, 0); r0c2 = fill(2, 0);
+                r1c0 = fill(0, 1); r1c1 = fill(1, 1); r1c2 = fill(2, 1);
+                r2c0 = fill(0, 2); r2c1 = fill(1, 2); r2c2 = fill(2, 2);
+            }
+            else
+            {
+                r0c0 = fill(0, 0); r0c1 = fill(0, 1); r0c2 = fill(0, 2);
+                r1c0 = fill(1, 0); r1c1 = fill(1, 1); r1c2 = fill(1, 2);
+                r2c0 = fill(2, 0); r2c1 = fill(2, 1); r2c2 = fill(2, 2);
+            }
         }
 
         public double this[int r, int c]
@@ -402,6 +434,10 @@ namespace Nerd_STF.Mathematics.Algebra
             new Matrix3x3(a.r0c0 / b, a.r0c1 / b, a.r0c2 / b,
                           a.r1c0 / b, a.r1c1 / b, a.r1c2 / b,
                           a.r2c0 / b, a.r2c1 / b, a.r2c2 / b);
+        public static Matrix3x3 operator ^(Matrix3x3 a, Matrix3x3 b) =>
+            new Matrix3x3(a.r0c0 * b.r0c0, a.r0c1 * b.r0c1, a.r0c2 * b.r0c2,
+                          a.r1c0 * b.r1c0, a.r1c1 * b.r1c1, a.r1c2 * b.r1c2,
+                          a.r2c0 * b.r2c0, a.r2c1 * b.r2c1, a.r2c2 * b.r2c2);
         public static Matrix3x3 operator ~(Matrix3x3 a) => a.Inverse();
         public static bool operator ==(Matrix3x3 a, Matrix3x3 b) => a.Equals(b);
         public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !a.Equals(b);

@@ -46,30 +46,58 @@ namespace Nerd_STF.Mathematics.Algebra
             this.r1c1 = r1c1;
         }
         /// <param name="byRows"><see langword="true"/> if the array is of the form [c, r], <see langword="false"/> if the array is of the form [r, c].</param>
-        public Matrix2x2(double[,] vals, bool byRows = true)
+        public Matrix2x2(double[,] vals, bool byRows = false)
         {
             if (byRows) // Collection of rows ([c, r])
-            {
-                r0c0 = vals[0, 0]; r0c1 = vals[0, 1];
-                r1c0 = vals[1, 0]; r1c1 = vals[1, 1];
-            }
-            else        // Collection of columns ([r, c])
             {
                 r0c0 = vals[0, 0]; r0c1 = vals[1, 0];
                 r1c0 = vals[0, 1]; r1c1 = vals[1, 1];
             }
+            else        // Collection of columns ([r, c])
+            {
+                r0c0 = vals[0, 0]; r0c1 = vals[0, 1];
+                r1c0 = vals[1, 0]; r1c1 = vals[1, 1];
+            }
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
-        public Matrix2x2(IEnumerable<IEnumerable<double>> vals, bool byRows = true)
+        public Matrix2x2(IEnumerable<IEnumerable<double>> vals, bool byRows = false)
         {
             MatrixHelper.SetMatrixValues(this, vals, byRows);
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
-        public Matrix2x2(IEnumerable<ListTuple<double>> vals, bool byRows = true)
+        public Matrix2x2(IEnumerable<ListTuple<double>> vals, bool byRows = false)
         {
             MatrixHelper.SetMatrixValues(this, vals, byRows);
         }
-        
+        /// <param name="byRows"><see langword="true"/> if the fill goes through columns for each row, <see langword="false"/> if the fill goes through rows for each column.</param>
+        public Matrix2x2(Fill<double> fill, bool byRows = false)
+        {
+            if (byRows)
+            {
+                r0c0 = fill(0); r0c1 = fill(2);
+                r1c0 = fill(1); r1c1 = fill(3);
+            }
+            else
+            {
+                r0c0 = fill(0); r0c1 = fill(1);
+                r1c0 = fill(2); r1c1 = fill(3);
+            }
+        }
+        /// <param name="byRows"><see langword="true"/> if the fill is a collection of rows (form [c, r]), <see langword="false"/> if the fill is a collection of columns (form [r, c]).</param>
+        public Matrix2x2(Fill2d<double> fill, bool byRows = false)
+        {
+            if (byRows)
+            {
+                r0c0 = fill(0, 0); r0c1 = fill(1, 0);
+                r1c0 = fill(0, 1); r1c1 = fill(1, 1);
+            }
+            else
+            {
+                r0c0 = fill(0, 0); r0c1 = fill(0, 1);
+                r1c0 = fill(1, 0); r1c1 = fill(1, 1);
+            }
+        }
+
         public double this[int r, int c]
         {
             get
@@ -314,6 +342,9 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix2x2 operator /(Matrix2x2 a, double b) =>
             new Matrix2x2(a.r0c0 / b, a.r0c1 / b,
                           a.r1c0 / b, a.r1c1 / b);
+        public static Matrix2x2 operator ^(Matrix2x2 a, Matrix2x2 b) =>
+            new Matrix2x2(a.r0c0 * b.r0c0, a.r0c1 * b.r0c1,
+                          a.r1c0 * b.r1c0, a.r1c1 * b.r1c1);
         public static Matrix2x2 operator ~(Matrix2x2 a) => a.Inverse();
         public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => a.Equals(b);
         public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !a.Equals(b);

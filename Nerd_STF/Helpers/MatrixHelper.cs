@@ -16,12 +16,12 @@ namespace Nerd_STF.Helpers
                 int y = 0;
                 foreach (double v in part)
                 {
-                    matrix[byRows ? (x, y) : (y, x)] = v;
+                    matrix[byRows ? (y, x) : (x, y)] = v;
                     y++;
-                    if (byRows ? y >= size.x : y >= size.y) break;
+                    if (byRows ? y >= size.y : y >= size.x) break;
                 }
                 x++;
-                if (byRows ? x >= size.y : x >= size.x) break;
+                if (byRows ? x >= size.x : x >= size.y) break;
             }
         }
         public static void SetMatrixValues<TMat>(TMat matrix, IEnumerable<ListTuple<double>> vals, bool byRows)
@@ -35,17 +35,17 @@ namespace Nerd_STF.Helpers
                 int y = 0;
                 foreach (double v in part)
                 {
-                    matrix[byRows ? (x, y) : (y, x)] = v;
+                    matrix[byRows ? (y, x) : (x, y)] = v;
                     y++;
-                    if (byRows ? y >= size.x : y >= size.y) break;
+                    if (byRows ? y >= size.y : y >= size.x) break;
                 }
                 x++;
-                if (byRows ? x >= size.y : x >= size.x) break;
+                if (byRows ? x >= size.x : x >= size.y) break;
             }
         }
     
         public static void SetRow<TMat>(TMat matrix, int row, IEnumerable<double> vals)
-            where TMat: IMatrix<TMat>
+            where TMat : IMatrix<TMat>
         {
             int col = 0;
             int max = matrix.Size.y;

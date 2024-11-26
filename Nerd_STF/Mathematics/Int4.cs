@@ -54,6 +54,13 @@ namespace Nerd_STF.Mathematics
                 if (index >= 2) break;
             }
         }
+        public Int4(Fill<int> fill)
+        {
+            w = fill(0);
+            x = fill(1);
+            y = fill(2);
+            z = fill(3);
+        }
 
         public int this[int index]
         {

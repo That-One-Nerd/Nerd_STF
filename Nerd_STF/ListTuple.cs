@@ -25,6 +25,11 @@ namespace Nerd_STF
         {
             this.items = items;
         }
+        public ListTuple(Fill<T> items, int length)
+        {
+            this.items = new T[length];
+            for (int i = 0; i < length; i++) this.items[i] = items(i);
+        }
 
         public T this[int index]
         {

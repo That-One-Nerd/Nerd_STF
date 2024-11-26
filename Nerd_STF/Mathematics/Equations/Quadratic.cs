@@ -42,6 +42,12 @@ namespace Nerd_STF.Mathematics.Equations
             B = 0;
             C = c;
         }
+        public Quadratic(Fill<double> fill)
+        {
+            C = fill(0);
+            B = fill(1);
+            A = fill(2);
+        }
         
         public double this[double x] => A * x * x + B * x + C;
         public double Get(double x) => A * x * x + B * x + C;

@@ -57,32 +57,68 @@ namespace Nerd_STF.Mathematics.Algebra
             this.r3c0 = r3c0; this.r3c1 = r3c1; this.r3c2 = r3c2; this.r3c3 = r3c3;
         }
         /// <param name="byRows"><see langword="true"/> if the array is of the form [c, r], <see langword="false"/> if the array is of the form [r, c].</param>
-        public Matrix4x4(double[,] vals, bool byRows = true)
+        public Matrix4x4(double[,] vals, bool byRows = false)
         {
             if (byRows) // Collection of rows ([c, r])
-            {
-                r0c0 = vals[0, 0]; r0c1 = vals[0, 1]; r0c2 = vals[0, 2]; r0c3 = vals[0, 3];
-                r1c0 = vals[1, 0]; r1c1 = vals[1, 1]; r1c2 = vals[1, 2]; r1c3 = vals[1, 3];
-                r2c0 = vals[2, 0]; r2c1 = vals[2, 1]; r2c2 = vals[2, 2]; r2c3 = vals[2, 3];
-                r3c0 = vals[3, 0]; r3c1 = vals[3, 1]; r3c2 = vals[3, 2]; r3c3 = vals[3, 3];
-            }
-            else
             {
                 r0c0 = vals[0, 0]; r0c1 = vals[1, 0]; r0c2 = vals[2, 0]; r0c3 = vals[3, 0];
                 r1c0 = vals[0, 1]; r1c1 = vals[1, 1]; r1c2 = vals[2, 1]; r1c3 = vals[3, 1];
                 r2c0 = vals[0, 2]; r2c1 = vals[1, 2]; r2c2 = vals[2, 2]; r2c3 = vals[3, 2];
                 r3c0 = vals[0, 3]; r3c1 = vals[1, 3]; r3c2 = vals[2, 3]; r3c3 = vals[3, 3];
             }
+            else
+            {
+                r0c0 = vals[0, 0]; r0c1 = vals[0, 1]; r0c2 = vals[0, 2]; r0c3 = vals[0, 3];
+                r1c0 = vals[1, 0]; r1c1 = vals[1, 1]; r1c2 = vals[1, 2]; r1c3 = vals[1, 3];
+                r2c0 = vals[2, 0]; r2c1 = vals[2, 1]; r2c2 = vals[2, 2]; r2c3 = vals[2, 3];
+                r3c0 = vals[3, 0]; r3c1 = vals[3, 1]; r3c2 = vals[3, 2]; r3c3 = vals[3, 3];
+            }
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
-        public Matrix4x4(IEnumerable<IEnumerable<double>> vals, bool byRows = true)
+        public Matrix4x4(IEnumerable<IEnumerable<double>> vals, bool byRows = false)
         {
             MatrixHelper.SetMatrixValues(this, vals, byRows);
         }
         /// <param name="byRows"><see langword="true"/> if the enumerable is a collection of rows (form [c, r]), <see langword="false"/> if the enumerable is a collection of columns (form [r, c]).</param>
-        public Matrix4x4(IEnumerable<ListTuple<double>> vals, bool byRows = true)
+        public Matrix4x4(IEnumerable<ListTuple<double>> vals, bool byRows = false)
         {
             MatrixHelper.SetMatrixValues(this, vals, byRows);
+        }
+        /// <param name="byRows"><see langword="true"/> if the fill goes through columns for each row, <see langword="false"/> if the fill goes through rows for each column.</param>
+        public Matrix4x4(Fill<double> fill, bool byRows = false)
+        {
+            if (byRows)
+            {
+                r0c0 = fill(0); r0c1 = fill(4); r0c2 = fill( 8); r0c3 = fill(12);
+                r1c0 = fill(1); r1c1 = fill(5); r1c2 = fill( 9); r1c3 = fill(13);
+                r2c0 = fill(2); r2c1 = fill(6); r2c2 = fill(10); r2c3 = fill(14);
+                r3c0 = fill(3); r3c1 = fill(7); r3c2 = fill(11); r3c3 = fill(15);
+            }
+            else
+            {
+                r0c0 = fill( 0); r0c1 = fill( 1); r0c2 = fill( 2); r0c3 = fill( 3);
+                r1c0 = fill( 4); r1c1 = fill( 5); r1c2 = fill( 6); r1c3 = fill( 7);
+                r2c0 = fill( 8); r2c1 = fill( 9); r2c2 = fill(10); r2c3 = fill(11);
+                r3c0 = fill(12); r3c1 = fill(13); r3c2 = fill(14); r3c3 = fill(15);
+            }
+        }
+        /// <param name="byRows"><see langword="true"/> if the fill is a collection of rows (form [c, r]), <see langword="false"/> if the fill is a collection of columns (form [r, c]).</param>
+        public Matrix4x4(Fill2d<double> fill, bool byRows = false)
+        {
+            if (byRows)
+            {
+                r0c0 = fill(0, 0); r0c1 = fill(1, 0); r0c2 = fill(2, 0); r0c3 = fill(3, 0);
+                r1c0 = fill(0, 1); r1c1 = fill(1, 1); r1c2 = fill(2, 1); r1c3 = fill(3, 1);
+                r2c0 = fill(0, 2); r2c1 = fill(1, 2); r2c2 = fill(2, 2); r2c3 = fill(3, 2);
+                r3c0 = fill(0, 3); r3c1 = fill(1, 3); r3c2 = fill(2, 3); r3c3 = fill(3, 3);
+            }
+            else
+            {
+                r0c0 = fill(0, 0); r0c1 = fill(0, 1); r0c2 = fill(0, 2); r0c3 = fill(0, 3);
+                r1c0 = fill(1, 0); r1c1 = fill(1, 1); r1c2 = fill(1, 2); r1c3 = fill(1, 3);
+                r2c0 = fill(2, 0); r2c1 = fill(2, 1); r2c2 = fill(2, 2); r2c3 = fill(2, 3);
+                r3c0 = fill(3, 0); r3c1 = fill(3, 1); r3c2 = fill(3, 2); r3c3 = fill(3, 3);
+            }
         }
 
         public double this[int r, int c]
@@ -544,6 +580,11 @@ namespace Nerd_STF.Mathematics.Algebra
                           a.r1c0 / b, a.r1c1 / b, a.r1c2 / b, a.r1c3 / b,
                           a.r2c0 / b, a.r2c1 / b, a.r2c2 / b, a.r2c3 / b,
                           a.r3c0 / b, a.r3c1 / b, a.r3c2 / b, a.r3c3 / b);
+        public static Matrix4x4 operator ^(Matrix4x4 a, Matrix4x4 b) =>
+            new Matrix4x4(a.r0c0 * b.r0c0, a.r0c1 * b.r0c1, a.r0c2 * b.r0c2, a.r0c3 * b.r0c3,
+                          a.r1c0 * b.r1c0, a.r1c1 * b.r1c1, a.r1c2 * b.r1c2, a.r1c3 * b.r1c3,
+                          a.r2c0 * b.r2c0, a.r2c1 * b.r2c1, a.r2c2 * b.r2c2, a.r2c3 * b.r2c3,
+                          a.r3c0 * b.r3c0, a.r3c1 * b.r3c1, a.r3c2 * b.r3c2, a.r3c3 * b.r3c3);
         public static Matrix4x4 operator ~(Matrix4x4 a) => a.Inverse();
         public static bool operator ==(Matrix4x4 a, Matrix4x4 b) => a.Equals(b);
         public static bool operator !=(Matrix4x4 a, Matrix4x4 b) => !a.Equals(b);

@@ -21,6 +21,11 @@ namespace Nerd_STF.Mathematics.Equations
             M = m;
             B = b;
         }
+        public Linear(Fill<double> fill)
+        {
+            B = fill(0);
+            M = fill(1);
+        }
 
         public double this[double x] => M * x + B;
         public double Get(double x) => M * x + B;

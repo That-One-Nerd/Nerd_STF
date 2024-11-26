@@ -374,6 +374,24 @@ namespace Nerd_STF.Mathematics
         }
         public static IEquation Lerp(IEquation a, IEquation b, double t, bool clamp = true) =>
             new Equation((double x) => Lerp(a.Get(x), b.Get(x), t, clamp));
+        public static Fill<double> Lerp(Fill<double> a, Fill<double> b, double t, bool clamp = true)
+        {
+            if (clamp) Clamp(ref t, 0, 1);
+            return delegate (int index)
+            {
+                double aVal = a(index);
+                return aVal + t * (b(index) - aVal);
+            };
+        }
+        public static Fill<int> Lerp(Fill<int> a, Fill<int> b, double t, bool clamp = true)
+        {
+            if (clamp) Clamp(ref t, 0, 1);
+            return delegate (int index)
+            {
+                int aVal = a(index);
+                return (int)(aVal + t * (b(index) - aVal));
+            };
+        }
 #if CS11_OR_GREATER
         public static T Lerp<T>(T a, T b, T t, bool clamp = true)
             where T : INumber<T>
@@ -381,6 +399,20 @@ namespace Nerd_STF.Mathematics
             if (clamp) Clamp(ref t, T.Zero, T.One);
             return a + t * (b - a);
         }
+        public static T Lerp<T>(T a, T b, double t, bool clamp = true)
+            where T : IInterpolable<T> => T.Lerp(a, b, t, clamp);
+        public static Fill<T> Lerp<T>(Fill<T> a, Fill<T> b, T t, bool clamp = true)
+            where T : INumber<T>
+        {
+            if (clamp) Clamp(ref t, T.Zero, T.One);
+            return delegate (int index)
+            {
+                T aVal = a(index);
+                return aVal + t * (b(index) - aVal);
+            };
+        }
+        public static Fill<T> Lerp<T>(Fill<T> a, Fill<T> b, double t, bool clamp = true)
+            where T : IInterpolable<T> => (int index) => T.Lerp(a(index), b(index), t, clamp);
 #endif
 
         public static int Max(int a, int b) => a > b ? a : b;

@@ -55,6 +55,13 @@ namespace Nerd_STF.Mathematics
                 if (index >= 2) break;
             }
         }
+        public Float4(Fill<double> fill)
+        {
+            w = fill(0);
+            x = fill(1);
+            y = fill(2);
+            z = fill(3);
+        }
 
         public double this[int index]
         {

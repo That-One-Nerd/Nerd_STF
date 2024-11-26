@@ -30,6 +30,16 @@ namespace Nerd_STF.Mathematics.Equations
             if (reverse) this.terms = TrimExcessTerms(terms.Reverse().ToArray());
             else this.terms = TrimExcessTerms(terms.ToArray());
         }
+        public Polynomial(bool reverse, Fill<double> terms, int length)
+        {
+            this.terms = new double[length];
+            for (int i = 0; i < length; i++)
+            {
+                if (reverse) this.terms[i] = terms(length - 1 - i);
+                else this.terms[i] = terms(i);
+            }
+            this.terms = TrimExcessTerms(this.terms);
+        }
         private static double[] TrimExcessTerms(double[] terms)
         {
             int newLength = terms.Length;

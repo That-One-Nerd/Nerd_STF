@@ -11,6 +11,7 @@ namespace Nerd_STF.Mathematics.Algebra
 
         static abstract TSelf operator *(TSelf a, double b);
         static abstract TSelf operator /(TSelf a, double b);
+        static abstract TSelf operator ^(TSelf a, TSelf b);
         static abstract TSelf? operator ~(TSelf m);
     }
 }
