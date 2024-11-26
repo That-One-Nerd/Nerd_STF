@@ -62,12 +62,12 @@ namespace Nerd_STF.Helpers
             // First convert all items to their string counterparts,
             // then measure the lengths and do spacing accordingly.
             Int2 size = matrix.Size;
-            string[,] items = new string[size.x, size.y];
+            string[,] items = new string[size.y, size.x];
             for (int x = 0; x < size.x; x++) for (int y = 0; y < size.y; y++)
-                    items[x, y] = matrix[y, x].ToString(format);
+                    items[y, x] = matrix[x, y].ToString(format);
 
             // Then write each line separately.
-            StringBuilder[] lines = new StringBuilder[size.y + 2];
+            StringBuilder[] lines = new StringBuilder[size.x + 2];
             for (int i = 0; i < lines.Length; i++)
             {
                 StringBuilder builder = new StringBuilder();
@@ -78,16 +78,16 @@ namespace Nerd_STF.Helpers
                 lines[i] = builder;
             }
             int totalLen = 0;
-            for (int x = 0; x < size.x; x++)
+            for (int x = 0; x < size.y; x++)
             {
                 int maxLen = 0;
-                for (int y = 0; y < size.y; y++)
+                for (int y = 0; y < size.x; y++)
                 {
                     string item = items[x, y];
                     if (item.Length > maxLen) maxLen = item.Length;
                 }
                 totalLen += maxLen + 1;
-                for (int y = 0; y < size.y; y++)
+                for (int y = 0; y < size.x; y++)
                 {
                     StringBuilder builder = lines[y + 1];
                     string item = items[x, y];
