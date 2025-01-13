@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Nerd_STF.Exceptions;
 
 namespace Nerd_STF.Mathematics
@@ -308,6 +309,21 @@ namespace Nerd_STF.Mathematics
         public string ToString(string format) => $"({w.ToString(format)}, {x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
 
         public double[] ToArray() => new double[] { w, x, y, z };
+        public Fill<double> ToFill()
+        {
+            Float4 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.w;
+                    case 1: return copy.x;
+                    case 2: return copy.y;
+                    case 3: return copy.z;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
         public List<double> ToList() => new List<double> { w, x, y, z };
 
         public static Float4 operator +(Float4 a, Float4 b) => new Float4(a.w + b.w, a.x + b.x, a.y + b.y, a.z + b.z);
@@ -325,10 +341,16 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float4(Int4 ints) => new Float4(ints.w, ints.x, ints.y, ints.z);
         public static implicit operator Float4(Float2 floats) => new Float4(0, floats.x, floats.y, 0);
         public static implicit operator Float4(Float3 floats) => new Float4(0, floats.x, floats.y, floats.z);
+        public static implicit operator Float4(Vector2 vec) => new Float4(0, vec.X, vec.Y, 0);
+        public static implicit operator Float4(Vector3 vec) => new Float4(0, vec.X, vec.Y, vec.Z);
+        public static implicit operator Float4(Vector4 vec) => new Float4(vec.W, vec.X, vec.Y, vec.Z);
         public static implicit operator Float4(ListTuple<double> tuple) => new Float4(tuple[0], tuple[1], tuple[2], tuple[3]);
         public static implicit operator Float4(ListTuple<int> tuple) => new Float4(tuple[0], tuple[1], tuple[2], tuple[3]);
         public static implicit operator Float4((double, double, double, double) tuple) => new Float4(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
 
+        public static explicit operator Vector2(Float4 group) => new Vector2((float)group.x, (float)group.y);
+        public static explicit operator Vector3(Float4 group) => new Vector3((float)group.x, (float)group.y, (float)group.z);
+        public static implicit operator Vector4(Float4 group) => new Vector4((float)group.x, (float)group.y, (float)group.z, (float)group.w);
         public static implicit operator ListTuple<double>(Float4 group) => new ListTuple<double>(group.w, group.x, group.y, group.z);
         public static explicit operator ListTuple<int>(Float4 group) => new ListTuple<int>((int)group.w, (int)group.x, (int)group.y, (int)group.z);
         public static implicit operator ValueTuple<double, double, double, double>(Float4 group) => (group.w, group.x, group.y, group.z);

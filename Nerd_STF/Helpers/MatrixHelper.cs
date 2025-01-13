@@ -18,10 +18,10 @@ namespace Nerd_STF.Helpers
                 {
                     matrix[byRows ? (y, x) : (x, y)] = v;
                     y++;
-                    if (byRows ? y >= size.y : y >= size.x) break;
+                    if (byRows ? y >= size.x : y >= size.y) break;
                 }
                 x++;
-                if (byRows ? x >= size.x : x >= size.y) break;
+                if (byRows ? x >= size.y : x >= size.x) break;
             }
         }
         public static void SetMatrixValues<TMat>(TMat matrix, IEnumerable<ListTuple<double>> vals, bool byRows)

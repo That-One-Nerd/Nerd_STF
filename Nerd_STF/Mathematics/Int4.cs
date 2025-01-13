@@ -265,6 +265,21 @@ namespace Nerd_STF.Mathematics
         public string ToString(string format) => $"({w.ToString(format)}, {x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
 
         public int[] ToArray() => new int[] { w, x, y, z };
+        public Fill<int> ToFill()
+        {
+            Int4 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.w;
+                    case 1: return copy.x;
+                    case 2: return copy.y;
+                    case 3: return copy.z;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
         public List<int> ToList() => new List<int> { w, x, y, z };
 
         public static Int4 operator +(Int4 a, Int4 b) => new Int4(a.w + b.w, a.x + b.x, a.y + b.y, a.z + b.z);

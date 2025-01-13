@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 
 namespace Nerd_STF.Mathematics
 {
@@ -260,6 +261,19 @@ namespace Nerd_STF.Mathematics
         public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)})";
 
         public double[] ToArray() => new double[] { x, y };
+        public Fill<double> ToFill()
+        {
+            Float2 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.x;
+                    case 1: return copy.y;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
         public List<double> ToList() => new List<double> { x, y };
 
         public static Float2 operator +(Float2 a, Float2 b) => new Float2(a.x + b.x, a.y + b.y);
@@ -281,6 +295,9 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float2(PointF point) => new Float2(point.X, point.Y);
         public static implicit operator Float2(Size point) => new Float2(point.Width, point.Height);
         public static implicit operator Float2(SizeF size) => new Float2(size.Width, size.Height);
+        public static implicit operator Float2(Vector2 vec) => new Float2(vec.X, vec.Y);
+        public static explicit operator Float2(Vector3 vec) => new Float2(vec.X, vec.Y);
+        public static explicit operator Float2(Vector4 vec) => new Float2(vec.X, vec.Y);
         public static implicit operator Float2(ListTuple<double> tuple) => new Float2(tuple[0], tuple[1]);
         public static implicit operator Float2(ListTuple<int> tuple) => new Float2(tuple[0], tuple[1]);
         public static implicit operator Float2((double, double) tuple) => new Float2(tuple.Item1, tuple.Item2);
@@ -289,6 +306,9 @@ namespace Nerd_STF.Mathematics
         public static implicit operator PointF(Float2 group) => new PointF((float)group.x, (float)group.y);
         public static explicit operator Size(Float2 group) => new Size((int)group.x, (int)group.y);
         public static implicit operator SizeF(Float2 group) => new SizeF((float)group.x, (float)group.y);
+        public static implicit operator Vector2(Float2 group) => new Vector2((float)group.x, (float)group.y);
+        public static implicit operator Vector3(Float2 group) => new Vector3((float)group.x, (float)group.y, 0);
+        public static implicit operator Vector4(Float2 group) => new Vector4((float)group.x, (float)group.y, 0, 0);
         public static implicit operator ListTuple<double>(Float2 group) => new ListTuple<double>(group.x, group.y);
         public static explicit operator ListTuple<int>(Float2 group) => new ListTuple<int>((int)group.x, (int)group.y);
         public static implicit operator ValueTuple<double, double>(Float2 group) => (group.x, group.y);

@@ -21,6 +21,7 @@ namespace Nerd_STF.Mathematics
         TItem this[int index] { get; set; }
 
         TItem[] ToArray();
+        Fill<TItem> ToFill();
         List<TItem> ToList();
     }
 }

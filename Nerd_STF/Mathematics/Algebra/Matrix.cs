@@ -148,6 +148,16 @@ namespace Nerd_STF.Mathematics.Algebra
             }
         }
 
+        public double TryGet(int r, int c)
+        {
+            if (r >= Size.x || c >= Size.y)
+            {
+                if (r == c) return 1;
+                else return 0;
+            }
+            else return terms[FlattenIndex(r, c)];
+        }
+
         public static Matrix FromMatrix<T>(T mat)
             where T : IMatrix<T> =>
             new Matrix(mat.Size, (int r, int c) => mat[r, c]);
@@ -294,6 +304,12 @@ namespace Nerd_STF.Mathematics.Algebra
             ThrowIfNotSquare();
             double sum = 0;
             for (int i = 0; i < size.x; i++) sum += terms[FlattenIndex(i, i)];
+            return sum;
+        }
+        public double TraceIsh()
+        {
+            double sum = 0;
+            for (int i = 0; i < MathE.Min(size.x, size.y); i++) sum += terms[FlattenIndex(i, i)];
             return sum;
         }
 

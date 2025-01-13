@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace Nerd_STF.Mathematics
 {
@@ -287,6 +288,20 @@ namespace Nerd_STF.Mathematics
         public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
 
         public double[] ToArray() => new double[] { x, y, z };
+        public Fill<double> ToFill()
+        {
+            Float3 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.x;
+                    case 1: return copy.y;
+                    case 2: return copy.z;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
         public List<double> ToList() => new List<double> { x, y, z };
 
         public static Float3 operator +(Float3 a, Float3 b) => new Float3(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -304,10 +319,16 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float3(Int2 ints) => new Float3(ints.x, ints.y, 0);
         public static implicit operator Float3(Int3 ints) => new Float3(ints.x, ints.y, ints.z);
         public static explicit operator Float3(Int4 ints) => new Float3(ints.x, ints.y, ints.z);
+        public static implicit operator Float3(Vector2 vec) => new Float3(vec.X, vec.Y, 0);
+        public static implicit operator Float3(Vector3 vec) => new Float3(vec.X, vec.Y, vec.Z);
+        public static explicit operator Float3(Vector4 vec) => new Float3(vec.X, vec.Y, vec.Z);
         public static implicit operator Float3(ListTuple<double> tuple) => new Float3(tuple[0], tuple[1], tuple[2]);
         public static implicit operator Float3(ListTuple<int> tuple) => new Float3(tuple[0], tuple[1], tuple[2]);
         public static implicit operator Float3((double, double, double) tuple) => new Float3(tuple.Item1, tuple.Item2, tuple.Item3);
 
+        public static explicit operator Vector2(Float3 group) => new Vector2((float)group.x, (float)group.y);
+        public static implicit operator Vector3(Float3 group) => new Vector3((float)group.x, (float)group.y, (float)group.z);
+        public static implicit operator Vector4(Float3 group) => new Vector4((float)group.x, (float)group.y, (float)group.z, 0);
         public static implicit operator ListTuple<double>(Float3 group) => new ListTuple<double>(group.x, group.y, group.z);
         public static explicit operator ListTuple<int>(Float3 group) => new ListTuple<int>((int)group.x, (int)group.y, (int)group.z);
         public static implicit operator ValueTuple<double, double, double>(Float3 group) => (group.x, group.y, group.z);
