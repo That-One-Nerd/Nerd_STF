@@ -47,7 +47,7 @@ namespace Nerd_STF.Mathematics
             {
                 this[index] = item;
                 index++;
-                if (index >= 2) break;
+                if (index == 3) break;
             }
         }
         public Int3(Fill<int> fill)

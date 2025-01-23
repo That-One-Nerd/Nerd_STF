@@ -46,7 +46,7 @@ namespace Nerd_STF.Mathematics
             {
                 this[index] = item;
                 index++;
-                if (index >= 2) break;
+                if (index == 2) break;
             }
         }
         public Float2(Fill<double> fill)

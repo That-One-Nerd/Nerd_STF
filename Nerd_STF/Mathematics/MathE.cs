@@ -703,7 +703,11 @@ namespace Nerd_STF.Mathematics
         public static IEquation Cot(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Cot(inputRad[x], terms));
 
-        public static double Sqrt(double num) => 1 / InverseSqrtFast((float)num); // !!TODO!!: Bring back Newton's
+        // YOU CANNOT USE POW HERE!!!
+        // The CordicHelper uses the Sqrt function for the Pow method.
+        // It'll cause a stack overflow.
+        // !!TODO!! - Bring back Newton's
+        public static double Sqrt(double num) => 1 / InverseSqrtFast((float)num);
         public static IEquation Sqrt(IEquation equ) =>
             new Equation((double x) => Sqrt(equ.Get(x)));
 

@@ -5,7 +5,6 @@ using System.Numerics;
 namespace Nerd_STF.Mathematics
 {
     public interface ISimpleMathOperations<TSelf> : IAdditionOperators<TSelf, TSelf, TSelf>,
-                                                    ISubtractionOperators<TSelf, TSelf, TSelf>,
                                                     IMultiplyOperators<TSelf, TSelf, TSelf>
         where TSelf : ISimpleMathOperations<TSelf>
     {
