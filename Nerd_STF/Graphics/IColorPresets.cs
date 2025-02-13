@@ -1,11 +1,7 @@
 ﻿#if CS11_OR_GREATER
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Nerd_STF.Graphics
 {
-    public interface IColorPresets<TSelf> where TSelf : struct, IColor<TSelf>, IColorPresets<TSelf>
+    public interface IColorPresets<TSelf> where TSelf : IColorPresets<TSelf>
     {
         static abstract TSelf Black { get; }
         static abstract TSelf Blue { get; }

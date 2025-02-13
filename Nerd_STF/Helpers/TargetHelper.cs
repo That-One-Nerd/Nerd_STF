@@ -4,6 +4,14 @@ namespace Nerd_STF.Helpers
 {
     internal static class TargetHelper
     {
+        public static void WriteLine(string content)
+        {
+#if NETSTANDARD1_1
+#else
+            Console.WriteLine(content);
+#endif
+        }
+
         public static T[] EmptyArray<T>()
         {
 #if NETSTANDARD1_1

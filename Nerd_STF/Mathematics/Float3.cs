@@ -1,4 +1,5 @@
 ﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -127,7 +128,7 @@ namespace Nerd_STF.Mathematics
                 total += val;
                 count++;
             }
-            return total;
+            return total / count;
         }
         public static Int3 Ceiling(Float3 val) =>
             new Int3(MathE.Ceiling(val.x),
@@ -314,6 +315,7 @@ namespace Nerd_STF.Mathematics
         public static bool operator ==(Float3 a, Float3 b) => a.Equals(b);
         public static bool operator !=(Float3 a, Float3 b) => !a.Equals(b);
 
+        public static explicit operator Float3(ColorRGB color) => new Float3(color.r, color.g, color.b);
         public static implicit operator Float3(Float2 floats) => new Float3(floats.x, floats.y, 0);
         public static explicit operator Float3(Float4 floats) => new Float3(floats.x, floats.y, floats.z);
         public static implicit operator Float3(Int2 ints) => new Float3(ints.x, ints.y, 0);

@@ -9,6 +9,7 @@ namespace Nerd_STF.Mathematics
                                    IEquatable<Angle>
 #if CS11_OR_GREATER
                                   ,IFromTuple<Angle, (double, Angle.Units)>,
+                                   IInterpolable<Angle>,
                                    IPresets2d<Angle>
 #endif
     {
@@ -37,6 +38,11 @@ namespace Nerd_STF.Mathematics
         public Angle Reflected => new Angle(MathE.ModAbs(-revTheta, 1));
 
         private readonly double revTheta;
+
+        public static Angle FromDegrees(double deg) => new Angle(deg, Units.Degrees);
+        public static Angle FromRadians(double rad) => new Angle(rad, Units.Radians);
+        public static Angle FromGradians(double grade) => new Angle(grade, Units.Gradians);
+        public static Angle FromRevolutions(double turns) => new Angle(turns, Units.Revolutions);
 
         public Angle(double theta, Units unit)
         {
@@ -127,6 +133,8 @@ namespace Nerd_STF.Mathematics
         }
         public static Angle Clamp(Angle value, Angle min, Angle max) =>
             new Angle(MathE.Clamp(value.revTheta, min.revTheta, max.revTheta));
+        public static Angle Lerp(Angle a, Angle b, double t, bool clamp = true) =>
+            new Angle(MathE.Lerp(a.revTheta, b.revTheta, t, clamp));
         public static Angle Max(IEnumerable<Angle> values) => Max(false, values);
         public static Angle Max(bool normalize, IEnumerable<Angle> values)
         {

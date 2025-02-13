@@ -5,6 +5,13 @@
         Red,
         Green,
         Blue,
-        Alpha
+        Alpha,
+        Hue,
+        Saturation,
+        Value,
+        Cyan,
+        Magenta,
+        Yellow,
+        Key
     }
 }

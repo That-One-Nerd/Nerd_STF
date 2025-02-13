@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Nerd_STF.Exceptions;
+using Nerd_STF.Graphics;
 
 namespace Nerd_STF.Mathematics
 {
@@ -136,7 +137,7 @@ namespace Nerd_STF.Mathematics
                 total += val;
                 count++;
             }
-            return total;
+            return total / count;
         }
         public static Int4 Ceiling(Float4 val) =>
             new Int4(MathE.Ceiling(val.w),
@@ -336,6 +337,7 @@ namespace Nerd_STF.Mathematics
         public static bool operator ==(Float4 a, Float4 b) => a.Equals(b);
         public static bool operator !=(Float4 a, Float4 b) => !a.Equals(b);
 
+        public static explicit operator Float4(ColorRGB color) => new Float4(color.a, color.r, color.g, color.b);
         public static implicit operator Float4(Int2 ints) => new Float4(0, ints.x, ints.y, 0);
         public static implicit operator Float4(Int3 ints) => new Float4(0, ints.x, ints.y, ints.z);
         public static implicit operator Float4(Int4 ints) => new Float4(ints.w, ints.x, ints.y, ints.z);

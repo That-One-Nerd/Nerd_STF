@@ -7,7 +7,8 @@ using System.Linq;
 
 namespace Nerd_STF.Graphics
 {
-    public struct ColorRGB : IColor<ColorRGB>
+    public struct ColorRGB : IColor<ColorRGB>,
+                             INumberGroup<ColorRGB, double>
 #if CS11_OR_GREATER
                             ,IFromTuple<ColorRGB, (double, double, double)>,
                              IFromTuple<ColorRGB, (double, double, double, double)>,
@@ -16,36 +17,36 @@ namespace Nerd_STF.Graphics
     {
         public static int ChannelCount => 4;
 
-        public static ColorRGB Black => new ColorRGB(0, 0, 0, 1);
-        public static ColorRGB Blue => new ColorRGB(0, 0, 1, 1);
-        public static ColorRGB Clear => new ColorRGB(0, 0, 0, 0);
-        public static ColorRGB Cyan => new ColorRGB(0, 1, 1, 1);
-        public static ColorRGB Gray => new ColorRGB(0.5, 0.5, 0.5, 1);
-        public static ColorRGB Green => new ColorRGB(0, 1, 0, 1);
-        public static ColorRGB Magenta => new ColorRGB(1, 0, 1, 1);
-        public static ColorRGB Orange => new ColorRGB(1, 0.5, 0, 1);
-        public static ColorRGB Purple => new ColorRGB(0.5, 0, 1, 1);
-        public static ColorRGB Red => new ColorRGB(1, 0, 0, 1);
-        public static ColorRGB White => new ColorRGB(1, 1, 1, 1);
-        public static ColorRGB Yellow => new ColorRGB(1, 1, 0, 1);
+        public static ColorRGB Black =>   new ColorRGB(0  , 0  , 0  , 1);
+        public static ColorRGB Blue =>    new ColorRGB(0  , 0  , 1  , 1);
+        public static ColorRGB Clear =>   new ColorRGB(0  , 0  , 0  , 0);
+        public static ColorRGB Cyan =>    new ColorRGB(0  , 1  , 1  , 1);
+        public static ColorRGB Gray =>    new ColorRGB(0.5, 0.5, 0.5, 1);
+        public static ColorRGB Green =>   new ColorRGB(0  , 1  , 0  , 1);
+        public static ColorRGB Magenta => new ColorRGB(1  , 0  , 1  , 1);
+        public static ColorRGB Orange =>  new ColorRGB(1  , 0.5, 0  , 1);
+        public static ColorRGB Purple =>  new ColorRGB(0.5, 0  , 1  , 1);
+        public static ColorRGB Red =>     new ColorRGB(1  , 0  , 0  , 1);
+        public static ColorRGB White =>   new ColorRGB(1  , 1  , 1  , 1);
+        public static ColorRGB Yellow =>  new ColorRGB(1  , 1  , 0  , 1);
 
         public double Magnitude => MathE.Sqrt(r * r + g * g + b * b);
 
         public double r, g, b, a;
 
-        public ColorRGB(double r, double g, double b)
+        public ColorRGB(double red, double green, double blue)
         {
-            this.r = r;
-            this.g = g;
-            this.b = b;
+            r = red;
+            g = green;
+            b = blue;
             a = 1;
         }
-        public ColorRGB(double r, double g, double b, double a)
+        public ColorRGB(double red, double green, double blue, double alpha)
         {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
+            r = red;
+            g = green;
+            b = blue;
+            a = alpha;
         }
         public ColorRGB(IEnumerable<double> nums)
         {
@@ -160,6 +161,9 @@ namespace Nerd_STF.Graphics
                                 MathE.Pow(avgB, invGamma),
                                 avgA);
         }
+#if CS11_OR_GREATER
+        static ColorRGB IColor<ColorRGB>.Average(IEnumerable<ColorRGB> colors) => Average(1, colors);
+#endif
         public static ColorRGB Clamp(ColorRGB color, ColorRGB min, ColorRGB max) =>
             new ColorRGB(MathE.Clamp(color.r, min.r, max.r),
                          MathE.Clamp(color.g, min.g, max.g),
@@ -206,12 +210,9 @@ namespace Nerd_STF.Graphics
         }
         public static ColorRGB Lerp(double gamma, ColorRGB a, ColorRGB b, double t, bool clamp = true)
         {
-            double aCorrectedR = MathE.Pow(a.r, gamma),
-                   aCorrectedG = MathE.Pow(a.g, gamma),
-                   aCorrectedB = MathE.Pow(a.b, gamma),
-                   bCorrectedR = MathE.Pow(b.r, gamma),
-                   bCorrectedG = MathE.Pow(b.g, gamma),
-                   bCorrectedB = MathE.Pow(b.b, gamma);
+            double aCorrectedR = MathE.Pow(a.r, gamma), bCorrectedR = MathE.Pow(b.r, gamma),
+                   aCorrectedG = MathE.Pow(a.g, gamma), bCorrectedG = MathE.Pow(b.g, gamma),
+                   aCorrectedB = MathE.Pow(a.b, gamma), bCorrectedB = MathE.Pow(b.b, gamma);
             // Gamma doesn't apply to the alpha channel.
 
             double newR = MathE.Lerp(aCorrectedR, bCorrectedR, t, clamp),
@@ -242,7 +243,7 @@ namespace Nerd_STF.Graphics
         public static ColorRGB Sum(IEnumerable<ColorRGB> colors)
         {
             bool any = false;
-            ColorRGB result = new ColorRGB(0, 0, 0, 1);
+            ColorRGB result = new ColorRGB(0, 0, 0, 0);
             foreach (ColorRGB color in colors)
             {
                 any = true;
@@ -278,9 +279,37 @@ namespace Nerd_STF.Graphics
         {
             Type type = typeof(TColor);
             if (type == typeof(ColorRGB)) return (TColor)(object)this;
+            else if (type == typeof(ColorHSV)) return (TColor)(object)AsHsv();
+            else if (type == typeof(ColorCMYK)) return (TColor)(object)AsCmyk();
             else throw new InvalidCastException();
         }
         public ColorRGB AsRgb() => this;
+        public ColorHSV AsHsv()
+        {
+            // Thanks https://www.rapidtables.com/convert/color/rgb-to-hsv.html
+            double cMax = MathE.Max(this), cMin = MathE.Min(this), delta = cMax - cMin;
+            Angle h;
+
+            if (delta == 0) h = Angle.Zero;
+            else if (cMax == r) h = Angle.FromDegrees(60 * MathE.ModAbs((g - b) / delta, 6));
+            else if (cMax == g) h = Angle.FromDegrees(60 * ((b - r) / delta + 2));
+            else if (cMax == b) h = Angle.FromDegrees(60 * ((r - g) / delta + 4));
+            else h = Angle.Zero;
+
+            double s = cMax == 0 ? 0 : delta / cMax;
+            return new ColorHSV(h, s, cMax);
+        }
+        public ColorCMYK AsCmyk()
+        {
+            // Thanks https://www.rapidtables.com/convert/color/rgb-to-cmyk.html
+            double diffK = MathE.Max(this), invDiffK = 1 / diffK;
+            return new ColorCMYK((diffK - r) * invDiffK,
+                                 (diffK - g) * invDiffK,
+                                 (diffK - b) * invDiffK,
+                                 1 - diffK);
+        }
+
+        public string HexCode() => $"#{(int)(r * 255):X2}{(int)(g * 255):X2}{(int)(b * 255):X2}";
 
         public IEnumerator<double> GetEnumerator()
         {
@@ -307,8 +336,8 @@ namespace Nerd_STF.Graphics
 
         public bool Equals(ColorRGB other)
         {
-            if (a <= 0 && b <= 0) return true;
-            else return r == other.r && g == other.g && b == other.b;
+            if (a <= 0 && other.a <= 0) return true;
+            else return r == other.r && g == other.g && b == other.b && a == other.a;
         }
         public bool Equals(IColor other) => Equals(other.AsRgb());
 #if CS8_OR_GREATER
@@ -329,13 +358,11 @@ namespace Nerd_STF.Graphics
             ColorRGB copy = this;
             return i => copy[i];
         }
-        public List<double> ToList() => new List<double>() { r, g, b, a };
+        public List<double> ToList() => new List<double> { r, g, b, a };
 
-        public static ColorRGB operator +(ColorRGB a) => a;
-        public static ColorRGB operator +(ColorRGB a, ColorRGB b) => new ColorRGB(a.r + b.r, a.g + b.g, a.b + b.b, 1 - (1 - a.a) * (1 - b.b));
-        public static ColorRGB operator -(ColorRGB a) => new ColorRGB(1 - a.r, 1 - a.g, 1 - a.b);
+        public static ColorRGB operator +(ColorRGB a, ColorRGB b) => new ColorRGB(a.r + b.r, a.g + b.g, a.b + b.b, 1 - (1 - a.a) * (1 - b.a));
         public static ColorRGB operator *(ColorRGB a, ColorRGB b) => new ColorRGB(a.r * b.r, a.g * b.g, a.b * b.b, a.a * b.a);
-        public static ColorRGB operator *(ColorRGB a, double b) => new ColorRGB(a.r * b, a.g * b, a.b * b);
+        public static ColorRGB operator *(ColorRGB a, double b) => new ColorRGB(a.r * b, a.g * b, a.b * b, a.a);
         public static bool operator ==(ColorRGB a, IColor b) => a.Equals(b.AsRgb());
         public static bool operator !=(ColorRGB a, IColor b) => !a.Equals(b.AsRgb());
         public static bool operator ==(ColorRGB a, ColorRGB b) => a.Equals(b);

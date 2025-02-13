@@ -86,6 +86,12 @@ namespace Nerd_STF
             return builder.ToString();
         }
 
+        public Fill<T> ToFill()
+        {
+            T[] items = this.items;
+            return i => items[i];
+        }
+
         public static bool operator ==(ListTuple<T> a, ListTuple<T> b) => a.Equals(b);
         public static bool operator !=(ListTuple<T> a, ListTuple<T> b) => !a.Equals(b);
 
@@ -105,7 +111,7 @@ namespace Nerd_STF
         public static implicit operator ListTuple<T>((T, T, T, T, T) tuple) => new ListTuple<T>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5);
         public static implicit operator ListTuple<T>((T, T, T, T, T, T) tuple) => new ListTuple<T>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, tuple.Item6);
         public static implicit operator ListTuple<T>((T, T, T, T, T, T, T) tuple) => new ListTuple<T>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, tuple.Item6, tuple.Item7);
-        public static implicit operator ListTuple<T>(T[] array) => new ListTuple<T>(array);
+        public static implicit operator ListTuple<T>(T[] array) => new ListTuple<T>(array)
 
         public struct Enumerator : IEnumerator<T>
         {

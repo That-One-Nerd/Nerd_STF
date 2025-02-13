@@ -10,24 +10,27 @@ namespace Nerd_STF.Graphics
 
         TColor AsColor<TColor>() where TColor : struct, IColor<TColor>;
         ColorRGB AsRgb();
+        ColorHSV AsHsv();
+        ColorCMYK AsCmyk();
+
+        string HexCode();
 
         bool Equals(IColor other);
     }
 
     public interface IColor<TSelf> : IColor,
-                                     IEquatable<TSelf>,
-                                     INumberGroup<TSelf, double>
+                                     IEquatable<TSelf>
 #if CS11_OR_GREATER
-                                    ,IColorPresets<TSelf>
+                                    ,IColorOperators<TSelf>,
+                                     IColorPresets<TSelf>,
+                                     IInterpolable<TSelf>
 #endif
         where TSelf : struct, IColor<TSelf>
     {
 #if CS11_OR_GREATER
         static abstract int ChannelCount { get; }
 
-        // TODO: Do all color formats have a gamma value?
-        static abstract TSelf Average(double gamma, IEnumerable<TSelf> colors);
-        static abstract TSelf Lerp(double gamma, TSelf a, TSelf b, double t, bool clamp = true);
+        static abstract TSelf Average(IEnumerable<TSelf> colors);
 #endif
     }
 }
