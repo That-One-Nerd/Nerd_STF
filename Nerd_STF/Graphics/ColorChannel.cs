@@ -12,6 +12,7 @@
         Cyan,
         Magenta,
         Yellow,
-        Key
+        Key,
+        Index
     }
 }

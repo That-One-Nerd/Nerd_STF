@@ -287,7 +287,8 @@ namespace Nerd_STF.Graphics
         public ColorHSV AsHsv()
         {
             // Thanks https://www.rapidtables.com/convert/color/rgb-to-hsv.html
-            double cMax = MathE.Max(this), cMin = MathE.Min(this), delta = cMax - cMin;
+            double[] group = new double[] { r, g, b };
+            double cMax = MathE.Max(group), cMin = MathE.Min(group), delta = cMax - cMin;
             Angle h;
 
             if (delta == 0) h = Angle.Zero;
@@ -302,7 +303,7 @@ namespace Nerd_STF.Graphics
         public ColorCMYK AsCmyk()
         {
             // Thanks https://www.rapidtables.com/convert/color/rgb-to-cmyk.html
-            double diffK = MathE.Max(this), invDiffK = 1 / diffK;
+            double diffK = MathE.Max(new double[] { r, g, b }), invDiffK = 1 / diffK;
             return new ColorCMYK((diffK - r) * invDiffK,
                                  (diffK - g) * invDiffK,
                                  (diffK - b) * invDiffK,

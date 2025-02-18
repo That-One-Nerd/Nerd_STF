@@ -271,8 +271,8 @@ namespace Nerd_STF.Graphics
             // Inlined version of AsRgb().AsHsv()
             double diffK = 1 - k;
             double r = (1 - c) * diffK, g = (1 - m) * diffK, b = (1 - y) * diffK;
-            double[] items = new double[] { r, g, b };
-            double cMax = MathE.Max(items), cMin = MathE.Min(items), delta = cMax - cMin;
+            double[] group = new double[] { r, g, b };
+            double cMax = MathE.Max(group), cMin = MathE.Min(group), delta = cMax - cMin;
             Angle h;
 
             if (delta == 0) h = Angle.Zero;
@@ -343,7 +343,7 @@ namespace Nerd_STF.Graphics
 
         public static ColorCMYK operator +(ColorCMYK a, ColorCMYK b) => new ColorCMYK(a.c + b.c, a.m + b.m, a.y + b.y, a.k + b.k, 1 - (1 - a.a) * (1 - b.a));
         public static ColorCMYK operator *(ColorCMYK a, ColorCMYK b) => new ColorCMYK(a.c * b.c, a.m * b.m, a.y * b.y, a.k * b.k, a.a * b.a);
-        public static ColorCMYK operator *(ColorCMYK a, double b) => new ColorCMYK(a.c * b, a.m * b, a.y * b, a.k * b, a.a);
+        public static ColorCMYK operator *(ColorCMYK a, double b) => new ColorCMYK(a.c, a.m, a.y, b == 0 ? 1 : MathE.Clamp(a.k / b, 0, 1), a.a);
         public static bool operator ==(ColorCMYK a, IColor b) => a.Equals(b.AsCmyk());
         public static bool operator !=(ColorCMYK a, IColor b) => !a.Equals(b.AsCmyk());
         public static bool operator ==(ColorCMYK a, ColorCMYK b) => a.Equals(b);
