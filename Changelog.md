@@ -1,61 +1,53 @@
-# Nerd_STF v3.0-beta2
+# Nerd_STF v3.0-beta3
 
-I've added a substantial number of things in this update, mostly matrix related.
+Nerd_STF 3.0 is approaching a stable release, but I've still got some things that I still want to add and things that I feel like are unsatisfactory. So here's another beta release. There will probably only be one or two more before a final version is ready. This is easily the most ambitious project I've done in such a small amount of time, so I think you can bear with me as I bring this part of it to completition.
 
-## List Tuples
+Here's what's new:
 
-In the previous beta, I introduced **Combination Indexers** for the double and int groups, however a problem was that they only returned `IEnumerable`s. So while some interesting things were supported, some things were not.
+## `Fill<T>` and `Fill2d<T>` are back!
+
+I thought the `Fill<T>` delegate was slightly redundant, since you could probably just pass an `IEnumerable` or something instead, but I've learned that it's really easy to pass a Fill delegate in places where an IEnumerable would be annoying. I might add support for Fill stuff in the future, such as an extension list, but for now I've just re-added the delegate and made most types support it in a constructor.
+
+## Slight Matrix Constructor Change
+
+I think I got the meaning of the `byRows` parameter mixed up in my head, so I have swapped its meaning to what it (I think) should be. The default value has also changed, so unless you've been explicitly using it you won't notice a difference.
+
+## And Best of All: Colors!
+
+I have had plenty of time to think about how I could have done colors better in the previous iteration of the library, and I've come up with this, which I think is slightly better.
+
+First of all, colors derive from the `IColor<TSelf>` interface similarly to how they did before, but no more `IColorFloat`. Now, every color has double-precision channels by default. To handle specific bit sizes, the `IColorFormat` interface has been created. It can of course be derived from, and I think it's pretty easy to use and understand, but hopefully there will be enough color formats already defined that you won't even need to touch it directly. At the moment, there's only one real color format created, `R8G8B8A8`, which is what it sounds like: 8 bits for each of the RGBA channels. There will be plenty more to come.
+
+I have been thinking about writing a stream class that is capable of having a bit-offset. I would use it in tandom with the color formats, as many of them span multiple bytes in ways that don't always align with 8-bit bytes. It seems somewhat out of place, but I think I'll go for it anyway.
+
+There's also a color palette system now. You give it a certain number of colors and it allocates room to the nearest power of two. If you give it 6 colors, it allocates room for 8. This is to always keep the size of the palette identical to its bit depth. 6 colors needs 3 bits per color, so might as well do as much as you can with those 3 bits.
+
+There is also an `IndexedColor` "format," which does not store its color directly. Rather, it stores its index and a reference to the color palette it came from. I understand a true "indexed color" wouldn't store a reference to its palette to save memory, but this is mostly for ease of use. Colors are passed through methods with the `ref` keyword, so you can manipulate them directly.
 
 ```csharp
-Float4 wxyz = (1, 2, 3, 4);
-IEnumerable<double> vals1 = wxyz["xy"]; // Yields [2, 3]
+void MethodA()
+{
+    ColorPalette<ColorRGB> palette = new(8);
 
-Float2 vals2 = wxyz["xy"];              // Not allowed!
+    // palette[3] is currently set to black.
+    MethodB(palette[3]);
+    // palette[3] is now set to blue.
+}
+
+void MethodB(IndexedColor<ColorRGB> color)
+{
+    color.Color() = ColorRGB.Blue;
+
+    // You could also:
+    ref ColorRGB val = ref color.Color();
+    val = ColorRGB.Blue;
+}
 ```
 
-And that kind of sucked. So I created the `ListTuple<T>` type. It's job is to act like a regular tuple, but be able to impliclty convert to either an `IEnumerable` or a regular `ValueTuple<T>`, thus allowing conversions to the double and int groups indirectly. Now, all combination indexers return a `ListTuple` instead of an `IEnumerable`.
+Anyway, that's all I've got for now. I'm not sure what will be next up, but here's what's left to do:
+- Complex numbers and quaternions.
+- More color types and formats.
+- Bit-offset compatible streams.
+- Fix bugs/inconveniences I've noted.
 
-Under the hood, the `ListTuple` actually uses an array, but you get the idea.
-
-```csharp
-Float4 wxyz = (1, 2, 3, 4);
-ListTuple<double> vals1 = wxyz["xy"]; // Yields (2, 3)
-
-Float2 vals2 = vals1;                 // Yields (2, 3)
-IEnumerable<double> vals3 = vals1;    // Yields [2, 3]
-```
-
-Problem is, now the names have the potential to make much less sense.
-```csharp
-Float4 wxyz = (1, 2, 3, 4);
-Float2 xy = wxyz["xy"];     // x <- x, y <- y
-Float2 wz = wxyz["wz"];     // x <- w, y <- z
-```
-
-But whatever. You can always stick to using `IEnumerable`s if you want.
-
-## No More `*.Abstract`
-
-I got rid of all the `Abstract` namespaces, since they don't really make much sense in the grand scheme of things. They've all been moved to the namespace that applies to them most (eg. `INumberGroup` went to `Nerd_STF.Mathematics`, `ICombinationIndexer` went to `Nerd_STF` since it applies to more than just mathematics).
-
-## The `Fraction` Type
-
-This type originally went under the name of `Rational` in Nerd_STF 2.x, but that name is actually incorrect, right? So in the rework, it changed names. But it also can do much more now thanks to the `INumber` interface added in .NET 7.0. If you're using that framework or above, the fraction type is fully compatible with that type, and all the math functions in `MathE` and elsewhere that use `INumber` will work with it.
-
-Can I just say that the `INumber` interface is really annoying to write a type for? There's so many weird casting functions and a whole lot of methods that even the .NET developers will hide in public declarations. Why have them at all?
-
----
-
-And I want to change the name of the `MathE` class. I'm thinking `Math2`, but I'm open to suggestions.
-
-## And Best of All, Matrices
-
-Oh yeah, we're adding those things again. I haven't completed (or even started) the dynamic `Matrix` class, that will arrive in beta3. But I have the `Matrix2x2`, `Matrix3x3`, and `Matrix4x4` fully implemented. The `ToString()` methods are much better with the new implementation than previously, and the `GetHashCode()` methods give different results even if the numbers have their positions swapped (which they originally didn't do).
-
-And it's much faster. Much, much faster. Don't get me wrong, multiplying a 4x4 matrix still requires 64 multiplications and 48 additions, which is quite a lot, but my original implementation was littered with many method calls, easily doubling the runtime. I have now super-inlined basically all of the static matrix code. And I mean, replacing all method calls with nothing but multiplication and addition for things like the determinants, the cofactors, the inverses, and more. Don't look at the source, it's really ugly.
-
----
-
-That's all the major stuff in this update! I'll see you guys in beta3!
-
-P.S. I know that the System library also includes `Vector2`, `Vector3`, and `Vector4` types. I'll add casting support for them soon.
+I think the Image type will be completely reworked and might be what version 3.1 is.
