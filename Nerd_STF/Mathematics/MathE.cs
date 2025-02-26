@@ -680,26 +680,38 @@ namespace Nerd_STF.Mathematics
 
             return flip ? result : -result;
         }
+        public static double Sin(Angle angle, int terms = 8) =>
+            Sin(angle.Radians, terms);
         public static IEquation Sin(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Sin(inputRad[x], terms));
         public static double Cos(double rad, int terms = 8) =>
             Sin(rad + Constants.HalfPi, terms);
+        public static double Cos(Angle angle, int terms = 8) =>
+            Cos(angle.Radians, terms);
         public static IEquation Cos(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Cos(inputRad[x], terms));
         public static double Tan(double rad, int terms = 8) =>
             Sin(rad + Constants.HalfPi, terms) / Sin(rad, terms);
+        public static double Tan(Angle angle, int terms = 8) =>
+            Tan(angle.Radians, terms);
         public static IEquation Tan(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Tan(inputRad[x], terms));
         public static double Csc(double rad, int terms = 8) =>
             1 / Sin(rad, terms);
+        public static double Csc(Angle angle, int terms = 8) =>
+            Csc(angle.Radians, terms);
         public static IEquation Csc(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Csc(inputRad[x], terms));
         public static double Sec(double rad, int terms = 8) =>
             1 / Sin(rad + Constants.HalfPi, terms);
+        public static double Sec(Angle angle, int terms = 8) =>
+            Sec(angle.Radians, terms);
         public static IEquation Sec(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Sec(inputRad[x], terms));
         public static double Cot(double rad, int terms = 8) =>
             Sin(rad, terms) / Sin(rad + Constants.HalfPi, terms);
+        public static double Cot(Angle angle, int terms = 8) =>
+            Cot(angle.Radians, terms);
         public static IEquation Cot(IEquation inputRad, int terms = 8) =>
             new Equation((double x) => Cot(inputRad[x], terms));
 

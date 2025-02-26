@@ -9,7 +9,6 @@ namespace Nerd_STF.Mathematics.Algebra
         double Magnitude { get; }
 
         static abstract TSelf ClampMagnitude(TSelf val, double minMag, double maxMag);
-        static abstract void ClampMagnitude(ref TSelf val, double minMag, double maxMag);
         static abstract double Dot(TSelf a, TSelf b);
         static abstract double Dot(IEnumerable<TSelf> vals);
     }

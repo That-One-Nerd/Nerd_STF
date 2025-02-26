@@ -361,7 +361,7 @@ namespace Nerd_STF.Mathematics.Numbers
         }
         public static bool IsEvenInteger(Fraction val) =>
             val.num % val.den == 0 && val.num / val.den % 2 == 0;
-        public static bool IsFinite(Fraction val) => val.den != 0 || val.num != 0;
+        public static bool IsFinite(Fraction val) => val.den != 0;
         public static bool IsInfinity(Fraction val) => val.den == 0 && val.num != 0;
         public static bool IsInteger(Fraction val) => val.num % val.den == 0;
         public static bool IsNaN(Fraction val) => val.num == 0 && val.den == 0;
@@ -375,9 +375,7 @@ namespace Nerd_STF.Mathematics.Numbers
         public static bool IsRealNumber(Fraction val) => val.den != 0;
         public static bool IsZero(Fraction val) => val.num == 0 && val.den != 0;
         public static Fraction MaxMagnitude(Fraction a, Fraction b) => a > b ? a : b;
-        public static Fraction MaxMagnitudeNumber(Fraction a, Fraction b) => a > b ? a : b;
         public static Fraction MinMagnitude(Fraction a, Fraction b) => a < b ? a : b;
-        public static Fraction MinMagnitudeNumber(Fraction a, Fraction b) => a < b ? a : b;
 #if CS11_OR_GREATER
         static bool INumberBase<Fraction>.IsComplexNumber(Fraction val) => false;
         static bool INumberBase<Fraction>.IsImaginaryNumber(Fraction val) => false;
@@ -393,6 +391,9 @@ namespace Nerd_STF.Mathematics.Numbers
         static Fraction IAdditiveIdentity<Fraction, Fraction>.AdditiveIdentity => Zero;
         static Fraction IMultiplicativeIdentity<Fraction, Fraction>.MultiplicativeIdentity => One;
         static int INumberBase<Fraction>.Radix => 2; // Not super sure what to put here.
+
+        static Fraction INumberBase<Fraction>.MaxMagnitudeNumber(Fraction a, Fraction b) => a > b ? a : b;
+        static Fraction INumberBase<Fraction>.MinMagnitudeNumber(Fraction a, Fraction b) => a < b ? a : b;
 
         private static bool TryConvertTo<T>(Fraction frac, out T value)
         {
