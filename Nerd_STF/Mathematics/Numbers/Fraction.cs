@@ -325,25 +325,13 @@ namespace Nerd_STF.Mathematics.Numbers
                 return false;
             }
             else if (value is Fraction valueFrac) result = valueFrac;
+            else if (value is Complex valueComp) result = Approximate(valueComp.Real);
             else if (value is double valueDouble) result = Approximate(valueDouble);
             else if (value is float valueSingle) result = Approximate(valueSingle);
 #if NET5_0_OR_GREATER
             else if (value is Half valueHalf) result = Approximate((double)valueHalf);
 #endif
-#if NET7_0_OR_GREATER
-            else if (value is UInt128 valueUInt128) result = new Fraction((int)valueUInt128, 1);
-            else if (value is Int128 valueInt128) result = new Fraction((int)valueInt128, 1);
-#endif
-            else if (value is ulong valueUInt64) result = new Fraction((int)valueUInt64, 1);
-            else if (value is long valueInt64) result = new Fraction((int)valueInt64, 1);
-            else if (value is uint valueUInt32) result = new Fraction((int)valueUInt32, 1);
             else if (value is int valueInt32) result = new Fraction(valueInt32, 1);
-            else if (value is ushort valueUInt16) result = new Fraction(valueUInt16, 1);
-            else if (value is short valueInt16) result = new Fraction(valueInt16, 1);
-            else if (value is byte valueUInt8) result = new Fraction(valueUInt8, 1);
-            else if (value is sbyte valueInt8) result = new Fraction(valueInt8, 1);
-            else if (value is IntPtr valueInt) result = new Fraction((int)valueInt, 1);
-            else if (value is UIntPtr valueUInt) result = new Fraction((int)valueUInt, 1);
             else
             {
                 result = NaN;
@@ -380,6 +368,7 @@ namespace Nerd_STF.Mathematics.Numbers
         static bool INumberBase<Fraction>.IsComplexNumber(Fraction val) => false;
         static bool INumberBase<Fraction>.IsImaginaryNumber(Fraction val) => false;
         static bool INumberBase<Fraction>.IsSubnormal(Fraction val) => false; // What does this mean???
+
         static Fraction INumberBase<Fraction>.Parse(string? str, NumberStyles style, IFormatProvider? provider) => Parse(str);
         static Fraction INumberBase<Fraction>.Parse(ReadOnlySpan<char> str, NumberStyles style, IFormatProvider? provider) => Parse(str);
         static bool INumberBase<Fraction>.TryParse(string? str, NumberStyles style, IFormatProvider? provider, out Fraction frac) => TryParse(str, out frac);
@@ -388,6 +377,7 @@ namespace Nerd_STF.Mathematics.Numbers
         static bool IParsable<Fraction>.TryParse(string? str, IFormatProvider? provider, out Fraction frac) => TryParse(str, out frac);
         static Fraction ISpanParsable<Fraction>.Parse(ReadOnlySpan<char> str, IFormatProvider? provider) => Parse(str);
         static bool ISpanParsable<Fraction>.TryParse(ReadOnlySpan<char> str, IFormatProvider? provider, out Fraction frac) => TryParse(str, out frac);
+
         static Fraction IAdditiveIdentity<Fraction, Fraction>.AdditiveIdentity => Zero;
         static Fraction IMultiplicativeIdentity<Fraction, Fraction>.MultiplicativeIdentity => One;
         static int INumberBase<Fraction>.Radix => 2; // Not super sure what to put here.
@@ -400,23 +390,13 @@ namespace Nerd_STF.Mathematics.Numbers
             object? tempValue;
 
             if (typeof(T) == typeof(Fraction)) tempValue = frac;
+            else if (typeof(T) == typeof(Complex)) tempValue = (frac.GetValue(), 0);
             else if (typeof(T) == typeof(double)) tempValue = frac.GetValue();
             else if (typeof(T) == typeof(float)) tempValue = (float)frac.GetValue();
 #if NET5_0_OR_GREATER
             else if (typeof(T) == typeof(Half)) tempValue = (Half)frac.GetValue();
 #endif
-#if NET7_0_OR_GREATER
-            else if (typeof(T) == typeof(UInt128)) tempValue = (UInt128)frac.GetValue();
-            else if (typeof(T) == typeof(Int128)) tempValue = (Int128)frac.GetValue();
-#endif
-            else if (typeof(T) == typeof(ulong)) tempValue = (ulong)frac.GetValue();
-            else if (typeof(T) == typeof(long)) tempValue = (long)frac.GetValue();
-            else if (typeof(T) == typeof(uint)) tempValue = (uint)frac.GetValue();
             else if (typeof(T) == typeof(int)) tempValue = (int)frac.GetValue();
-            else if (typeof(T) == typeof(ushort)) tempValue = (ushort)frac.GetValue();
-            else if (typeof(T) == typeof(short)) tempValue = (short)frac.GetValue();
-            else if (typeof(T) == typeof(byte)) tempValue = (byte)frac.GetValue();
-            else if (typeof(T) == typeof(sbyte)) tempValue = (sbyte)frac.GetValue();
             else
             {
                 value = default!;

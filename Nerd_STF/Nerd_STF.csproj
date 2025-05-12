@@ -3,7 +3,7 @@
   <!-- General stuff -->
   
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.1;netstandard1.3;netstandard2.1;netcoreapp3.0;net5.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.1;netstandard1.3;netstandard2.1;net46;net462;net47;netcoreapp3.0;net5.0;net7.0</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <DebugType>portable</DebugType>
@@ -93,7 +93,7 @@ I think the Image type will be completely reworked and might be what version 3.1
     <PackageReference Include="System.Memory" Version="4.5.5" />                  <!-- Newer versions not supported. -->
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />        <!-- Newer versions not supported. -->
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" /> <!-- Version that comes with .NET has vulnerabilities. -->
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />              <!-- Newer version not supported. -->
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
@@ -102,13 +102,48 @@ I think the Image type will be completely reworked and might be what version 3.1
     <PackageReference Include="System.Memory" Version="4.5.5" />                  <!-- Newer versions not supported. -->
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />        <!-- Newer versions not supported. -->
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" /> <!-- Version that comes with .NET has vulnerabilities. -->
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />              <!-- Newer version not supported. -->
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net46'">
+    <PackageReference Include="System.Memory" Version="4.5.5" />                  <!-- Newer versions not supported. -->
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />              <!-- Newer versions not supported. -->
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net462'">
+    <PackageReference Include="System.Memory" Version="4.6.2" />
+    <PackageReference Include="System.ValueTuple" Version="4.6.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net47'">
+    <PackageReference Include="System.Memory" Version="4.6.2" />
   </ItemGroup>
   
   <!-- PropertyGroup customization based on framework. -->
   <!-- Used to define environment variables based on features the framework supports. -->
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net471'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.1'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER</DefineConstants>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net46'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net462'">
+    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net47'">
     <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
@@ -124,19 +159,6 @@ I think the Image type will be completely reworked and might be what version 3.1
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net7.0'">
     <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER;CS9_OR_GREATER;CS10_OR_GREATER;CS11_OR_GREATER</DefineConstants>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.1'">
-    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
-    <DefineConstants>$(DefineConstants);CS7_OR_GREATER</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
-    <DefineConstants>$(DefineConstants);CS7_OR_GREATER;CS8_OR_GREATER</DefineConstants>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   

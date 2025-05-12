@@ -286,6 +286,7 @@ namespace Nerd_STF.Mathematics
         public static bool operator ==(Float2 a, Float2 b) => a.Equals(b);
         public static bool operator !=(Float2 a, Float2 b) => !a.Equals(b);
 
+        public static explicit operator Float2(Complex complex) => new Float2(complex.Real, complex.Imaginary);
         public static explicit operator Float2(Float3 floats) => new Float2(floats.x, floats.y);
         public static explicit operator Float2(Float4 floats) => new Float2(floats.x, floats.y);
         public static implicit operator Float2(Int2 ints) => new Float2(ints.x, ints.y);

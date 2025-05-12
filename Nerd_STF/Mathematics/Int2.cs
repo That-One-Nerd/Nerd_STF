@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Mathematics.Algebra;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -259,6 +260,7 @@ namespace Nerd_STF.Mathematics
         public static bool operator ==(Int2 a, Int2 b) => a.Equals(b);
         public static bool operator !=(Int2 a, Int2 b) => !a.Equals(b);
 
+        public static explicit operator Int2(Complex complex) => new Int2((int)complex.Real, (int)complex.Imaginary);
         public static explicit operator Int2(Float2 floats) => new Int2((int)floats.x, (int)floats.y);
         public static explicit operator Int2(Float3 floats) => new Int2((int)floats.x, (int)floats.y);
         public static explicit operator Int2(Float4 floats) => new Int2((int)floats.x, (int)floats.y);
