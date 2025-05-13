@@ -2,7 +2,7 @@
 
 namespace Nerd_STF.Helpers
 {
-    public static class CordicHelper
+    internal static class CordicHelper
     {
         // Starts at 4 radians. Each index downwards is half that.
         // Goes from 2^2 to 2^-19.

@@ -2,18 +2,21 @@
 using Nerd_STF.Helpers;
 using Nerd_STF.Mathematics.Algebra;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using System.Text;
 
 namespace Nerd_STF.Mathematics.Numbers
 {
-    public struct Complex : IEquatable<Complex>,
-                            IFormattable
+    public struct Complex : IComparable<Complex>,
+                            IEquatable<Complex>,
+                            IFormattable,
+                            INumberGroup<Complex, double>
 #if CS11_OR_GREATER
                            ,INumber<Complex>,
+                            IFromTuple<Complex, (double, double)>,
                             IInterpolable<Complex>,
                             IPresets2d<Complex>,
                             IRoundable<Complex>,
@@ -53,6 +56,61 @@ namespace Nerd_STF.Mathematics.Numbers
         {
             r = real;
             i = imaginary;
+        }
+
+        public double this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return r;
+                    case 1: return i;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: r = value; break;
+                    case 1: i = value; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+        }
+        public ListTuple<double> this[string key]
+        {
+            get
+            {
+                double[] items = new double[key.Length];
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    switch (c)
+                    {
+                        case 'r': items[i] = r; break;
+                        case 'i': items[i] = this.i; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+                return new ListTuple<double>(items);
+            }
+            set
+            {
+                IEnumerator<double> stepper = value.GetEnumerator();
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    stepper.MoveNext();
+                    switch (c)
+                    {
+                        case 'r': r = stepper.Current; break;
+                        case 'i': this.i = stepper.Current; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+            }
         }
 
 #if CS8_OR_GREATER
@@ -195,20 +253,19 @@ namespace Nerd_STF.Mathematics.Numbers
         public static Complex Floor(Complex num) =>
             new Complex(MathE.Floor(num.r),
                         MathE.Floor(num.i));
-        public static Complex Lerp(Complex a, Complex b, double t, bool clamp = false) =>
+        public static Complex Lerp(Complex a, Complex b, double t, bool clamp = true) =>
             new Complex(MathE.Lerp(a.r, b.r, t, clamp),
                         MathE.Lerp(a.i, b.i, t, clamp));
         public static Complex Product(IEnumerable<Complex> vals)
         {
             bool any = false;
-            double resultR = 1, resultI = 1;
+            Complex result = One;
             foreach (Complex val in vals)
             {
                 any = true;
-                resultR *= val.r;
-                resultI *= val.i;
+                result *= val;
             }
-            return any ? new Complex(resultR, resultI) : Zero;
+            return any ? result : Zero;
         }
         public static Complex Round(Complex val) =>
             new Complex(MathE.Round(val.r),
@@ -338,12 +395,20 @@ namespace Nerd_STF.Mathematics.Numbers
             {
                 reals[index] = val.r;
                 imaginaries[index] = val.i;
+                index++;
             }
             return (reals, imaginaries);
         }
 
-        public int CompareTo(double other) => Magnitude.CompareTo(MathE.Abs(other));
-        public int CompareTo(Complex other) => Magnitude.CompareTo(other.Magnitude);
+        public IEnumerator<double> GetEnumerator()
+        {
+            yield return r;
+            yield return i;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public int CompareTo(double other) => MagnitudeSqr.CompareTo(MathE.Abs(other * other));
+        public int CompareTo(Complex other) => MagnitudeSqr.CompareTo(other.MagnitudeSqr);
 #if CS8_OR_GREATER
         public int CompareTo(object? other)
 #else
@@ -352,8 +417,9 @@ namespace Nerd_STF.Mathematics.Numbers
         {
             if (other is null) return 1;
             else if (other is Complex otherComplex) return CompareTo(otherComplex);
+            else if (other is double otherDouble) return CompareTo(otherDouble);
             else if (TryConvertFrom(other, out Complex otherConvert)) return CompareTo(otherConvert);
-            else return 0;
+            else return 1;
         }
         public bool Equals(double other) => r == other && i == 0;
         public bool Equals(Complex other) => r == other.r && i == other.i;
@@ -369,41 +435,24 @@ namespace Nerd_STF.Mathematics.Numbers
             else return false;
         }
         public override int GetHashCode() => base.GetHashCode();
-        public override string ToString() => ToString(null, null);
+        public override string ToString() => ToStringHelper.HighDimNumberToString(this, null, null);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToString(format, null);
-        public string ToString(IFormatProvider? provider) => ToString(null, provider);
+        public string ToString(string? format) => ToStringHelper.HighDimNumberToString(this, format, null);
+        public string ToString(IFormatProvider? provider) => ToStringHelper.HighDimNumberToString(this, null, provider);
+        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.HighDimNumberToString(this, format, provider);
 #else
-        public string ToString(string format) => ToString(format, null);
-        public string ToString(IFormatProvider provider) => ToString(null, provider);
+        public string ToString(string format) => ToStringHelper.HighDimNumberToString(this, format, null);
+        public string ToString(IFormatProvider provider) => ToStringHelper.HighDimNumberToString(this, null, provider);
+        public string ToString(string format, IFormatProvider provider) => ToStringHelper.HighDimNumberToString(this, format, provider);
 #endif
-#if CS8_OR_GREATER
-        public string ToString(string? format, IFormatProvider? provider)
-#else
-        public string ToString(string format, IFormatProvider provider)
-#endif
+
+        public double[] ToArray() => new double[] { r, i };
+        public Fill<double> ToFill()
         {
-            if (r == 0 && i == 0) return 0.0.ToString(format, provider);
-            else if (r == 0) return $"{i.ToString(format, provider)}i";
-            else
-            {
-                StringBuilder builder = new StringBuilder();
-                builder.Append(r.ToString(format, provider));
-                if (i > 0)
-                {
-                    builder.Append(" + ");
-                    builder.Append(i.ToString(format, provider));
-                    builder.Append('i');
-                }
-                else if (i < 0)
-                {
-                    builder.Append(" - ");
-                    builder.Append((-i).ToString(format, provider));
-                    builder.Append('i');
-                }
-                return builder.ToString();
-            }
+            Complex @this = this;
+            return i => @this[i];
         }
+        public List<double> ToList() => new List<double>() { r, i };
 
 #if CS11_OR_GREATER
         public bool TryFormat(Span<char> dest, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
@@ -414,16 +463,17 @@ namespace Nerd_STF.Mathematics.Numbers
             charsWritten = result.Length;
             return true;
         }
+
+        static Complex IIncrementOperators<Complex>.operator ++(Complex a) => new Complex(a.r + 1, a.i);
+        static Complex IDecrementOperators<Complex>.operator --(Complex a) => new Complex(a.r - 1, a.i);
 #endif
 
         public static Complex operator +(Complex a) => a;
         public static Complex operator +(Complex a, Complex b) => new Complex(a.r + b.r, a.i + b.i);
         public static Complex operator +(Complex a, double b) => new Complex(a.r + b, a.i);
-        public static Complex operator ++(Complex a) => new Complex(a.r + 1, a.i);
         public static Complex operator -(Complex a) => new Complex(-a.r, -a.i);
         public static Complex operator -(Complex a, Complex b) => new Complex(a.r - b.r, a.i - b.i);
         public static Complex operator -(Complex a, double b) => new Complex(a.r - b, a.i);
-        public static Complex operator --(Complex a) => new Complex(a.r - 1, a.i);
         public static Complex operator *(Complex a, Complex b) => new Complex(a.r * b.r - a.i * b.i, a.r * b.i + a.i * b.r);
         public static Complex operator *(Complex a, double b) => new Complex(a.r * b, a.i * b);
         public static Complex operator /(Complex a, Complex b)
@@ -447,9 +497,14 @@ namespace Nerd_STF.Mathematics.Numbers
         public static bool operator <=(Complex a, Complex b) => a.CompareTo(b) <= 0;
 
         public static implicit operator Complex(System.Numerics.Complex num) => new Complex(num.Real, num.Imaginary);
-        public static implicit operator System.Numerics.Complex(Complex num) => new Complex(num.r, num.i);
         public static implicit operator Complex(Float2 group) => new Complex(group.x, group.y);
         public static explicit operator Complex(Int2 group) => new Complex(group.x, group.y);
+        public static implicit operator Complex(ListTuple<double> tuple) => new Complex(tuple[0], tuple[1]);
+        public static implicit operator Complex(ValueTuple<double, double> tuple) => new Complex(tuple.Item1, tuple.Item2);
         public static explicit operator Complex(Vector2 group) => new Complex(group.X, group.Y);
+
+        public static implicit operator System.Numerics.Complex(Complex num) => new Complex(num.r, num.i);
+        public static implicit operator ListTuple<double>(Complex num) => new ListTuple<double>(num.r, num.i);
+        public static implicit operator ValueTuple<double, double>(Complex num) => (num.r, num.i);
     }
 }

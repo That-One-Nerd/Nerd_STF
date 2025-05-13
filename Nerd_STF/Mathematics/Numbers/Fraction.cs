@@ -325,7 +325,7 @@ namespace Nerd_STF.Mathematics.Numbers
                 return false;
             }
             else if (value is Fraction valueFrac) result = valueFrac;
-            else if (value is Complex valueComp) result = Approximate(valueComp.Real);
+            else if (value is Complex valueComp) result = Approximate(valueComp.r);
             else if (value is double valueDouble) result = Approximate(valueDouble);
             else if (value is float valueSingle) result = Approximate(valueSingle);
 #if NET5_0_OR_GREATER

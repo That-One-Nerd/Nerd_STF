@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Mathematics;
 using Nerd_STF.Mathematics.Algebra;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -109,6 +110,45 @@ namespace Nerd_STF.Helpers
                 if (i != lines.Length - 1) total.AppendLine();
             }
             return total.ToString();
+        }
+
+        private static readonly string dimNumSymbols = " ijk?";
+#if CS8_OR_GREATER
+        public static string HighDimNumberToString(IEnumerable<double> terms, string? format, IFormatProvider? provider)
+#else
+        public static string HighDimNumberToString(IEnumerable<double> terms, string format, IFormatProvider provider)
+#endif
+        {
+            StringBuilder builder = new StringBuilder();
+            int index = 0;
+            bool first = true;
+            foreach (double term in terms)
+            {
+                if (term == 0)
+                {
+                    index++;
+                    continue;
+                }
+                if (first) builder.Append(term.ToString(format, provider));
+                else
+                {
+                    if (term > 0)
+                    {
+                        builder.Append(" + ");
+                        builder.Append(term.ToString(format, provider));
+                    }
+                    else
+                    {
+                        builder.Append(" - ");
+                        builder.Append((-term).ToString(format, provider));
+                    }
+                }
+                if (index > 0) builder.Append(dimNumSymbols[MathE.Min(index, dimNumSymbols.Length)]);
+                first = false;
+                index++;
+            }
+            if (first) builder.Append(0.0.ToString(format, provider));
+            return builder.ToString();
         }
     }
 }
