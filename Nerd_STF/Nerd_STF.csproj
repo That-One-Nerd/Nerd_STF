@@ -15,7 +15,7 @@
   
   <PropertyGroup>
     <Title>Nerd_STF</Title>
-    <Version>3.0.0-beta3</Version>
+    <Version>3.0.0</Version>
     <Authors>That_One_Nerd</Authors>
     <Description>A general-purpose mathematics library for C#.</Description>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
@@ -28,19 +28,168 @@
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation</PackageTags>
     
     <!-- Sorry this is stupidly long, wish I could have linked a markdown file instead. -->
-    <PackageReleaseNotes># Nerd_STF v3.0-beta3
+    <PackageReleaseNotes># Nerd_STF Version 3.0
 
-Nerd_STF 3.0 is approaching a stable release, but I've still got some things that I still want to add and things that I feel like are unsatisfactory. So here's another beta release. There will probably only be one or two more before a final version is ready. This is easily the most ambitious project I've done in such a small amount of time, so I think you can bear with me as I bring this part of it to completition.
+It's time to get this thing out of beta.
 
-Here's what's new:
+Nerd_STF 3.0 is finally out! Honestly, there's not a whole lot of tweaks here from the last prerelease, because I got bored of implementing `INumber` methods for the `Quaternion` class, so I'm putting that on hold for now.
+
+For those that haven't seen the pre-releases, the v3.0 update is basically an entire rewrite of the previous library. Almost everything made it over, but there's also a lot of breaking changes. Here's the gist:
+
+# What's New
+
+## More Compatibility
+
+Nerd_STF now targets several versions of .NET and .NET Standard, making it basically run anywhere. You can use [this website](https://dotnet.microsoft.com/en-us/platform/dotnet-standard#versions) to see what different versions of .NET Standard support, but if your project uses a version of .NET that was released in the last 10 years, chances are Nerd_STF supports it.
+
+In addition, Nerd_STF uses some of the new C# features while still retaining older compatibility. If you want to use Nerd_STF in your .NET 8.0 project, you will reference the version of Nerd_STF compiled for .NET 7.0 and retain those fancy new interface features (among others) found in C# 11. Nullability support has been added to all versions of .NET that use C# 8 and above. And if I decide to use more new C# features for Nerd_STF, I'll just target another version of .NET.
+
+## Committed to Doubles
+
+Nerd_STF is a precision library, not one meant to be highly optimized at the sacrifice of precision. So I've decided to fully commit to doubles. The double groups are still called `Float2`, `Float3` and `Float4`, because `Double2` doesn't have quite the same ring to it now, does it? Hope it doesn't get too confusing.
+
+But all math functions are now using doubles (with a few exceptions).
+
+## 'w' Goes in Front Now
+
+I think this is how it should have been. I was really breaking the rules of the alphabet before. Previously in a `Float4`, the `w` component was fourth. Now it is first. The order goes w, x, y, z. You know, how it should.
+
+This means though that casting a `Float3` to a `Float4` will put the extra zero at the start, not the end (because `x` -&gt; `x` in the cast).
+```csharp
+Float3  xyz = (5, 6, 7);
+Float4 wxyz = xyz;       // Gives (0, 5, 6, 7)
+```
+This also means that truncating a `Float4` removes the front `w` first, giving some odd results.
+```csharp
+Float2  xy  = (10, 9);
+Float4 wxyz = xy;       // Gives (0, 10, 9, 0)
+```
+```csharp
+Float4 wxyz = (9, 8, 7, 6);
+Float2  xy  = (Float2)wxyz; // Must be explicitly stated. Yields (8, 7)
+```
+
+But `x` always goes to `x` when casting between groups, same with the other variables. Hopefully that'll make more sense.
+
+## Combination Indexers
+
+One thing I've always been envious of was HLSL's ability to easily make a subset of a group.
+```c++
+float3 group = float3(1, 2, 3);
+float2 part = group.yz;         // Like this.
+```
+And I had a crude version of this in Nerd_STF before, with properties for `XY`, `YZW`, and stuff like that. But you couldn't do things out of order (for example, you could never do `.ZY`). Also, the naming scheme would not make very much sense. `x` was always the first item Now, you can do it with an indexer.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable&lt;double&gt; zyx = wxyz["zyx"]; // Yields [ 4, 3, 2 ]
+```
+
+I think you get it, it makes sense. It returns an IEnumerable though, so support has been added in the group constructors to read data from an IEnumerable. You can also set things this way.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+wxyz["xy"] = [ 9, 8 ];      // Yields (9, 8, 3, 4)
+```
+
+You can also have duplicates. Why you would want duplicates is beyond me. And the order can be whatever you'd like.
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable&lt;double&gt; nums = wxyz["wyyxzzwy"]; // Yields [ 1, 3, 3, 2, 4, 4, 1, 3 ]
+```
+
+## Better Equations
+
+The previous equation system was just a delegate to a method. While it worked for unoptimized things, it won't automatically give precise results. So that system has been overhauled.
+
+Now, every equation derives from the `IEquation` interface, which defines a few operators (most importantly the `Get(double)` method, which is intended to evaluate the equation at the given input). And there are multiple types. There's the base `Equation` type that replicates the method delegate it used to be, but there are also now `Polynomial` equations which specialize in... uh... polynomials, including `Quadratic` and `Linear` along with the dynamic `Polynomial` type.
+
+The indexer is equivalent to calling the `Get(double)` method.
+
+Creating your own is easy, simply derive from the interface and implement the methods required. You should never throw an exception if the two equations you are adding (or multiplying or whatever) are not the same type. If they cannot be combined in a nice way, you should default to the delegate-based approach. Here is an example:
+```csharp
+public IEquation Add(IEquation other) {
+    if (other is YourEquation yourEqu) {
+        // Properly add your two equations.
+    } else {
+        // Unknown other equation type, do a basic addition system.
+        return new Equation(x =&gt; Get(x) + other.Get(x));
+    }
+}
+```
+
+And in practice, you should avoid referring to a general equation by its type. Go by the interface operators instead.
+```csharp
+double Fun(double x) =&gt; 0.5 * MathE.Sin(x);
+Equation a = (Equation)Fun; // The traditional delegate approach from previous versions.
+Polynomial b = new Polynomial(1, 5, 4); // x^2 + 5x + 4
+
+IEquation c = a.Add(b).Multiply(2); // Result is technically an `Equation`, but we should not cast here.
+```
+
+## Renamed the `Mathf` class.
+
+I chose that name because I thought Unity did it well, but I also intend for this project to be compatible with Unity. So I've renamed it to `MathE`. I'm still iffy on that name. I'll commit to one before this project goes out of beta, but it might change until then. Other ideas I'm considering are `Mathe` and `Math2`. Feel free to give your input!
+
+## Support for `System.Drawing` types.
+
+I've tried to use this library when working with Windows Forms a few times. Problem is, it sucks having to manually set the variables from `Point` and `Size`. So Nerd_STF 3.0 now does that for you, with implicit casts to and from both, along with their float variations.
+
+**It's worth mentioning that `Float2` is a double group, while `PointF` is a float group. Data *will* be lost slightly when implicitly casting. Watch out!**
+
+## List Tuples
+
+In the beta1, I introduced **Combination Indexers** for the double and int groups, however a problem was that they only returned `IEnumerable`s. So while some interesting things were supported, some things were not.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+IEnumerable&lt;double&gt; vals1 = wxyz["xy"]; // Yields [2, 3]
+
+Float2 vals2 = wxyz["xy"];              // Not allowed!
+```
+
+And that kind of sucked. So I created the `ListTuple&lt;T&gt;` type. It's job is to act like a regular tuple, but be able to impliclty convert to either an `IEnumerable` or a regular `ValueTuple&lt;T&gt;`, thus allowing conversions to the double and int groups indirectly. Now, all combination indexers return a `ListTuple` instead of an `IEnumerable`.
+
+Under the hood, the `ListTuple` actually uses an array, but you get the idea.
+
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+ListTuple&lt;double&gt; vals1 = wxyz["xy"]; // Yields (2, 3)
+
+Float2 vals2 = vals1;                 // Yields (2, 3)
+IEnumerable&lt;double&gt; vals3 = vals1;    // Yields [2, 3]
+```
+
+Problem is, now the names have the potential to make much less sense.
+```csharp
+Float4 wxyz = (1, 2, 3, 4);
+Float2 xy = wxyz["xy"];     // x &lt;- x, y &lt;- y
+Float2 wz = wxyz["wz"];     // x &lt;- w, y &lt;- z
+```
+
+But whatever. You can always stick to using `IEnumerable`s if you want.
+
+## No More `*.Abstract`
+
+I got rid of all the `Abstract` namespaces, since they don't really make much sense in the grand scheme of things. They've all been moved to the namespace that applies to them most (eg. `INumberGroup` went to `Nerd_STF.Mathematics`, `ICombinationIndexer` went to `Nerd_STF` since it applies to more than just mathematics).
+
+## The `Fraction` Type
+
+This type originally went under the name of `Rational` in Nerd_STF 2.x, but that name is actually incorrect, right? So in the rework, it changed names. But it also can do much more now thanks to the `INumber` interface added in .NET 7.0. If you're using that framework or above, the fraction type is fully compatible with that type, and all the math functions in `MathE` and elsewhere that use `INumber` will work with it.
+
+Can I just say that the `INumber` interface is really annoying to write a type for? There's so many weird casting functions and a whole lot of methods that even the .NET developers will hide in public declarations. Why have them at all?
+
+## And Best of All, Matrices
+
+Oh yeah, we're adding those things again. We've got hard-coded `Matrix2x2`, `Matrix3x3`, and `Matrix4x4` classes, as well as a dynamic-sized `Matrix` class fully implemented. The `ToString()` methods are much better with the new implementation than previously, and the `GetHashCode()` methods give different results even if the numbers have their positions swapped (which they originally didn't do).
+
+And they're much faster. Much, much faster. Don't get me wrong, multiplying a 4x4 matrix still requires 64 multiplications and 48 additions, which is quite a lot, but my original implementation was littered with many method calls, easily doubling the runtime. I have now super-inlined basically all of the static matrix code. And I mean, replacing all method calls with nothing but multiplication and addition for things like the determinants, the cofactors, the inverses, and more. Don't look at the source, it's really ugly.
+
+**Note that the dynamic matrix class is not optimized this way, only the constant-size classes.**
 
 ## `Fill&lt;T&gt;` and `Fill2d&lt;T&gt;` are back!
 
 I thought the `Fill&lt;T&gt;` delegate was slightly redundant, since you could probably just pass an `IEnumerable` or something instead, but I've learned that it's really easy to pass a Fill delegate in places where an IEnumerable would be annoying. I might add support for Fill stuff in the future, such as an extension list, but for now I've just re-added the delegate and made most types support it in a constructor.
-
-## Slight Matrix Constructor Change
-
-I think I got the meaning of the `byRows` parameter mixed up in my head, so I have swapped its meaning to what it (I think) should be. The default value has also changed, so unless you've been explicitly using it you won't notice a difference.
 
 ## And Best of All: Colors!
 
@@ -74,13 +223,13 @@ void MethodB(IndexedColor&lt;ColorRGB&gt; color)
 }
 ```
 
-Anyway, that's all I've got for now. I'm not sure what will be next up, but here's what's left to do:
-- Complex numbers and quaternions.
-- More color types and formats.
-- Bit-offset compatible streams.
-- Fix bugs/inconveniences I've noted.
+---
 
-I think the Image type will be completely reworked and might be what version 3.1 is.</PackageReleaseNotes>
+Anyway, that's a lot of stuff. It's a big update. You should download it!
+
+Sorry my original writing has been a bit off. I kind of forgot about this project again. I can't promise a new update any time soon, but maybe there'll be one!
+
+Enjoy the full release!</PackageReleaseNotes>
   </PropertyGroup>
 
   <!-- ItemGroup customization based on framework. -->

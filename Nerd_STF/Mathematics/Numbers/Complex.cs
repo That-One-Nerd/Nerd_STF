@@ -500,6 +500,7 @@ namespace Nerd_STF.Mathematics.Numbers
         public static implicit operator Complex(Float2 group) => new Complex(group.x, group.y);
         public static explicit operator Complex(Int2 group) => new Complex(group.x, group.y);
         public static implicit operator Complex(ListTuple<double> tuple) => new Complex(tuple[0], tuple[1]);
+        public static explicit operator Complex(Quaternion quat) => new Complex(quat.w, quat.x);
         public static implicit operator Complex(ValueTuple<double, double> tuple) => new Complex(tuple.Item1, tuple.Item2);
         public static explicit operator Complex(Vector2 group) => new Complex(group.X, group.Y);
 

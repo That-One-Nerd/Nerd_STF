@@ -14,8 +14,8 @@ namespace Nerd_STF.Mathematics.Numbers
                                IFormattable,
                                INumberGroup<Quaternion, double>
 #if CS11_OR_GREATER
-                              ,//INumber<Quaternion>,
-                               //IFromTuple<Quaternion, (double, double, double, double)>,
+                              ,//INumber<Quaternion>, Maybe some day.
+                               IFromTuple<Quaternion, (double, double, double, double)>,
                                IInterpolable<Quaternion>,
                                IPresets4d<Quaternion>,
                                IRoundable<Quaternion>,
@@ -323,5 +323,14 @@ namespace Nerd_STF.Mathematics.Numbers
         public static bool operator <=(Quaternion a, Quaternion b) => a.CompareTo(b) <= 0;
 
         public static implicit operator Quaternion(Complex complex) => new Quaternion(complex.r, complex.i, 0, 0);
+        public static implicit operator Quaternion(Float4 group) => new Quaternion(group.w, group.x, group.y, group.z);
+        public static explicit operator Quaternion(Int4 group) => new Quaternion(group.w, group.x, group.y, group.z);
+        public static implicit operator Quaternion(ListTuple<double> tuple) => new Quaternion(tuple[0], tuple[1], tuple[2], tuple[3]);
+        public static explicit operator Quaternion(System.Numerics.Quaternion quat) => new Quaternion(quat.W, quat.X, quat.Y, quat.Z);
+        public static implicit operator Quaternion(ValueTuple<double, double, double, double> tuple) => new Quaternion(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
+
+        public static implicit operator ListTuple<double>(Quaternion quat) => new ListTuple<double>(quat.w, quat.x, quat.y, quat.z);
+        public static implicit operator System.Numerics.Quaternion(Quaternion quat) => new System.Numerics.Quaternion((float)quat.x, (float)quat.y, (float)quat.z, (float)quat.w);
+        public static implicit operator ValueTuple<double, double, double, double>(Quaternion quat) => (quat.w, quat.x, quat.y, quat.z);
     }
 }
