@@ -1,344 +1,312 @@
-﻿namespace Nerd_STF.Mathematics;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
-public record struct Int4 : IAbsolute<Int4>, IAverage<Int4>, IClamp<Int4>, IClampMagnitude<Int4, int>,
-    IComparable<Int4>, IDivide<Int4>, IDot<Int4, int>, IEquatable<Int4>,
-    IFromTuple<Int4, (int x, int y, int z, int w)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>,
-    ILerp<Int4, float>, IMathOperators<Int4>, IMax<Int4>, IMedian<Int4>, IMin<Int4>, IPresets4d<Int4>,
-    IProduct<Int4>, ISplittable<Int4, (int[] Xs, int[] Ys, int[] Zs, int[] Ws)>, ISubtract<Int4>, ISum<Int4>
+namespace Nerd_STF.Mathematics
 {
-    public static Int4 Back => new(0, 0, -1, 0);
-    public static Int4 Down => new(0, -1, 0, 0);
-    public static Int4 Forward => new(0, 0, 1, 0);
-    public static Int4 HighW => new(0, 0, 0, 1);
-    public static Int4 Left => new(-1, 0, 0, 0);
-    public static Int4 LowW => new(0, 0, 0, -1);
-    public static Int4 Right => new(1, 0, 0, 0);
-    public static Int4 Up => new(0, 1, 0, 0);
+    public struct Int4 : INumberGroup<Int4, int>
+#if CS11_OR_GREATER
+                        ,IFromTuple<Int4, (int, int, int, int)>,
+                         IPresets4d<Int4>,
+                         ISplittable<Int4, (int[] Ws, int[] Xs, int[] Ys, int[] Zs)>
+#endif
+    {
+        public static Int4 Backward => new Int4(0, 0, 0, -1);
+        public static Int4 Down => new Int4(0, 0, -1, 0);
+        public static Int4 Forward => new Int4(0, 0, 0, 1);
+        public static Int4 HighW => new Int4(1, 0, 0, 0);
+        public static Int4 Left => new Int4(0, -1, 0, 0);
+        public static Int4 LowW => new Int4(-1, 0, 0, 0);
+        public static Int4 Right => new Int4(0, 1, 0, 0);
+        public static Int4 Up => new Int4(0, 0, 1, 0);
 
-    public static Int4 One => new(1, 1, 1, 1);
-    public static Int4 Zero => new(0, 0, 0, 0);
+        public static Int4 One => new Int4(1, 1, 1, 1);
+        public static Int4 Zero => new Int4(0, 0, 0, 0);
 
-    public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z + w * w);
-    public Int4 Normalized => (Int4)((Float4)this * Mathf.InverseSqrt(x * x + y * y + z * z + w * w));
+        public double InverseMagnitude => MathE.InverseSqrt(w * w + x * x + y * y + z * z);
+        public double Magnitude => MathE.Sqrt(w * w + x * x + y * y + z * z);
+        public Float4 Normalized => (Float4)this * InverseMagnitude;
 
-    public Int2 XW
-    {
-        get => (x, w);
-        set
-        {
-            x = value.x;
-            w = value.y;
-        }
-    }
-    public Int2 XY
-    {
-        get => (x, y);
-        set
-        {
-            x = value.x;
-            y = value.y;
-        }
-    }
-    public Int2 XZ
-    {
-        get => (x, z);
-        set
-        {
-            x = value.x;
-            z = value.y;
-        }
-    }
-    public Int2 YW
-    {
-        get => (y, w);
-        set
-        {
-            y = value.x;
-            w = value.y;
-        }
-    }
-    public Int2 YZ
-    {
-        get => (y, z);
-        set
-        {
-            y = value.x;
-            z = value.y;
-        }
-    }
-    public Int2 ZW
-    {
-        get => (z, w);
-        set
-        {
-            z = value.x;
-            w = value.y;
-        }
-    }
+        public int w, x, y, z;
 
-    public Int3 XYW
-    {
-        get => (x, y, w);
-        set
+        public Int4(int w, int x, int y, int z)
         {
-            x = value.x;
-            y = value.y;
-            w = value.z;
+            this.w = w;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
-    }
-    public Int3 XYZ
-    {
-        get => (x, y, z);
-        set
+        public Int4(IEnumerable<int> nums)
         {
-            x = value.x;
-            y = value.y;
-            z = value.z;
-        }
-    }
-    public Int3 XZW
-    {
-        get => (x, z, w);
-        set
-        {
-            x = value.x;
-            z = value.y;
-            w = value.z;
-        }
-    }
-    public Int3 YZW
-    {
-        get => (y, z, w);
-        set
-        {
-            y = value.x;
-            z = value.y;
-            w = value.z;
-        }
-    }
+            w = 0;
+            x = 0;
+            y = 0;
+            z = 0;
 
-    public int x, y, z, w;
-
-    public Int4(int all) : this(all, all, all, all) { }
-    public Int4(int x, int y) : this(x, y, 0, 0) { }
-    public Int4(int x, int y, int z) : this(x, y, z, 0) { }
-    public Int4(int x, int y, int z, int w)
-    {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
-    }
-    public Int4(Fill<int> fill) : this(fill(0), fill(1), fill(2), fill(3)) { }
-
-    public int this[int index]
-    {
-        get => index switch
-        {
-            0 => x,
-            1 => y,
-            2 => z,
-            3 => w,
-            _ => throw new IndexOutOfRangeException(nameof(index)),
-        };
-        set
-        {
-            switch (index)
+            int index = 0;
+            foreach (int item in nums)
             {
-                case 0:
-                    x = value;
-                    break;
-
-                case 1:
-                    y = value;
-                    break;
-
-                case 2:
-                    z = value;
-                    break;
-
-                case 3:
-                    w = value;
-                    break;
-
-                default: throw new IndexOutOfRangeException(nameof(index));
+                this[index] = item;
+                index++;
+                if (index == 4) break;
             }
         }
-    }
-    public int this[Index index]
-    {
-        get => this[index.IsFromEnd ? 4 - index.Value : index.Value];
-        set => this[index.IsFromEnd ? 4 - index.Value : index.Value] = value;
-    }
-    public int[] this[Range range]
-    {
-        get
+        public Int4(Fill<int> fill)
         {
-            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
-            List<int> res = new();
-            for (int i = start; i < end; i++) res.Add(this[i]);
-            return res.ToArray();
+            w = fill(0);
+            x = fill(1);
+            y = fill(2);
+            z = fill(3);
         }
-        set
+
+        public int this[int index]
         {
-            int start = range.Start.IsFromEnd ? 4 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 4 - range.End.Value : range.End.Value;
-            for (int i = start; i < end; i++) this[i] = value[i];
+            get
+            {
+                switch (index)
+                {
+                    case 0: return w;
+                    case 1: return x;
+                    case 2: return y;
+                    case 3: return z;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: w = value; break;
+                    case 1: x = value; break;
+                    case 2: y = value; break;
+                    case 3: z = value; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
         }
-    }
-
-    public static Int4 Absolute(Int4 val) =>
-        new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z), Mathf.Absolute(val.w));
-    public static Int4 Average(params Int4[] vals) => Sum(vals) / vals.Length;
-    public static Int4 Clamp(Int4 val, Int4 min, Int4 max) =>
-        new(Mathf.Clamp(val.x, min.x, max.x),
-            Mathf.Clamp(val.y, min.y, max.y),
-            Mathf.Clamp(val.z, min.z, max.z),
-            Mathf.Clamp(val.w, min.w, max.w));
-    public static Int4 ClampMagnitude(Int4 val, int minMag, int maxMag)
-    {
-        if (maxMag < minMag) throw new ArgumentOutOfRangeException(nameof(maxMag),
-            nameof(maxMag) + " must be greater than or equal to " + nameof(minMag));
-        float mag = val.Magnitude;
-        if (mag >= minMag && mag <= maxMag) return val;
-        val = val.Normalized;
-        if (mag < minMag) val *= minMag;
-        else if (mag > maxMag) val *= maxMag;
-        return val;
-    }
-    public static Int4 Divide(Int4 num, params Int4[] vals) => num / Product(vals);
-    public static int Dot(Int4 a, Int4 b) => a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-    public static int Dot(params Int4[] vals)
-    {
-        if (vals.Length < 1) return 0;
-        int x = 1, y = 1, z = 1, w = 1;
-        foreach (Int4 d in vals)
+        public ListTuple<int> this[string key]
         {
-            x *= d.x;
-            y *= d.y;
-            z *= d.z;
-            w *= d.w;
+            get
+            {
+                int[] items = new int[key.Length];
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    switch (c)
+                    {
+                        case 'w': items[i] = w; break;
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+                return new ListTuple<int>(items);
+            }
+            set
+            {
+                IEnumerator<int> stepper = value.GetEnumerator();
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    stepper.MoveNext();
+                    switch (c)
+                    {
+                        case 'w': w = stepper.Current; break;
+                        case 'x': x = stepper.Current; break;
+                        case 'y': y = stepper.Current; break;
+                        case 'z': z = stepper.Current; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+            }
         }
-        return x + y + z;
-    }
-    public static Int4 Lerp(Int4 a, Int4 b, float t, bool clamp = true) =>
-        new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp),
-            Mathf.Lerp(a.w, b.w, t, clamp));
-    public static Int4 Median(params Int4[] vals)
-    {
-        float index = (vals.Length - 1) * 0.5f;
-        Int4 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return (valA + valB) / 2;
-    }
-    public static Int4 Max(params Int4[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int4 val = vals[0];
-        foreach (Int4 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
-        return val;
-    }
-    public static Int4 Min(params Int4[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int4 val = vals[0];
-        foreach (Int4 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
-        return val;
-    }
-    public static Int4 Product(params Int4[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int4 val = One;
-        foreach (Int4 d in vals) val *= d;
-        return val;
-    }
-    public static Int4 Subtract(Int4 num, params Int4[] vals) => num - Sum(vals);
-    public static Int4 Sum(params Int4[] vals)
-    {
-        Int4 val = Zero;
-        foreach (Int4 d in vals) val += d;
-        return val;
-    }
 
-    public static (int[] Xs, int[] Ys, int[] Zs, int[] Ws) SplitArray(params Int4[] vals)
-    {
-        int[] Xs = new int[vals.Length], Ys = new int[vals.Length], Zs = new int[vals.Length],
-              Ws = new int[vals.Length];
-        for (int i = 0; i < vals.Length; i++)
+        public static Int4 Average(IEnumerable<Int4> values)
         {
-            Xs[i] = vals[i].x;
-            Ys[i] = vals[i].y;
-            Zs[i] = vals[i].z;
-            Ws[i] = vals[i].w;
+            Int4 total = Zero;
+            int count = 0;
+            foreach (Int4 val in values)
+            {
+                total += val;
+                count++;
+            }
+            return total / count;
         }
-        return (Xs, Ys, Zs, Ws);
+        public static Int4 Clamp(Int4 value, Int4 min, Int4 max) =>
+            new Int4(MathE.Clamp(value.w, min.w, max.w),
+                     MathE.Clamp(value.x, min.x, max.x),
+                     MathE.Clamp(value.y, min.y, max.y),
+                     MathE.Clamp(value.z, min.z, max.z));
+        public static void Clamp(ref Int4 value, Int4 min, Int4 max)
+        {
+            MathE.Clamp(ref value.w, min.w, max.w);
+            MathE.Clamp(ref value.x, min.x, max.x);
+            MathE.Clamp(ref value.y, min.y, max.y);
+            MathE.Clamp(ref value.z, min.z, max.z);
+        }
+        public static Int4 ClampMagnitude(Int4 value, double minMag, double maxMag)
+        {
+            Int4 copy = value;
+            ClampMagnitude(ref copy, minMag, maxMag);
+            return copy;
+        }
+        public static void ClampMagnitude(ref Int4 value, double minMag, double maxMag)
+        {
+            if (minMag > maxMag) throw new ClampOrderMismatchException(nameof(minMag), nameof(maxMag));
+            double mag = value.Magnitude;
+            if (mag < minMag)
+            {
+                double factor = minMag / mag;
+                value.w = MathE.Ceiling(value.w * factor);
+                value.x = MathE.Ceiling(value.x * factor);
+                value.y = MathE.Ceiling(value.y * factor);
+                value.z = MathE.Ceiling(value.z * factor);
+            }
+            else if (mag > maxMag)
+            {
+                double factor = maxMag / mag;
+                value.w = MathE.Floor(value.w * factor);
+                value.x = MathE.Floor(value.x * factor);
+                value.y = MathE.Floor(value.y * factor);
+                value.z = MathE.Floor(value.z * factor);
+            }
+        }
+        public static int Dot(Int4 a, Int4 b) => a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
+        public static int Dot(IEnumerable<Int4> values)
+        {
+            int w = 1, x = 1, y = 1, z = 1;
+            foreach (Int4 val in values)
+            {
+                w *= val.w;
+                x *= val.x;
+                y *= val.y;
+                z *= val.z;
+            }
+            return w + x + y + z;
+        }
+#if CS11_OR_GREATER
+        static double IVectorOperations<Int4>.Dot(Int4 a, Int4 b) => Dot(a, b);
+        static double IVectorOperations<Int4>.Dot(IEnumerable<Int4> vals) => Dot(vals);
+#endif
+        public static Int4 Lerp(Int4 a, Int4 b, double t, bool clamp = true) =>
+            new Int4(MathE.Lerp(a.w, b.w, t, clamp),
+                     MathE.Lerp(a.x, b.x, t, clamp),
+                     MathE.Lerp(a.y, b.y, t, clamp),
+                     MathE.Lerp(a.z, b.z, t, clamp));
+        public static Int4 Product(IEnumerable<Int4> values)
+        {
+            bool any = false;
+            Int4 total = One;
+            foreach (Int4 val in values)
+            {
+                any = true;
+                total *= val;
+            }
+            return any ? total : Zero;
+        }
+        public static Int4 Sum(IEnumerable<Int4> values)
+        {
+            Int4 total = Zero;
+            foreach (Int4 val in values) total += val;
+            return total;
+        }
+
+        public static (int[] Ws, int[] Xs, int[] Ys, int[] Zs) SplitArray(IEnumerable<Int4> values)
+        {
+            int count = values.Count();
+            int[] Ws = new int[count], Xs = new int[count], Ys = new int[count], Zs = new int[count];
+            int index = 0;
+            foreach (Int4 val in values)
+            {
+                Ws[index] = val.w;
+                Xs[index] = val.x;
+                Ys[index] = val.y;
+                Zs[index] = val.z;
+                index++;
+            }
+            return (Ws, Xs, Ys, Zs);
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            yield return w;
+            yield return x;
+            yield return y;
+            yield return z;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Deconstruct(out int w, out int x, out int y, out int z)
+        {
+            w = this.w;
+            x = this.x;
+            y = this.y;
+            z = this.z;
+        }
+
+        public bool Equals(Int4 other) => w == other.w && x == other.x && y == other.y && z == other.z;
+#if CS8_OR_GREATER
+        public override bool Equals(object? obj)
+#else
+        public override bool Equals(object obj)
+#endif
+        {
+            if (obj is null) return false;
+            else if (obj is Int4 objInt4) return Equals(objInt4);
+            else if (obj is Float4 objFloat4) return objFloat4.Equals(this);
+            else return false;
+        }
+        public override int GetHashCode() => w.GetHashCode() ^ x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
+        public override string ToString() => $"({w}, {x}, {y}, {z})";
+        public string ToString(string format) => $"({w.ToString(format)}, {x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
+
+        public int[] ToArray() => new int[] { w, x, y, z };
+        public Fill<int> ToFill()
+        {
+            Int4 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.w;
+                    case 1: return copy.x;
+                    case 2: return copy.y;
+                    case 3: return copy.z;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
+        public List<int> ToList() => new List<int> { w, x, y, z };
+
+        public static Int4 operator +(Int4 a, Int4 b) => new Int4(a.w + b.w, a.x + b.x, a.y + b.y, a.z + b.z);
+        public static Int4 operator -(Int4 a) => new Int4(-a.w, -a.x, -a.y, -a.z);
+        public static Int4 operator -(Int4 a, Int4 b) => new Int4(a.w - b.w, a.x - b.x, a.y - b.y, a.z - b.z);
+        public static Int4 operator *(Int4 a, int b) => new Int4(a.w * b, a.x * b, a.y * b, a.z * b);
+        public static Int4 operator *(Int4 a, Int4 b) => new Int4(a.w * b.w, a.x * b.x, a.y * b.y, a.z * b.z);
+        public static Int4 operator /(Int4 a, int b) => new Int4(a.w / b, a.x / b, a.y / b, a.z / b);
+        public static Int4 operator /(Int4 a, Int4 b) => new Int4(a.w / b.w, a.x / b.x, a.y / b.y, a.z / b.z);
+        public static Int4 operator &(Int4 a, Int4 b) => new Int4(a.w & b.w, a.x & b.x, a.y & b.y, a.z & b.z);
+        public static Int4 operator |(Int4 a, Int4 b) => new Int4(a.w | b.w, a.x | b.x, a.y | b.y, a.z | b.z);
+        public static Int4 operator ^(Int4 a, Int4 b) => new Int4(a.w ^ b.w, a.x ^ b.x, a.y ^ b.y, a.z ^ b.z);
+        public static bool operator ==(Int4 a, Int4 b) => a.Equals(b);
+        public static bool operator !=(Int4 a, Int4 b) => !a.Equals(b);
+
+        public static implicit operator Int4(Int2 ints) => new Int4(0, ints.x, ints.y, 0);
+        public static implicit operator Int4(Int3 ints) => new Int4(0, ints.x, ints.y, ints.z);
+        public static explicit operator Int4(Float2 floats) => new Int4(0, (int)floats.x, (int)floats.y, 0);
+        public static explicit operator Int4(Float3 floats) => new Int4(0, (int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int4(Float4 floats) => new Int4((int)floats.w, (int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int4(Numbers.Quaternion quat) => new Int4((int)quat.w, (int)quat.x, (int)quat.y, (int)quat.z);
+        public static explicit operator Int4(ListTuple<double> tuple) => new Int4((int)tuple[0], (int)tuple[1], (int)tuple[2], (int)tuple[3]);
+        public static implicit operator Int4(ListTuple<int> tuple) => new Int4(tuple[0], tuple[1], tuple[2], tuple[3]);
+        public static implicit operator Int4((int, int, int, int) tuple) => new Int4(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);
+
+        public static implicit operator ListTuple<double>(Int4 group) => new ListTuple<double>(group.w, group.x, group.y, group.z);
+        public static implicit operator ListTuple<int>(Int4 group) => new ListTuple<int>(group.w, group.x, group.y, group.z);
+        public static implicit operator ValueTuple<int, int, int, int>(Int4 group) => (group.w, group.x, group.y, group.z);
     }
-
-    public int CompareTo(Int4 other) => Magnitude.CompareTo(other.Magnitude);
-    public bool Equals(Int4 other) => x == other.x && y == other.y && z == other.z && w == other.w;
-    public override int GetHashCode() => base.GetHashCode();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<int> GetEnumerator()
-    {
-        yield return x;
-        yield return y;
-        yield return z;
-        yield return w;
-    }
-
-    public int[] ToArray() => new[] { x, y, z, w };
-    public Fill<int> ToFill()
-    {
-        Int4 @this = this;
-        return i => @this[i];
-    }
-    public List<int> ToList() => new() { x, y, z, w };
-
-    private bool PrintMembers(StringBuilder builder)
-    {
-        builder.Append("x = ");
-        builder.Append(x);
-        builder.Append(", y = ");
-        builder.Append(y);
-        builder.Append(", z = ");
-        builder.Append(z);
-        builder.Append(", w = ");
-        builder.Append(w);
-        return true;
-    }
-
-    public static Int4 operator +(Int4 a, Int4 b) => new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
-    public static Int4 operator -(Int4 d) => new(-d.x, -d.y, -d.z, -d.w);
-    public static Int4 operator -(Int4 a, Int4 b) => new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
-    public static Int4 operator *(Int4 a, Int4 b) => new(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
-    public static Int4 operator *(Int4 a, int b) => new(a.x * b, a.y * b, a.z * b, a.w * b);
-    public static Int4 operator *(Int4 a, Matrix b) => (Int4)((Matrix)(Float4)a * b);
-    public static Int4 operator /(Int4 a, Int4 b) => new(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
-    public static Int4 operator /(Int4 a, int b) => new(a.x / b, a.y / b, a.z / b, a.w / b);
-    public static Int4 operator /(Int4 a, Matrix b) => (Int4)((Matrix)(Float4)a / b);
-    public static Int4 operator &(Int4 a, Int4 b) => new(a.x & b.x, a.y & b.y, a.z & b.z, a.w & b.w);
-    public static Int4 operator |(Int4 a, Int4 b) => new(a.x | b.x, a.y | b.y, a.z | b.z, a.w | b.w);
-    public static Int4 operator ^(Int4 a, Int4 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z, a.w ^ b.w);
-
-    public static explicit operator Int4(Complex val) => new((int)val.u, (int)val.i, 0, 0);
-    public static explicit operator Int4(Quaternion val) => new((int)val.u, (int)val.i, (int)val.j, (int)val.k);
-    public static explicit operator Int4(Float2 val) => new((int)val.x, (int)val.y, 0, 0);
-    public static explicit operator Int4(Float3 val) => new((int)val.x, (int)val.y, (int)val.z, 0);
-    public static explicit operator Int4(Float4 val) => new((int)val.x, (int)val.y, (int)val.z, (int)val.w);
-    public static implicit operator Int4(Int2 val) => new(val.x, val.y, 0, 0);
-    public static implicit operator Int4(Int3 val) => new(val.x, val.y, val.z, 0);
-    public static explicit operator Int4(Matrix m) => new((int)m[0, 0], (int)m[1, 0], (int)m[2, 0], (int)m[3, 0]);
-    public static explicit operator Int4(Vector2d val) => (Int4)val.ToXYZ();
-    public static explicit operator Int4(Vert val) => new((int)val.position.x, (int)val.position.y,
-                                                          (int)val.position.z, 0);
-    public static explicit operator Int4(RGBA val) => val.ToRGBAByte();
-    public static explicit operator Int4(CMYKA val) => (Int4)val.ToCMYKAByte();
-    public static explicit operator Int4(HSVA val) => val.ToHSVAByte();
-    public static implicit operator Int4(RGBAByte val) => new(val.R, val.G, val.B, val.A);
-    public static explicit operator Int4(CMYKAByte val) => new(val.C, val.M, val.Y, val.K);
-    public static implicit operator Int4(HSVAByte val) => new(val.H, val.S, val.V, val.A);
-    public static implicit operator Int4(Fill<int> fill) => new(fill);
-    public static implicit operator Int4((int x, int y, int z, int w) vals) =>
-        new(vals.x, vals.y, vals.z, vals.w);
 }

@@ -1,19 +1,18 @@
-﻿namespace Nerd_STF.Graphics;
-
-public enum ColorChannel : byte
+﻿namespace Nerd_STF.Graphics
 {
-    Alpha,
-    Black,
-    Blue,
-    Cyan,
-    Green,
-    Hue,
-    Luminance,
-    Magenta,
-    Matte,
-    Red,
-    Saturation,
-    Yellow,
-    Value,
-    ZDepth
+    public enum ColorChannel
+    {
+        Red,
+        Green,
+        Blue,
+        Alpha,
+        Hue,
+        Saturation,
+        Value,
+        Cyan,
+        Magenta,
+        Yellow,
+        Key,
+        Index
+    }
 }

@@ -1,46 +1,89 @@
 # Nerd_STF
 
-## Table of Contents
-- [What is it?](#what-is-it)
-- [What about Nerd_STF Versions `2021`?](#what-about-nerd_stf-versions-2021)
-- [How do I install it?](#how-do-i-install-it)
-- [I've found a bug!](#ive-found-a-bug)
-- [I'd like to contribute.](#id-like-to-contribute)
+Nerd_STF is a multi-purpose library for .NET focused primarily on mathematics. It supports basically all versions of .NET has plenty of flexibility to let you do what you please with it.
 
-## What is it?
+**Contents**
+- [Examples](#examples)
+- [How to Install](#how-to-install)
+    - [NuGet](#nuget)
+    - [Manual Reference](#manual-reference)
+- [I found a bug!](#i-found-a-bug)
+- [I'd like to contribute!](#id-like-to-contribute)
+- [When's your next release?](#whens-your-next-release)
+- [Older Versions](#older-versions)
 
-Nerd_STF is a multi-purpose .NET 7.0 library that contains many objects I feel would help the default C# library package. Feel free to do with it what you'd like.
+## Examples
 
-Nerd_STF includes some math as well as many other computer science topics. It contains types like groups of floats/ints, geometry types like `Vert`, `Line`, and `Triangle`, and color types like `RGBA`, `CMYKA`, `HSVA`, and their byte equivalents, all of which can convert seamlessly between each other.
+Here's how to derive a polynomial in Nerd_STF:
+```csharp
+using Nerd_STF.Mathematics.Equations;
 
-## What about Nerd_STF Versions `2021`?
-Nerd_STF `2021` used an different version scheme, based on the year, as you might have guessed (it is not the year `2` right now), and while I will be keeping the `2021` versions up, I wouldn't recommend using them, and the code is old code, written by a more naive me. Hell, I wrote an entire `List<T>` class there before I knew of the `System.Collections.Generic.List<T>` class that did literally everything for me already. Oh well. So, keep that in mind when you check out those versions of the library.
+Polynomial poly = new(2, 1, 3); // 2x^2 + x + 3
+Polynomial derivative = poly.Derive();
 
-## How do I install it?
-The NuGet package for this library is [here](https://www.nuget.org/packages/Nerd_STF/), so you could always install it that way using the .NET CLI:
-1. Open your terminal in your project directory.
-2. Enter this command: `dotnet add package Nerd_STF`
-3. There is no step 3.
+Console.WriteLine(derivative);  // Output: 4x + 1
+```
 
-You can also include the NuGet package via a package reference in your project file:
-1. Open your project file.
-2. Add this to the XML data: `<PackageReference Include="Nerd_STF" />`
-3. There is no step 3.
+Here's how to get or set part of a number group:
+```csharp
+Float3 xyz = (1, 2, 3);
 
-Alternatively, you can install it via a project reference in Visual Studio 2019 and 2022. Here's how:
-1. Download the latest library release from the [GitHub repository](https://github.com/That-One-Nerd/Nerd_STF/releases), extract the files, and save them somewhere you can find later. The files must all be in the same direcrtory/folder together.
-2. Open Visual Studio 2019 or 2022.
-3. Right-click your .NET project in the Solution Explorer.
-4. Hover over "Add >" list and then click "Project Reference..."
-5. Click "Browse," and locate the `.dll` file you previously extracted (the full name is "Nerd_STF.dll").
-6. Click "Add," then "OK," and the library is now imported!
+Float2 xy = new(xyz["xy"]);
+Float2 zy = new(xyz["zy"]);
+double[] yxzy = [.. xyz["yxzy"]];
 
-## I've found a bug!
+xyz["yz"] = [7, 8];
+Console.WriteLine(xyz); // Output: (1, 7, 8)
+```
 
-I'm not suprised, there are definitely a bunch of undiscovered bugs in Nerd_STF simply because I'm just one person. If you've found one, please do me a favor and create an issue about it in the [GitHub repository](https://github.com/That-One-Nerd/Nerd_STF). They likely aren't difficult fixes, they are just hard to spot even with some level of testing.
+Pretty easy, right?
 
-## I'd like to contribute.
+## How to Install
 
-I would love some contributions! I probably won't accept drastic pull requests or merges with the library, but small changes are quite welcome! I'm just one person and I can only do so much work by myself. If you want to contribute, please only edit the current version branch (eg. if we are on version `2.3.1`, edit the `v2.3` branch). Please do not edit the main branch. I will merge the changes with main myself.
+### NuGet
 
-Try to follow a similar style to the current library, but otherwise I'm open to changes. Thank you to those who contribute!
+You can install the package very easily with the NuGet Package Manager. The link to its NuGet page is [here](https://www.nuget.org/packages/Nerd_STF/). You could install it by running a command:
+```shell
+# Do not include version flag to download the latest release.
+dotnet add package Nerd_STF --version 3.0
+```
+or by including a package reference element in your project file:
+```xml
+<!-- Do not include the version tag to download the latest release. -->
+<PackageReference Include="Nerd_STF" Version="3.0" />
+```
+
+### Manual Reference
+
+You could also manually reference the DLL for the project. Go to the [releases page](https://github.com/That-One-Nerd/Nerd_STF/releases) and select the library version and .NET target of your choice. At the time of writing, this project compiles to .NET Standard 1.3, 2.1, and .NET 7.0, but more may be added in the future.
+
+Place the DLL somewhere you'll be able to reference later.
+
+If you're using Visual Studio 2019 or 2022:
+- Right click the project icon in the hierarchy.
+- Go to **Add** > **Project Reference**
+- Click **Browse** and locate the DLL you saved earlier.
+- Click **OK**. You should be good to go!
+
+Otherwise, you'll have to add a project reference element in your project file somewhere.
+```xml
+<Reference Include="Nerd_STF">
+  <HintPath>path\to\your\download\Nerd_STF.3.0.NET7.0.dll</HintPath>
+</Reference>
+```
+
+## I found a bug!
+
+I'm not surprised, I'm only one guy. Feel free to make an issue in the [repository](https://github.com/That-One-Nerd/Nerd_STF) and I'll get to it when I can!
+
+## I'd like to contribute!
+
+Well, I'd prefer to do most of the programming myself, but if anyone wants to submit a pull request, feel free! Stick to the version-specific branches, try not to make commits on the main branch.
+
+## When's your next release?
+
+No idea. This is a pet project, so progress on this library will come and go. It was more than a year between versions 2.4.1 and 3.0. It's really whenever mood strikes, so just watch the [project](https://github.com/users/That-One-Nerd/projects/8) to see what the current status is.
+
+## Older Versions
+
+3.0 has plenty of breaking changes from 2.4.1 (and the rest of the 2.x updates), so it's totally fine if you don't want to update. I'll keep the 2.x updates up for the long-term, no reason to remove them. As for the versions before 2.0, well, it wasn't even really a library at that point. Do with it what you will.

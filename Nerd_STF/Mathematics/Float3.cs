@@ -1,282 +1,338 @@
-﻿using System;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Graphics;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
-namespace Nerd_STF.Mathematics;
-
-public record struct Float3 : IAbsolute<Float3>, IAverage<Float3>,
-    ICeiling<Float3, Int3>, IClamp<Float3>, IClampMagnitude<Float3, float>, IComparable<Float3>,
-    ICross<Float3>, IDivide<Float3>, IDot<Float3, float>, IEquatable<Float3>,
-    IFloor<Float3, Int3>, IFromTuple<Float3, (float x, float y, float z)>, IGroup<float>,
-    IIndexAll<float>, IIndexRangeAll<float>, ILerp<Float3, float>, IMathOperators<Float3>, IMax<Float3>,
-    IMedian<Float3>, IMin<Float3>, IPresets3d<Float3>, IProduct<Float3>, IRound<Float3, Int3>,
-    ISplittable<Float3, (float[] Xs, float[] Ys, float[] Zs)>, ISubtract<Float3>, ISum<Float3>
+namespace Nerd_STF.Mathematics
 {
-    public static Float3 Back => new(0, 0, -1);
-    public static Float3 Down => new(0, -1, 0);
-    public static Float3 Forward => new(0, 0, 1);
-    public static Float3 Left => new(-1, 0, 0);
-    public static Float3 Right => new(1, 0, 0);
-    public static Float3 Up => new(0, 1, 0);
-
-    public static Float3 One => new(1, 1, 1);
-    public static Float3 Zero => new(0, 0, 0);
-
-    public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
-    public Float3 Normalized => this * Mathf.InverseSqrt(x * x + y * y + z * z);
-
-    public Float2 XY
+    public struct Float3 : INumberGroup<Float3, double>
+#if CS11_OR_GREATER
+                          ,IFromTuple<Float3, (double, double, double)>,
+                           IPresets2d<Float3>,
+                           IRoundable<Float3, Int3>,
+                           IRefRoundable<Float3>,
+                           ISplittable<Float3, (double[] Xs, double[] Ys, double[] Zs)>
+#endif
     {
-        get => (x, y);
-        set
+        public static Float3 Backward => new Float3(0, 0, -1);
+        public static Float3 Down => new Float3(0, -1, 0);
+        public static Float3 Forward => new Float3(0, 0, 1);
+        public static Float3 Left => new Float3(-1, 0, 0);
+        public static Float3 Right => new Float3(1, 0, 0);
+        public static Float3 Up => new Float3(0, 1, 0);
+
+        public static Float3 One => new Float3(1, 1, 1);
+        public static Float3 Zero => new Float3(0, 0, 0);
+
+        public double InverseMagnitude => MathE.InverseSqrt(x * x + y * y + z * z);
+        public double Magnitude => MathE.Sqrt(x * x + y * y + z * z);
+        public Float3 Normalized => this * InverseMagnitude;
+
+        public double x, y, z;
+
+        public Float3(double x, double y, double z)
         {
-            x = value.x;
-            y = value.y;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
-    }
-    public Float2 XZ
-    {
-        get => (x, z);
-        set
+        public Float3(IEnumerable<double> nums)
         {
-            x = value.x;
-            z = value.y;
-        }
-    }
-    public Float2 YZ
-    {
-        get => (y, z);
-        set
-        {
-            y = value.x;
-            z = value.y;
-        }
-    }
+            x = 0;
+            y = 0;
+            z = 0;
 
-    public float x, y, z;
-
-    public Float3(float all) : this(all, all, all) { }
-    public Float3(float x, float y) : this(x, y, 0) { }
-    public Float3(float x, float y, float z)
-    {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-    public Float3(Fill<float> fill) : this(fill(0), fill(1), fill(2)) { }
-    public Float3(Fill<int> fill) : this(fill(0), fill(1), fill(2)) { }
-
-    public float this[int index]
-    {
-        get => index switch
-        {
-            0 => x,
-            1 => y,
-            2 => z,
-            _ => throw new IndexOutOfRangeException(nameof(index)),
-        };
-        set
-        {
-            switch (index)
+            int index = 0;
+            foreach (double item in nums)
             {
-                case 0:
-                    x = value;
-                    break;
-
-                case 1:
-                    y = value;
-                    break;
-
-                case 2:
-                    z = value;
-                    break;
-
-                default: throw new IndexOutOfRangeException(nameof(index));
+                this[index] = item;
+                index++;
+                if (index == 3) break;
             }
         }
-    }
-    public float this[Index index]
-    {
-        get => this[index.IsFromEnd ? 3 - index.Value : index.Value];
-        set => this[index.IsFromEnd ? 3 - index.Value : index.Value] = value;
-    }
-    public float[] this[Range range]
-    {
-        get
+        public Float3(Fill<double> fill)
         {
-            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
-            List<float> res = new();
-            for (int i = start; i < end; i++) res.Add(this[i]);
-            return res.ToArray();
+            x = fill(0);
+            y = fill(1);
+            z = fill(2);
         }
-        set
+
+        public double this[int index]
         {
-            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
-            for (int i = start; i < end; i++) this[i] = value[i];
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    case 2: return z;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    case 2: z = value; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
         }
-    }
-
-    public static Float3 Absolute(Float3 val) =>
-        new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z));
-    public static Float3 Average(params Float3[] vals) => Sum(vals) / vals.Length;
-    public static Int3 Ceiling(Float3 val) =>
-        new(Mathf.Ceiling(val.x), Mathf.Ceiling(val.y), Mathf.Ceiling(val.z));
-    public static Float3 Clamp(Float3 val, Float3 min, Float3 max) =>
-        new(Mathf.Clamp(val.x, min.x, max.x),
-            Mathf.Clamp(val.y, min.y, max.y),
-            Mathf.Clamp(val.z, min.z, max.z));
-    public static Float3 ClampMagnitude(Float3 val, float minMag, float maxMag)
-    {
-        if (maxMag < minMag) throw new ArgumentOutOfRangeException(nameof(maxMag),
-            nameof(maxMag) + " must be greater than or equal to " + nameof(minMag));
-        float mag = val.Magnitude;
-        if (mag >= minMag && mag <= maxMag) return val;
-        val = val.Normalized;
-        if (mag < minMag) val *= minMag;
-        else if (mag > maxMag) val *= maxMag;
-        return val;
-    }
-    public static Float3 Cross(Float3 a, Float3 b, bool normalized = false)
-    {
-        Float3 val = new(a.y * b.z - b.y * a.z,
-                          b.x * a.z - a.x * b.z,
-                          a.x * b.y - b.x * a.y);
-        return normalized ? val.Normalized : val;
-    }
-    public static Float3 Divide(Float3 num, params Float3[] vals) => num / Product(vals);
-    public static float Dot(Float3 a, Float3 b) => a.x * b.x + a.y * b.y + a.z * b.z;
-    public static float Dot(params Float3[] vals)
-    {
-        if (vals.Length < 1) return 0;
-        float x = 1, y = 1, z = 1;
-        foreach (Float3 d in vals)
+        public ListTuple<double> this[string key]
         {
-            x *= d.x;
-            y *= d.y;
-            z *= d.z;
+            get
+            {
+                double[] items = new double[key.Length];
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    switch (c)
+                    {
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+                return new ListTuple<double>(items);
+            }
+            set
+            {
+                IEnumerator<double> stepper = value.GetEnumerator();
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    stepper.MoveNext();
+                    switch (c)
+                    {
+                        case 'x': x = stepper.Current; break;
+                        case 'y': y = stepper.Current; break;
+                        case 'z': z = stepper.Current; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+            }
         }
-        return x + y + z;
-    }
-    public static Int3 Floor(Float3 val) =>
-        new(Mathf.Floor(val.x), Mathf.Floor(val.y), Mathf.Floor(val.z));
-    public static Float3 Lerp(Float3 a, Float3 b, float t, bool clamp = true) =>
-        new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp));
-    public static Float3 Median(params Float3[] vals)
-    {
-        float index = (vals.Length - 1) * 0.5f;
-        Float3 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return (valA + valB) * 0.5f;
-    }
-    public static Float3 Max(params Float3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float3 val = vals[0];
-        foreach (Float3 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
-        return val;
-    }
-    public static Float3 Min(params Float3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float3 val = vals[0];
-        foreach (Float3 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
-        return val;
-    }
-    public static Float3 Product(params Float3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Float3 val = One;
-        foreach (Float3 d in vals) val *= d;
-        return val;
-    }
-    public static Int3 Round(Float3 val) =>
-        new(Mathf.RoundInt(val.x), Mathf.RoundInt(val.y), Mathf.RoundInt(val.z));
-    public static Float3 Subtract(Float3 num, params Float3[] vals) => num - Sum(vals);
-    public static Float3 Sum(params Float3[] vals)
-    {
-        Float3 val = Zero;
-        foreach (Float3 d in vals) val += d;
-        return val;
-    }
 
-    public static (float[] Xs, float[] Ys, float[] Zs) SplitArray(params Float3[] vals)
-    {
-        float[] Xs = new float[vals.Length], Ys = new float[vals.Length], Zs = new float[vals.Length];
-        for (int i = 0; i < vals.Length; i++)
+        public static Float3 Average(IEnumerable<Float3> values)
         {
-            Xs[i] = vals[i].x;
-            Ys[i] = vals[i].y;
-            Zs[i] = vals[i].z;
+            Float3 total = Zero;
+            int count = 0;
+            foreach (Float3 val in values)
+            {
+                total += val;
+                count++;
+            }
+            return total / count;
         }
-        return (Xs, Ys, Zs);
+        public static Int3 Ceiling(Float3 val) =>
+            new Int3(MathE.Ceiling(val.x),
+                     MathE.Ceiling(val.y),
+                     MathE.Ceiling(val.z));
+        public static void Ceiling(ref Float3 val)
+        {
+            MathE.Ceiling(ref val.x);
+            MathE.Ceiling(ref val.y);
+            MathE.Ceiling(ref val.z);
+        }
+        public static Float3 Clamp(Float3 value, Float3 min, Float3 max) =>
+            new Float3(MathE.Clamp(value.x, min.x, max.x),
+                       MathE.Clamp(value.y, min.y, max.y),
+                       MathE.Clamp(value.z, min.z, max.z));
+        public static void Clamp(ref Float3 value, Float3 min, Float3 max)
+        {
+            MathE.Clamp(ref value.x, min.x, max.x);
+            MathE.Clamp(ref value.y, min.y, max.y);
+            MathE.Clamp(ref value.z, min.z, max.z);
+        }
+        public static Float3 ClampMagnitude(Float3 value, double minMag, double maxMag)
+        {
+            Float3 copy = value;
+            ClampMagnitude(ref copy, minMag, maxMag);
+            return copy;
+        }
+        public static void ClampMagnitude(ref Float3 value, double minMag, double maxMag)
+        {
+            if (minMag > maxMag) throw new ClampOrderMismatchException(nameof(minMag), nameof(maxMag));
+            double mag = value.Magnitude;
+
+            if (mag < minMag)
+            {
+                double factor = minMag / mag;
+                value.x *= factor;
+                value.y *= factor;
+                value.z *= factor;
+            }
+            else if (mag > maxMag)
+            {
+                double factor = maxMag / mag;
+                value.x *= factor;
+                value.y *= factor;
+                value.z *= factor;
+            }
+        }
+        public static Float3 Cross(Float3 a, Float3 b) =>
+            new Float3(a.y * b.z - a.z * b.y,
+                       a.z * b.x - a.x * b.z,
+                       a.x * b.y - a.y * b.x);
+        public static double Dot(Float3 a, Float3 b) => a.x * b.x + a.y * b.y + a.z * b.z;
+        public static double Dot(IEnumerable<Float3> values)
+        {
+            double x = 1, y = 1, z = 1;
+            foreach (Float3 val in values)
+            {
+                x *= val.x;
+                y *= val.y;
+                z *= val.z;
+            }
+            return x + y + z;
+        }
+        public static Int3 Floor(Float3 value) =>
+            new Int3(MathE.Floor(value.x),
+                     MathE.Floor(value.y),
+                     MathE.Floor(value.z));
+        public static void Floor(ref Float3 value)
+        {
+            MathE.Floor(ref value.x);
+            MathE.Floor(ref value.y);
+            MathE.Floor(ref value.z);
+        }
+        public static Float3 Lerp(Float3 a, Float3 b, double t, bool clamp = true) =>
+            new Float3(MathE.Lerp(a.x, b.x, t, clamp),
+                       MathE.Lerp(a.y, b.y, t, clamp),
+                       MathE.Lerp(a.z, b.z, t, clamp));
+        public static Float3 Product(IEnumerable<Float3> values)
+        {
+            bool any = false;
+            Float3 result = One;
+            foreach (Float3 val in values)
+            {
+                any = true;
+                result *= val;
+            }
+            return any ? result : Zero;
+        }
+        public static Int3 Round(Float3 value) =>
+            new Int3(MathE.Round(value.x),
+                     MathE.Round(value.y),
+                     MathE.Round(value.z));
+        public static void Round(ref Float3 value)
+        {
+            MathE.Round(ref value.x);
+            MathE.Round(ref value.y);
+            MathE.Round(ref value.z);
+        }
+        public static Float3 Sum(IEnumerable<Float3> values)
+        {
+            Float3 result = Zero;
+            foreach (Float3 val in values) result += val;
+            return result;
+        }
+
+        public static (double[] Xs, double[] Ys, double[] Zs) SplitArray(IEnumerable<Float3> values)
+        {
+            int count = values.Count();
+            double[] Xs = new double[count], Ys = new double[count], Zs = new double[count];
+            int index = 0;
+            foreach (Float3 val in values)
+            {
+                Xs[index] = val.x;
+                Ys[index] = val.y;
+                Zs[index] = val.z;
+                index++;
+            }
+            return (Xs, Ys, Zs);
+        }
+
+        public void Normalize()
+        {
+            double invMag = InverseMagnitude;
+            x *= invMag;
+            y *= invMag;
+            z *= invMag;
+        }
+
+        public IEnumerator<double> GetEnumerator()
+        {
+            yield return x;
+            yield return y;
+            yield return z;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Deconstruct(out double x, out double y, out double z)
+        {
+            x = this.x;
+            y = this.y;
+            z = this.z;
+        }
+
+        public bool Equals(Float3 other) => x == other.x && y == other.y && z == other.z;
+#if CS8_OR_GREATER
+        public override bool Equals(object? obj)
+#else
+        public override bool Equals(object obj)
+#endif
+        {
+            if (obj is null) return false;
+            else if (obj is Float3 objFloat3) return Equals(objFloat3);
+            else if (obj is Int3 objInt3) return Equals(objInt3);
+            else return false;
+        }
+        public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
+        public override string ToString() => $"({x}, {y}, {z})";
+        public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
+
+        public double[] ToArray() => new double[] { x, y, z };
+        public Fill<double> ToFill()
+        {
+            Float3 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.x;
+                    case 1: return copy.y;
+                    case 2: return copy.z;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
+        public List<double> ToList() => new List<double> { x, y, z };
+
+        public static Float3 operator +(Float3 a, Float3 b) => new Float3(a.x + b.x, a.y + b.y, a.z + b.z);
+        public static Float3 operator -(Float3 a) => new Float3(-a.x, -a.y, -a.z);
+        public static Float3 operator -(Float3 a, Float3 b) => new Float3(a.x - b.x, a.y - b.y, a.z - b.z);
+        public static Float3 operator *(Float3 a, double b) => new Float3(a.x * b, a.y * b, a.z * b);
+        public static Float3 operator *(Float3 a, Float3 b) => new Float3(a.x * b.x, a.y * b.y, a.z * b.z);
+        public static Float3 operator /(Float3 a, double b) => new Float3(a.x / b, a.y / b, a.z / b);
+        public static Float3 operator /(Float3 a, Float3 b) => new Float3(a.x / b.x, a.y / b.y, a.z / b.z);
+        public static bool operator ==(Float3 a, Float3 b) => a.Equals(b);
+        public static bool operator !=(Float3 a, Float3 b) => !a.Equals(b);
+
+        public static explicit operator Float3(ColorRGB color) => new Float3(color.r, color.g, color.b);
+        public static implicit operator Float3(Float2 floats) => new Float3(floats.x, floats.y, 0);
+        public static explicit operator Float3(Float4 floats) => new Float3(floats.x, floats.y, floats.z);
+        public static implicit operator Float3(Int2 ints) => new Float3(ints.x, ints.y, 0);
+        public static implicit operator Float3(Int3 ints) => new Float3(ints.x, ints.y, ints.z);
+        public static explicit operator Float3(Int4 ints) => new Float3(ints.x, ints.y, ints.z);
+        public static implicit operator Float3(Vector2 vec) => new Float3(vec.X, vec.Y, 0);
+        public static implicit operator Float3(Vector3 vec) => new Float3(vec.X, vec.Y, vec.Z);
+        public static explicit operator Float3(Vector4 vec) => new Float3(vec.X, vec.Y, vec.Z);
+        public static implicit operator Float3(ListTuple<double> tuple) => new Float3(tuple[0], tuple[1], tuple[2]);
+        public static implicit operator Float3(ListTuple<int> tuple) => new Float3(tuple[0], tuple[1], tuple[2]);
+        public static implicit operator Float3((double, double, double) tuple) => new Float3(tuple.Item1, tuple.Item2, tuple.Item3);
+
+        public static explicit operator Vector2(Float3 group) => new Vector2((float)group.x, (float)group.y);
+        public static implicit operator Vector3(Float3 group) => new Vector3((float)group.x, (float)group.y, (float)group.z);
+        public static implicit operator Vector4(Float3 group) => new Vector4((float)group.x, (float)group.y, (float)group.z, 0);
+        public static implicit operator ListTuple<double>(Float3 group) => new ListTuple<double>(group.x, group.y, group.z);
+        public static explicit operator ListTuple<int>(Float3 group) => new ListTuple<int>((int)group.x, (int)group.y, (int)group.z);
+        public static implicit operator ValueTuple<double, double, double>(Float3 group) => (group.x, group.y, group.z);
     }
-
-    public int CompareTo(Float3 other) => Magnitude.CompareTo(other.Magnitude);
-    public bool Equals(Float3 other) => x == other.x && y == other.y && z == other.z;
-    public override int GetHashCode() => base.GetHashCode();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<float> GetEnumerator()
-    {
-        yield return x;
-        yield return y;
-        yield return z;
-    }
-
-    public float[] ToArray() => new[] { x, y, z };
-    public Fill<float> ToFill()
-    {
-        Float3 @this = this;
-        return i => @this[i];
-    }
-    public List<float> ToList() => new() { x, y, z };
-
-    public Vector3d ToVector()
-    {
-        float mag = Magnitude;
-        Float3 normalized = Normalized;
-        Angle yaw = Mathf.ArcCos(normalized.y);
-        Angle pitch = Mathf.ArcSin(normalized.x / Mathf.Sin(yaw));
-        return new(yaw, pitch, mag);
-    }
-
-    private bool PrintMembers(StringBuilder builder)
-    {
-        builder.Append("x = ");
-        builder.Append(x);
-        builder.Append(", y = ");
-        builder.Append(y);
-        builder.Append(", z = ");
-        builder.Append(z);
-        return true;
-    }
-
-    public static Float3 operator +(Float3 a, Float3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);
-    public static Float3 operator -(Float3 d) => new(-d.x, -d.y, -d.z);
-    public static Float3 operator -(Float3 a, Float3 b) => new(a.x - b.x, a.y - b.y, a.z - b.z);
-    public static Float3 operator *(Float3 a, Float3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
-    public static Float3 operator *(Float3 a, float b) => new(a.x * b, a.y * b, a.z * b);
-    public static Float3 operator *(Float3 a, Matrix b) => (Float3)((Matrix)a * b);
-    public static Quaternion operator *(Float3 a, Quaternion b) => (Quaternion)a * b;
-    public static Float3 operator /(Float3 a, Float3 b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
-    public static Float3 operator /(Float3 a, float b) => new(a.x / b, a.y / b, a.z / b);
-    public static Float3 operator /(Float3 a, Matrix b) => (Float3)((Matrix)a / b);
-
-    public static implicit operator Float3(Complex val) => new(val.u, val.i, 0);
-    public static explicit operator Float3(Quaternion val) => new(val.u, val.i, val.j);
-    public static implicit operator Float3(Float2 val) => new(val.x, val.y, 0);
-    public static explicit operator Float3(Float4 val) => new(val.x, val.y, val.z);
-    public static implicit operator Float3(Int2 val) => new(val.x, val.y, 0);
-    public static implicit operator Float3(Int3 val) => new(val.x, val.y, val.z);
-    public static explicit operator Float3(Int4 val) => new(val.x, val.y, val.z);
-    public static explicit operator Float3(Matrix m) => new(m[0, 0], m[1, 0], m[2, 0]);
-    public static explicit operator Float3(Vector2d val) => val.ToXYZ();
-    public static implicit operator Float3(Vert val) => new(val.position.x, val.position.y, val.position.z);
-    public static explicit operator Float3(RGBA val) => new(val.R, val.G, val.B);
-    public static explicit operator Float3(HSVA val) => new(val.H.Normalized, val.S, val.V);
-    public static explicit operator Float3(RGBAByte val) => (Float3)val.ToRGBA();
-    public static explicit operator Float3(HSVAByte val) => (Float3)val.ToHSVA();
-    public static implicit operator Float3(Fill<float> fill) => new(fill);
-    public static implicit operator Float3(Fill<int> fill) => new(fill);
-    public static implicit operator Float3((float x, float y, float z) val) =>
-        new(val.x, val.y, val.z);
 }

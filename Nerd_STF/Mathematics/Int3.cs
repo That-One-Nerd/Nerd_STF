@@ -1,268 +1,297 @@
-﻿using System.Data;
+﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Nerd_STF.Mathematics;
-
-public record struct Int3 : IAbsolute<Int3>, IAverage<Int3>, IClamp<Int3>, IClampMagnitude<Int3, int>,
-    IComparable<Int3>, ICross<Int3>, IDivide<Int3>, IDot<Int3, int>, IEquatable<Int3>,
-    IFromTuple<Int3, (int x, int y, int z)>, IGroup<int>, IIndexAll<int>, IIndexRangeAll<int>, ILerp<Int3, float>,
-    IMathOperators<Int3>, IMax<Int3>, IMedian<Int3>, IMin<Int3>, IPresets3d<Int3>, IProduct<Int3>,
-    ISplittable<Int3, (int[] Xs, int[] Ys, int[] Zs)>, ISubtract<Int3>, ISum<Int3>
+namespace Nerd_STF.Mathematics
 {
-    public static Int3 Back => new(0, 0, -1);
-    public static Int3 Down => new(0, -1, 0);
-    public static Int3 Forward => new(0, 0, 1);
-    public static Int3 Left => new(-1, 0, 0);
-    public static Int3 Right => new(1, 0, 0);
-    public static Int3 Up => new(0, 1, 0);
-
-    public static Int3 One => new(1, 1, 1);
-    public static Int3 Zero => new(0, 0, 0);
-
-    public float Magnitude => Mathf.Sqrt(x * x + y * y + z * z);
-    public Int3 Normalized => (Int3)((Float3)this * Mathf.InverseSqrt(x * x + y * y + z * z));
-
-    public Int2 XY
+    public struct Int3 : INumberGroup<Int3, int>
+#if CS11_OR_GREATER
+                        ,IFromTuple<Int3, (int, int, int)>,
+                         IPresets3d<Int3>,
+                         ISplittable<Int3, (int[] Xs, int[] Ys, int[] Zs)>
+#endif
     {
-        get => (x, y);
-        set
+        public static Int3 Backward => new Int3(0, 0, -1);
+        public static Int3 Down => new Int3(0, -1, 0);
+        public static Int3 Forward => new Int3(0, 0, 1);
+        public static Int3 Left => new Int3(-1, 0, 0);
+        public static Int3 Right => new Int3(1, 0, 0);
+        public static Int3 Up => new Int3(0, 1, 0);
+
+        public static Int3 One => new Int3(1, 1, 1);
+        public static Int3 Zero => new Int3(0, 0, 0);
+
+        public double InverseMagnitude => MathE.InverseSqrt(x * x + y * y + z * z);
+        public double Magnitude => MathE.Sqrt(x * x + y * y + z * z);
+        public Float3 Normalized => (Float3)this * InverseMagnitude;
+
+        public int x, y, z;
+
+        public Int3(int x, int y, int z)
         {
-            x = value.x;
-            y = value.y;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
-    }
-    public Int2 XZ
-    {
-        get => (x, z);
-        set
+        public Int3(IEnumerable<int> nums)
         {
-            x = value.x;
-            z = value.y;
-        }
-    }
-    public Int2 YZ
-    {
-        get => (y, z);
-        set
-        {
-            y = value.x;
-            z = value.y;
-        }
-    }
+            x = 0;
+            y = 0;
+            z = 0;
 
-    public int x, y, z;
-
-    public Int3(int all) : this(all, all, all) { }
-    public Int3(int x, int y) : this(x, y, 0) { }
-    public Int3(int x, int y, int z)
-    {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-    public Int3(Fill<int> fill) : this(fill(0), fill(1), fill(2)) { }
-
-    public int this[int index]
-    {
-        get => index switch
-        {
-            0 => x,
-            1 => y,
-            2 => z,
-            _ => throw new IndexOutOfRangeException(nameof(index)),
-        };
-        set
-        {
-            switch (index)
+            int index = 0;
+            foreach (int item in nums)
             {
-                case 0:
-                    x = value;
-                    break;
-
-                case 1:
-                    y = value;
-                    break;
-
-                case 2:
-                    z = value;
-                    break;
-
-                default: throw new IndexOutOfRangeException(nameof(index));
+                this[index] = item;
+                index++;
+                if (index == 3) break;
             }
         }
-    }
-    public int this[Index index]
-    {
-        get => this[index.IsFromEnd ? 3 - index.Value : index.Value];
-        set => this[index.IsFromEnd ? 3 - index.Value : index.Value] = value;
-    }
-    public int[] this[Range range]
-    {
-        get
+        public Int3(Fill<int> fill)
         {
-            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
-            List<int> res = new();
-            for (int i = start; i < end; i++) res.Add(this[i]);
-            return res.ToArray();
+            x = fill(0);
+            y = fill(1);
+            z = fill(2);
         }
-        set
+
+        public int this[int index]
         {
-            int start = range.Start.IsFromEnd ? 3 - range.Start.Value : range.Start.Value;
-            int end = range.End.IsFromEnd ? 3 - range.End.Value : range.End.Value;
-            for (int i = start; i < end; i++) this[i] = value[i];
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    case 2: return z;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    case 2: z = value; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(index));
+                }
+            }
         }
-    }
-
-    public static Int3 Absolute(Int3 val) =>
-        new(Mathf.Absolute(val.x), Mathf.Absolute(val.y), Mathf.Absolute(val.z));
-    public static Int3 Average(params Int3[] vals) => Sum(vals) / vals.Length;
-    public static Int3 Clamp(Int3 val, Int3 min, Int3 max) =>
-        new(Mathf.Clamp(val.x, min.x, max.x),
-            Mathf.Clamp(val.y, min.y, max.y),
-            Mathf.Clamp(val.z, min.z, max.z));
-    public static Int3 ClampMagnitude(Int3 val, int minMag, int maxMag)
-    {
-        if (maxMag < minMag) throw new ArgumentOutOfRangeException(nameof(maxMag),
-            nameof(maxMag) + " must be greater than or equal to " + nameof(minMag));
-        float mag = val.Magnitude;
-        if (mag >= minMag && mag <= maxMag) return val;
-        val = val.Normalized;
-        if (mag < minMag) val *= minMag;
-        else if (mag > maxMag) val *= maxMag;
-        return val;
-    }
-    public static Int3 Cross(Int3 a, Int3 b, bool normalized = false)
-    {
-        Int3 val = new(a.y * b.z - b.y * a.z,
-                       b.x * a.z - a.x * b.z,
-                       a.x * b.y - b.x * a.y);
-        return normalized ? val.Normalized : val;
-    }
-    public static Int3 Divide(Int3 num, params Int3[] vals) => num / Product(vals);
-    public static int Dot(Int3 a, Int3 b) => a.x * b.x + a.y * b.y + a.z * b.z;
-    public static int Dot(params Int3[] vals)
-    {
-        if (vals.Length < 1) return 0;
-        int x = 1, y = 1, z = 1;
-        foreach (Int3 d in vals)
+        public ListTuple<int> this[string key]
         {
-            x *= d.x;
-            y *= d.y;
-            z *= d.z;
+            get
+            {
+                int[] items = new int[key.Length];
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    switch (c)
+                    {
+                        case 'x': items[i] = x; break;
+                        case 'y': items[i] = y; break;
+                        case 'z': items[i] = z; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+                return new ListTuple<int>(items);
+            }
+            set
+            {
+                IEnumerator<int> stepper = value.GetEnumerator();
+                for (int i = 0; i < key.Length; i++)
+                {
+                    char c = key[i];
+                    stepper.MoveNext();
+                    switch (c)
+                    {
+                        case 'x': x = stepper.Current; break;
+                        case 'y': y = stepper.Current; break;
+                        case 'z': z = stepper.Current; break;
+                        default: throw new ArgumentException("Invalid key.", nameof(key));
+                    }
+                }
+            }
         }
-        return x + y + z;
-    }
-    public static Int3 Lerp(Int3 a, Int3 b, float t, bool clamp = true) =>
-        new(Mathf.Lerp(a.x, b.x, t, clamp), Mathf.Lerp(a.y, b.y, t, clamp), Mathf.Lerp(a.z, b.z, t, clamp));
-    public static Int3 Median(params Int3[] vals)
-    {
-        float index = (vals.Length - 1) * 0.5f;
-        Int3 valA = vals[Mathf.Floor(index)], valB = vals[Mathf.Ceiling(index)];
-        return (valA + valB) / 2;
-    }
-    public static Int3 Max(params Int3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int3 val = vals[0];
-        foreach (Int3 d in vals) val = d.Magnitude > val.Magnitude ? d : val;
-        return val;
-    }
-    public static Int3 Min(params Int3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int3 val = vals[0];
-        foreach (Int3 d in vals) val = d.Magnitude < val.Magnitude ? d : val;
-        return val;
-    }
-    public static Int3 Product(params Int3[] vals)
-    {
-        if (vals.Length < 1) return Zero;
-        Int3 val = One;
-        foreach (Int3 d in vals) val *= d;
-        return val;
-    }
-    public static Int3 Subtract(Int3 num, params Int3[] vals) => num - Sum(vals);
-    public static Int3 Sum(params Int3[] vals)
-    {
-        Int3 val = Zero;
-        foreach (Int3 d in vals) val += d;
-        return val;
-    }
 
-    public static (int[] Xs, int[] Ys, int[] Zs) SplitArray(params Int3[] vals)
-    {
-        int[] Xs = new int[vals.Length], Ys = new int[vals.Length], Zs = new int[vals.Length];
-        for (int i = 0; i < vals.Length; i++)
+        public static Int3 Average(IEnumerable<Int3> values)
         {
-            Xs[i] = vals[i].x;
-            Ys[i] = vals[i].y;
-            Zs[i] = vals[i].z;
+            Int3 total = Zero;
+            int count = 0;
+            foreach (Int3 val in values)
+            {
+                total += val;
+                count++;
+            }
+            return total / count;
         }
-        return (Xs, Ys, Zs);
+        public static Int3 Clamp(Int3 value, Int3 min, Int3 max) =>
+            new Int3(MathE.Clamp(value.x, min.x, max.x),
+                     MathE.Clamp(value.y, min.y, max.y),
+                     MathE.Clamp(value.z, min.z, max.z));
+        public static void Clamp(ref Int3 value, Int3 min, Int3 max)
+        {
+            MathE.Clamp(ref value.x, min.x, max.x);
+            MathE.Clamp(ref value.y, min.y, max.y);
+            MathE.Clamp(ref value.z, min.z, max.z);
+        }
+        public static Int3 ClampMagnitude(Int3 value, double minMag, double maxMag)
+        {
+            Int3 copy = value;
+            ClampMagnitude(ref copy, minMag, maxMag);
+            return copy;
+        }
+        public static void ClampMagnitude(ref Int3 value, double minMag, double maxMag)
+        {
+            if (minMag > maxMag) throw new ClampOrderMismatchException(nameof(minMag), nameof(maxMag));
+            double mag = value.Magnitude;
+
+            if (mag < minMag)
+            {
+                double factor = minMag / mag;
+                value.x = MathE.Ceiling(value.x * factor);
+                value.y = MathE.Ceiling(value.y * factor);
+                value.z = MathE.Ceiling(value.z * factor);
+            }
+            else if (mag > maxMag)
+            {
+                double factor = maxMag / mag;
+                value.x = MathE.Floor(value.x * factor);
+                value.y = MathE.Floor(value.y * factor);
+                value.z = MathE.Floor(value.z * factor);
+            }
+        }
+        public static Int3 Cross(Int3 a, Int3 b) =>
+            new Int3(a.y * b.z - a.z * b.y,
+                     a.z * b.x - a.x * b.z,
+                     a.x * b.y - a.y * b.x);
+        public static int Dot(Int3 a, Int3 b) => a.x * b.x + a.y * b.y + a.z * b.z;
+        public static int Dot(IEnumerable<Int3> values)
+        {
+            int x = 1, y = 1, z = 1;
+            foreach (Int3 val in values)
+            {
+                x *= val.x;
+                y *= val.y;
+                z *= val.z;
+            }
+            return x + y + z;
+        }
+#if CS11_OR_GREATER
+        static double IVectorOperations<Int3>.Dot(Int3 a, Int3 b) => Dot(a, b);
+        static double IVectorOperations<Int3>.Dot(IEnumerable<Int3> vals) => Dot(vals);
+#endif
+        public static Int3 Lerp(Int3 a, Int3 b, double t, bool clamp = true) =>
+            new Int3(MathE.Lerp(a.x, b.x, t, clamp),
+                     MathE.Lerp(a.y, b.y, t, clamp),
+                     MathE.Lerp(a.z, b.z, t, clamp));
+        public static Int3 Product(IEnumerable<Int3> values)
+        {
+            bool any = false;
+            Int3 total = One;
+            foreach (Int3 val in values)
+            {
+                any = true;
+                total *= val;
+            }
+            return any ? total : Zero;
+        }
+        public static Int3 Sum(IEnumerable<Int3> values)
+        {
+            Int3 total = Zero;
+            foreach (Int3 val in values) total += val;
+            return total;
+        }
+
+        public static (int[] Xs, int[] Ys, int[] Zs) SplitArray(IEnumerable<Int3> values)
+        {
+            int count = values.Count();
+            int[] Xs = new int[count], Ys = new int[count], Zs = new int[count];
+            int index = 0;
+            foreach (Int3 val in values)
+            {
+                Xs[index] = val.x;
+                Ys[index] = val.y;
+                Zs[index] = val.z;
+                index++;
+            }
+            return (Xs, Ys, Zs);
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            yield return x;
+            yield return y;
+            yield return z;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void Dceconstruct(out int x, out int y, out int z)
+        {
+            x = this.x;
+            y = this.y;
+            z = this.z;
+        }
+
+        public bool Equals(Int3 other) => x == other.x && y == other.y && z == other.z;
+#if CS8_OR_GREATER
+        public override bool Equals(object? obj)
+#else
+        public override bool Equals(object obj)
+#endif
+        {
+            if (obj is null) return false;
+            else if (obj is Int3 objInt3) return Equals(objInt3);
+            else if (obj is Float2 objFloat3) return objFloat3.Equals(this);
+            else return false;
+        }
+        public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
+        public override string ToString() => $"({x}, {y}, {z})";
+        public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)}, {z.ToString(format)})";
+
+        public int[] ToArray() => new int[] { x, y, z };
+        public Fill<int> ToFill()
+        {
+            Int3 copy = this;
+            return delegate (int i)
+            {
+                switch (i)
+                {
+                    case 0: return copy.x;
+                    case 1: return copy.y;
+                    case 2: return copy.z;
+                    default: throw new ArgumentOutOfRangeException(nameof(i));
+                }
+            };
+        }
+        public List<int> ToList() => new List<int> { x, y, z };
+
+        public static Int3 operator +(Int3 a, Int3 b) => new Int3(a.x + b.x, a.y + b.y, a.z + b.z);
+        public static Int3 operator -(Int3 a) => new Int3(-a.x, -a.y, -a.z);
+        public static Int3 operator -(Int3 a, Int3 b) => new Int3(a.x - b.x, a.y - b.y, a.z - b.z);
+        public static Int3 operator *(Int3 a, int b) => new Int3(a.x * b, a.y * b, a.z * b);
+        public static Int3 operator *(Int3 a, Int3 b) => new Int3(a.x * b.x, a.y * b.y, a.z * b.z);
+        public static Int3 operator /(Int3 a, int b) => new Int3(a.x / b, a.y / b, a.z / b);
+        public static Int3 operator /(Int3 a, Int3 b) => new Int3(a.x / b.x, a.y / b.y, a.z / b.z);
+        public static Int3 operator &(Int3 a, Int3 b) => new Int3(a.x & b.x, a.y & b.y, a.z & b.z);
+        public static Int3 operator |(Int3 a, Int3 b) => new Int3(a.x | b.x, a.y | b.y, a.z | b.z);
+        public static Int3 operator ^(Int3 a, Int3 b) => new Int3(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z);
+        public static bool operator ==(Int3 a, Int3 b) => a.Equals(b);
+        public static bool operator !=(Int3 a, Int3 b) => !a.Equals(b);
+
+        public static implicit operator Int3(Int2 ints) => new Int3(ints.x, ints.y, 0);
+        public static explicit operator Int3(Int4 ints) => new Int3(ints.x, ints.y, ints.z);
+        public static explicit operator Int3(Float2 floats) => new Int3((int)floats.x, (int)floats.y, 0);
+        public static explicit operator Int3(Float3 floats) => new Int3((int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int3(Float4 floats) => new Int3((int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int3(ListTuple<double> tuple) => new Int3((int)tuple[0], (int)tuple[1], (int)tuple[2]);
+        public static implicit operator Int3(ListTuple<int> tuple) => new Int3(tuple[0], tuple[1], tuple[2]);
+        public static implicit operator Int3((int, int, int) tuple) => new Int3(tuple.Item1, tuple.Item2, tuple.Item3);
+
+        public static implicit operator ListTuple<double>(Int3 group) => new ListTuple<double>(group.x, group.y, group.z);
+        public static implicit operator ListTuple<int>(Int3 group) => new ListTuple<int>(group.x, group.y, group.z);
+        public static implicit operator ValueTuple<int, int, int>(Int3 group) => (group.x, group.y, group.z);
     }
-
-    public int CompareTo(Int3 other) => Magnitude.CompareTo(other.Magnitude);
-    public bool Equals(Int3 other) => x == other.x && y == other.y && z == other.z;
-    public override int GetHashCode() => base.GetHashCode();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public IEnumerator<int> GetEnumerator()
-    {
-        yield return x;
-        yield return y;
-        yield return z;
-    }
-
-    public int[] ToArray() => new[] { x, y, z };
-    public Fill<int> ToFill()
-    {
-        Int3 @this = this;
-        return i => @this[i];
-    }
-    public List<int> ToList() => new() { x, y, z };
-
-    public Vector3d ToVector() => ((Float3)this).ToVector();
-
-    private bool PrintMembers(StringBuilder builder)
-    {
-        builder.Append("x = ");
-        builder.Append(x);
-        builder.Append(", y = ");
-        builder.Append(y);
-        builder.Append(", z = ");
-        builder.Append(z);
-        return true;
-    }
-
-    public static Int3 operator +(Int3 a, Int3 b) => new(a.x + b.x, a.y + b.y, a.z + b.z);
-    public static Int3 operator -(Int3 i) => new(-i.x, -i.y, -i.z);
-    public static Int3 operator -(Int3 a, Int3 b) => new(a.x - b.x, a.y - b.y, a.z - b.z);
-    public static Int3 operator *(Int3 a, Int3 b) => new(a.x * b.x, a.y * b.y, a.z * b.z);
-    public static Int3 operator *(Int3 a, int b) => new(a.x * b, a.y * b, a.z * b);
-    public static Int3 operator *(Int3 a, Matrix b) => (Int3)((Matrix)(Float3)a * b);
-    public static Int3 operator /(Int3 a, Int3 b) => new(a.x / b.x, a.y / b.y, a.z / b.z);
-    public static Int3 operator /(Int3 a, int b) => new(a.x / b, a.y / b, a.z / b);
-    public static Int3 operator /(Int3 a, Matrix b) => (Int3)((Matrix)(Float3)a / b);
-    public static Int3 operator &(Int3 a, Int3 b) => new(a.x & b.x, a.y & b.y, a.z & b.z);
-    public static Int3 operator |(Int3 a, Int3 b) => new(a.x | b.x, a.y | b.y, a.z | b.z);
-    public static Int3 operator ^(Int3 a, Int3 b) => new(a.x ^ b.x, a.y ^ b.y, a.z ^ b.z);
-
-    public static explicit operator Int3(Complex val) => new((int)val.u, (int)val.i, 0);
-    public static explicit operator Int3(Quaternion val) => new((int)val.u, (int)val.i, (int)val.j);
-    public static explicit operator Int3(Float2 val) => new((int)val.x, (int)val.y, 0);
-    public static explicit operator Int3(Float3 val) => new((int)val.x, (int)val.y, (int)val.z);
-    public static explicit operator Int3(Float4 val) => new((int)val.x, (int)val.y, (int)val.z);
-    public static implicit operator Int3(Int2 val) => new(val.x, val.y, 0);
-    public static explicit operator Int3(Int4 val) => new(val.x, val.y, val.z);
-    public static explicit operator Int3(Matrix m) => new((int)m[0, 0], (int)m[1, 0], (int)m[2, 0]);
-    public static explicit operator Int3(Vector2d val) => (Int3)val.ToXYZ();
-    public static explicit operator Int3(Vert val) => new((int)val.position.x, (int)val.position.y,
-                                                          (int)val.position.z);
-    public static explicit operator Int3(RGBA val) => (Int3)val.ToRGBAByte();
-    public static explicit operator Int3(HSVA val) => (Int3)val.ToHSVAByte();
-    public static explicit operator Int3(RGBAByte val) => new(val.R, val.G, val.B);
-    public static explicit operator Int3(HSVAByte val) => new(val.H, val.S, val.V);
-    public static implicit operator Int3(Fill<int> fill) => new(fill);
-    public static implicit operator Int3((int x, int y, int z) vals) =>
-        new(vals.x, vals.y, vals.z);
 }

@@ -1,118 +1,53 @@
-# Nerd_STF v2.4.1
+# Nerd_STF v3.0-beta3
 
-Hey everyone! This is one of the larger small updates, and I'm pretty proud of what I got done in a week.
+Nerd_STF 3.0 is approaching a stable release, but I've still got some things that I still want to add and things that I feel like are unsatisfactory. So here's another beta release. There will probably only be one or two more before a final version is ready. This is easily the most ambitious project I've done in such a small amount of time, so I think you can bear with me as I bring this part of it to completition.
 
-Along with adding setters to parts like `Float3.XY` and fixing a few bugs, almost all improvements in this update are related to matricies. First of all, I've added a bunch of new items to the `IMatrix` interface. Now, any deriving matrix has more requirements that fit the regular `Matrix` type. I don't know why one would use the `IMatrix` interface rather than a specific matrix type, but now the options are more sophisticated.
+Here's what's new:
 
-I've added some new stuff to all the matrix types, including row operations. You can now scale a row, add a row to another, and swap two rows. If I become aware of any more commonly-used row operations, I'll add then in a `2.4.2` update. But I think I've got all the good ones. There is also a mutable version of each operation which, rather than returning a new matrix with changes made, instead applies the changes to itself.
+## `Fill<T>` and `Fill2d<T>` are back!
 
-Did you know I made two seperate blunders in the `Cofactor()` method? For the `Matrix2x2` version of the `Cofactor()` method, I had the diagonal elements swapped. Whoops. For the `Matrix` version of the `Cofactor()` method, matricies with even column count would break because of the alternating sign pattern I was using. Now, as far as I know, that bug is fixed.
+I thought the `Fill<T>` delegate was slightly redundant, since you could probably just pass an `IEnumerable` or something instead, but I've learned that it's really easy to pass a Fill delegate in places where an IEnumerable would be annoying. I might add support for Fill stuff in the future, such as an extension list, but for now I've just re-added the delegate and made most types support it in a constructor.
 
-The last thing I did was add the ability to turn a matrix into its equivalent row-echelon form. This is applicable only to the `Matrix` type (the dynamic one), and works with some levels of success. It's a little weird and tends to give results with lots of negative zeroes, but overall it's fine, I think. As far as I know there aren't any obvious bugs. We'll see though.
+## Slight Matrix Constructor Change
 
-Anyway, that's everything in this update. Again, pretty small, but meaningful nonetheless. Unless I haven't screwed anything up, the next update I work on will be `2.5`, so I'll see you then!
+I think I got the meaning of the `byRows` parameter mixed up in my head, so I have swapped its meaning to what it (I think) should be. The default value has also changed, so unless you've been explicitly using it you won't notice a difference.
 
-Here's the full changelog:
+## And Best of All: Colors!
+
+I have had plenty of time to think about how I could have done colors better in the previous iteration of the library, and I've come up with this, which I think is slightly better.
+
+First of all, colors derive from the `IColor<TSelf>` interface similarly to how they did before, but no more `IColorFloat`. Now, every color has double-precision channels by default. To handle specific bit sizes, the `IColorFormat` interface has been created. It can of course be derived from, and I think it's pretty easy to use and understand, but hopefully there will be enough color formats already defined that you won't even need to touch it directly. At the moment, there's only one real color format created, `R8G8B8A8`, which is what it sounds like: 8 bits for each of the RGBA channels. There will be plenty more to come.
+
+I have been thinking about writing a stream class that is capable of having a bit-offset. I would use it in tandom with the color formats, as many of them span multiple bytes in ways that don't always align with 8-bit bytes. It seems somewhat out of place, but I think I'll go for it anyway.
+
+There's also a color palette system now. You give it a certain number of colors and it allocates room to the nearest power of two. If you give it 6 colors, it allocates room for 8. This is to always keep the size of the palette identical to its bit depth. 6 colors needs 3 bits per color, so might as well do as much as you can with those 3 bits.
+
+There is also an `IndexedColor` "format," which does not store its color directly. Rather, it stores its index and a reference to the color palette it came from. I understand a true "indexed color" wouldn't store a reference to its palette to save memory, but this is mostly for ease of use. Colors are passed through methods with the `ref` keyword, so you can manipulate them directly.
+
+```csharp
+void MethodA()
+{
+    ColorPalette<ColorRGB> palette = new(8);
+
+    // palette[3] is currently set to black.
+    MethodB(palette[3]);
+    // palette[3] is now set to blue.
+}
+
+void MethodB(IndexedColor<ColorRGB> color)
+{
+    color.Color() = ColorRGB.Blue;
+
+    // You could also:
+    ref ColorRGB val = ref color.Color();
+    val = ColorRGB.Blue;
+}
 ```
-* Nerd_STF
-    * Mathematics
-        * Abstract
-            * IMatrix
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + Cofactor()
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-                + this[int, int]
-                + this[Index, Index]
-        * Algebra
-            * Matrix
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-                = Fixed a blunder in `SignGrid(Int2)` with signs being incorrectly placed on matrixes with even column count.
-            * Matrix2x2
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-                = Fixed a blunder in `Cofactor()` with the position of elements.
-            * Matrix3x3
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-            * Matrix4x4
-                + AddRow(int, int, float)
-                + AddRowMutable(int, int, float)
-                + GetColumn(int)
-                + GetRow(int)
-                + ScaleRow(int, float)
-                + ScaleRowMutable(int, float)
-                + SetColumn(int, float[])
-                + SetRow(int, float[])
-                + Size
-                + SwapRows(int, int)
-                + SwapRowsMutable(int, int)
-        * NumberSystems
-            * Complex
-                + operator Complex(SystemComplex)
-                + operator SystemComplex(Complex)
-            * Quaternion
-                + operator Quaternion(SystemQuaternion)
-                + operator SystemQuaternion(Quaternion)
-        * Float3
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YZ`
-        * Float4
-            = Added a setter to `XW`
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YW`
-            = Added a setter to `YZ`
-            = Added a setter to `ZW`
-            = Added a setter to `XYW`
-            = Added a setter to `XYZ`
-            = Added a setter to `XZW`
-            = Added a setter to `YZW`
-        * Int3
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YZ`
-        * Int4
-            = Added a setter to `XW`
-            = Added a setter to `XY`
-            = Added a setter to `XZ`
-            = Added a setter to `YW`
-            = Added a setter to `YZ`
-            = Added a setter to `ZW`
-            = Added a setter to `XYW`
-            = Added a setter to `XYZ`
-            = Added a setter to `XZW`
-            = Added a setter to `YZW`
-```
+
+Anyway, that's all I've got for now. I'm not sure what will be next up, but here's what's left to do:
+- Complex numbers and quaternions.
+- More color types and formats.
+- Bit-offset compatible streams.
+- Fix bugs/inconveniences I've noted.
+
+I think the Image type will be completely reworked and might be what version 3.1 is.
