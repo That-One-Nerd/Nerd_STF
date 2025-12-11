@@ -209,6 +209,34 @@ namespace Nerd_STF.Graphics
             else return false;
         }
         public override int GetHashCode() => entries.GetHashCode();
+        public override string ToString()
+        {
+            StringBuilder result = new StringBuilder("{");
+            for (int i = 0; i < entries.Count; i++)
+            {
+                KeyValuePair<double, TColor> entry = entries[i];
+                result.Append($" {entry.Key:0.00}={entry.Value}");
+                if (i < entries.Count - 1) result.Append(',');
+            }
+            return result.Append(" }").ToString();
+        }
+        public string ToColorString(int length = 50)
+        {
+            // Console codes. If you want a preview, this is a very easy way to view it.
+            StringBuilder result = new StringBuilder();
+            int trueLen = length * 2;
+            for (int i = 0; i < length; i++)
+            {
+                int i1 = 2 * i, i2 = 2 * i + 1;
+                ColorRGB foreColor = Get((double)i1 / (trueLen - 1)).AsRgb(),
+                         backColor = Get((double)i2 / (trueLen - 1)).AsRgb();
+                result.Append($"\x1b[38;2;{(int)(255 * foreColor.r)};{(int)(255 * foreColor.g)};{(int)(255 * foreColor.b)}m");
+                result.Append($"\x1b[48;2;{(int)(255 * backColor.r)};{(int)(255 * backColor.g)};{(int)(255 * backColor.b)}m");
+                result.Append('▌');
+            }
+            result.Append("\x1b[0m");
+            return result.ToString();
+        }
 
         public IEnumerator<KeyValuePair<double, TColor>> GetEnumerator() => entries.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
