@@ -10,6 +10,6 @@ namespace Nerd_STF.Mathematics.Discrete
         bool IsReflexive();
         bool IsSymmetric();
         bool IsAntiSymmetric();
-        bool IsTransitive();
+        //bool IsTransitive();
     }
 }

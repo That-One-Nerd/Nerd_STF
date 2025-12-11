@@ -7,8 +7,8 @@ using System.Text;
 
 namespace Nerd_STF.Mathematics.Discrete
 {
-    public class DiscreteRelation<TItem1, TItem2>// : IFiniteRelation<TItem1, TItem2>,
-                                                 //   IFiniteSet<DiscreteRelation<TItem1, TItem2>, (TItem1, TItem2)>
+    public class DiscreteRelation<TItem1, TItem2> : IFiniteRelation<TItem1, TItem2>,
+                                                    IFiniteSet<DiscreteRelation<TItem1, TItem2>, (TItem1, TItem2)>
         where TItem1 : IEquatable<TItem1>
         where TItem2 : IEquatable<TItem2>
     {
@@ -35,7 +35,7 @@ namespace Nerd_STF.Mathematics.Discrete
             }
             return result;
         }
-        //IEnumerable<TItem2> IRelation<TItem1, TItem2>.Get(TItem1 item) => Get(item);
+        IEnumerable<TItem2> IRelation<TItem1, TItem2>.Get(TItem1 item) => Get(item);
         public (DiscreteSet<TItem1>, DiscreteSet<TItem2>) Distinct()
         {
             DiscreteSet<TItem1> item1s = new DiscreteSet<TItem1>();
@@ -47,9 +47,10 @@ namespace Nerd_STF.Mathematics.Discrete
             }
             return (item1s, item2s);
         }
-        //(IEnumerable<TItem1>, IEnumerable<TItem2>) IFiniteRelation<TItem1, TItem2>.Distinct() => Distinct();
+        (IEnumerable<TItem1>, IEnumerable<TItem2>) IFiniteRelation<TItem1, TItem2>.Distinct() => Distinct();
 
         public bool IsRelated(TItem1 item1, TItem2 item2) => relations.Contains((item1, item2));
+        bool ISet<DiscreteRelation<TItem1, TItem2>, (TItem1, TItem2)>.Contains((TItem1, TItem2) rel) => relations.Contains(rel);
 
         public Matrix GetMatrix()
         {
@@ -77,9 +78,80 @@ namespace Nerd_STF.Mathematics.Discrete
         public DiscreteRelation<TItem1, TItem2> With(TItem1 item1, TItem2 item2) => new DiscreteRelation<TItem1, TItem2>(relations.With((item1, item2)));
         public DiscreteRelation<TItem1, TItem2> With((TItem1, TItem2) rel) => new DiscreteRelation<TItem1, TItem2>(relations.With(rel));
 
-        public IEnumerator<(TItem1, TItem2)> GetEnumerator() => relations.GetEnumerator();
-        //IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        public DiscreteRelation<TItem1, TItem2> Union(DiscreteRelation<TItem1, TItem2> other) => new DiscreteRelation<TItem1, TItem2>(relations.Union(other.relations));
+        public DiscreteRelation<TItem1, TItem2> Intersection(DiscreteRelation<TItem1, TItem2> other) => new DiscreteRelation<TItem1, TItem2>(relations.Intersection(other.relations));
+        public DiscreteRelation<TItem1, TItem2> Difference(DiscreteRelation<TItem1, TItem2> other) => new DiscreteRelation<TItem1, TItem2>(relations.Difference(other.relations));
 
+        public bool IsReflexive()
+        {
+            if (typeof(TItem1) != typeof(TItem2)) return false; // Not the same type, cannot be reflexive.
+            DiscreteSet<TItem1> item1s = Distinct().Item1;
+            foreach (TItem1 item in item1s)
+            {
+                TItem2 cast = (TItem2)(object)item;
+                if (!IsRelated(item, cast)) return false;
+            }
+            return true;
+        }
+        public bool IsSymmetric()
+        {
+            if (typeof(TItem1) != typeof(TItem2)) return false; // Not the same type, cannot be symmetric.
+            foreach ((TItem1, TItem2) pair in relations)
+            {
+                TItem1 swapA = (TItem1)(object)pair.Item2;
+                TItem2 swapB = (TItem2)(object)pair.Item1;
+                if (!IsRelated(swapA, swapB)) return false;
+            }
+            return true;
+        }
+        public bool IsAntiSymmetric()
+        {
+            if (typeof(TItem1) != typeof(TItem2)) return true; // Not the same type, will always be antisymmetric.
+            foreach ((TItem1, TItem2) pair in relations)
+            {
+                TItem1 swapA = (TItem1)(object)pair.Item2;
+                TItem2 swapB = (TItem2)(object)pair.Item1;
+                if (IsRelated(swapA, swapB)) return false;
+            }
+            return true;
+        }
+
+        public IEnumerator<(TItem1, TItem2)> GetEnumerator() => relations.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+#if CS8_OR_GREATER
+        public bool Equals(DiscreteRelation<TItem1, TItem2>? other)
+#else
+        public bool Equals(DiscreteRelation<TItem1, TItem2> other)
+#endif
+        {
+            if (other is null) return false;
+            else if (Count != other.Count) return false;
+            else return relations.Equals(other.relations);
+        }
+#if CS8_OR_GREATER
+        public bool Equals(IFiniteRelation<TItem1, TItem2>? other)
+#else
+        public bool Equals(IFiniteRelation<TItem1, TItem2> other)
+#endif
+        {
+            if (other is null) return false;
+            else if (Count != other.Count) return false;
+            foreach ((TItem1, TItem2) rel in relations) if (!other.IsRelated(rel.Item1, rel.Item2)) return false;
+            return true;
+        }
+#if CS8_OR_GREATER
+        public override bool Equals(object? other)
+#else
+        public override bool Equals(object other)
+#endif
+        {
+            if (other is null) return false;
+            else if (other is DiscreteRelation<TItem1, TItem2> discreteRel) return Equals(discreteRel);
+            else if (other is IFiniteRelation<TItem1, TItem2> finiteRel) return Equals(finiteRel);
+            else return false;
+        }
+        public override int GetHashCode() => relations.GetHashCode();
         public override string ToString()
         {
             StringBuilder result = new StringBuilder("{ ");
@@ -95,6 +167,9 @@ namespace Nerd_STF.Mathematics.Discrete
             return result.ToString();
         }
 
-        public static DiscreteRelation<TItem1, TItem2> operator +(DiscreteRelation<TItem1, TItem2> relation, (TItem1, TItem2) rel) => relation.With(rel);
+        public static DiscreteRelation<TItem1, TItem2> operator +(DiscreteRelation<TItem1, TItem2> a, (TItem1, TItem2) b) => a.With(b);
+        public static DiscreteRelation<TItem1, TItem2> operator &(DiscreteRelation<TItem1, TItem2> a, DiscreteRelation<TItem1, TItem2> b) => a.Union(b);
+        public static DiscreteRelation<TItem1, TItem2> operator |(DiscreteRelation<TItem1, TItem2> a, DiscreteRelation<TItem1, TItem2> b) => a.Intersection(b);
+        public static DiscreteRelation<TItem1, TItem2> operator -(DiscreteRelation<TItem1, TItem2> a, DiscreteRelation<TItem1, TItem2> b) => a.Difference(b);
     }
 }
