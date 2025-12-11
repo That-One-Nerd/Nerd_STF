@@ -12,6 +12,7 @@ namespace Nerd_STF.Graphics
         ColorRGB AsRgb();
         ColorHSV AsHsv();
         ColorCMYK AsCmyk();
+        ColorYCC AsYcc();
 
         string HexCode();
 

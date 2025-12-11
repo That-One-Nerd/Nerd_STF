@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Nerd_STF.Graphics
@@ -106,7 +107,7 @@ namespace Nerd_STF.Graphics
                 double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     switch (c)
                     {
                         case 'c': items[i] = c; break;
@@ -124,7 +125,7 @@ namespace Nerd_STF.Graphics
                 IEnumerator<double> stepper = value.GetEnumerator();
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     stepper.MoveNext();
                     switch (c)
                     {
@@ -139,16 +140,16 @@ namespace Nerd_STF.Graphics
             }
         }
     
-        public static ColorCMYK Average(double gamma, IEnumerable<ColorCMYK> colors)
+        public static ColorCMYK Average(IEnumerable<ColorCMYK> colors, double gamma = 1.0)
         {
             double avgC = 0, avgM = 0, avgY = 0, avgK = 0, avgA = 0;
             int count = 0;
             foreach (ColorCMYK color in colors)
             {
-                double correctC = MathE.Pow(color.c, gamma),
-                       correctM = MathE.Pow(color.m, gamma),
-                       correctY = MathE.Pow(color.y, gamma),
-                       correctK = MathE.Pow(color.k, gamma);
+                double correctC = Math.Pow(color.c, gamma),
+                       correctM = Math.Pow(color.m, gamma),
+                       correctY = Math.Pow(color.y, gamma),
+                       correctK = Math.Pow(color.k, gamma);
                 // Gamma doesn't apply to the alpha channel.
 
                 avgC += correctC;
@@ -164,14 +165,14 @@ namespace Nerd_STF.Graphics
             avgK /= count;
             avgA /= count;
             double invGamma = 1 / gamma;
-            return new ColorCMYK(MathE.Pow(avgC, invGamma),
-                                 MathE.Pow(avgM, invGamma),
-                                 MathE.Pow(avgY, invGamma),
-                                 MathE.Pow(avgK, invGamma),
+            return new ColorCMYK(Math.Pow(avgC, invGamma),
+                                 Math.Pow(avgM, invGamma),
+                                 Math.Pow(avgY, invGamma),
+                                 Math.Pow(avgK, invGamma),
                                  avgA);
         }
 #if CS11_OR_GREATER
-        static ColorCMYK IColor<ColorCMYK>.Average(IEnumerable<ColorCMYK> colors) => Average(1, colors);
+        static ColorCMYK IColor<ColorCMYK>.Average(IEnumerable<ColorCMYK> colors) => Average(colors);
 #endif
         public static ColorCMYK Clamp(ColorCMYK color, ColorCMYK min, ColorCMYK max) =>
             new ColorCMYK(MathE.Clamp(color.c, min.c, max.c),
@@ -179,12 +180,12 @@ namespace Nerd_STF.Graphics
                           MathE.Clamp(color.y, min.y, max.y),
                           MathE.Clamp(color.k, min.k, max.k),
                           MathE.Clamp(color.a, min.a, max.a));
-        public static ColorCMYK Lerp(double gamma, ColorCMYK a, ColorCMYK b, double t, bool clamp = true)
+        public static ColorCMYK Lerp(ColorCMYK a, ColorCMYK b, double t, double gamma = 1.0, bool clamp = true)
         {
-            double aCorrectedC = MathE.Pow(a.c, gamma), bCorrectedC = MathE.Pow(b.c, gamma),
-                   aCorrectedM = MathE.Pow(a.m, gamma), bCorrectedM = MathE.Pow(b.m, gamma),
-                   aCorrectedY = MathE.Pow(a.y, gamma), bCorrectedY = MathE.Pow(b.y, gamma),
-                   aCorrectedK = MathE.Pow(a.k, gamma), bCorrectedK = MathE.Pow(b.k, gamma);
+            double aCorrectedC = Math.Pow(a.c, gamma), bCorrectedC = Math.Pow(b.c, gamma),
+                   aCorrectedM = Math.Pow(a.m, gamma), bCorrectedM = Math.Pow(b.m, gamma),
+                   aCorrectedY = Math.Pow(a.y, gamma), bCorrectedY = Math.Pow(b.y, gamma),
+                   aCorrectedK = Math.Pow(a.k, gamma), bCorrectedK = Math.Pow(b.k, gamma);
 
             double newC = MathE.Lerp(aCorrectedC, bCorrectedC, t, clamp),
                    newM = MathE.Lerp(aCorrectedM, bCorrectedM, t, clamp),
@@ -193,14 +194,14 @@ namespace Nerd_STF.Graphics
                    newA = MathE.Lerp(a.a, b.a, t, clamp);
 
             double invGamma = 1 / gamma;
-            return new ColorCMYK(MathE.Pow(newC, invGamma),
-                                 MathE.Pow(newM, invGamma),
-                                 MathE.Pow(newY, invGamma),
-                                 MathE.Pow(newK, invGamma),
+            return new ColorCMYK(Math.Pow(newC, invGamma),
+                                 Math.Pow(newM, invGamma),
+                                 Math.Pow(newY, invGamma),
+                                 Math.Pow(newK, invGamma),
                                  newA);
         }
 #if CS11_OR_GREATER
-        static ColorCMYK IInterpolable<ColorCMYK>.Lerp(ColorCMYK a, ColorCMYK b, double t, bool clamp) => Lerp(1, a, b, t, clamp);
+        static ColorCMYK IInterpolable<ColorCMYK>.Lerp(ColorCMYK a, ColorCMYK b, double t, bool clamp) => Lerp(a, b, t, 1.0, clamp);
 #endif
         public static ColorCMYK Product(IEnumerable<ColorCMYK> colors)
         {
@@ -285,6 +286,7 @@ namespace Nerd_STF.Graphics
             return new ColorHSV(h, s, cMax);
         }
         public ColorCMYK AsCmyk() => this;
+        public ColorYCC AsYcc() => AsRgb().AsYcc();
 
         public string HexCode() => AsRgb().HexCode();
 
@@ -316,20 +318,17 @@ namespace Nerd_STF.Graphics
 
         public bool Equals(ColorCMYK other)
         {
-            if (a <= 0 && other.a <= 0) return true;
-            else if (k >= 1 && other.k >= 1) return true;
+            if (a <= 0) return other.a <= 0;
+            else if (k >= 1) return other.k >= 1;
             else return c == other.c && m == other.m && y == other.y && k == other.k && a == other.a;
         }
         public bool Equals(IColor other) => Equals(other.AsCmyk());
 #if CS8_OR_GREATER
-        public override bool Equals(object? other)
+        public override bool Equals(object? other) =>
 #else
-        public override bool Equals(object other)
+        public override bool Equals(object other) =>
 #endif
-        {
-            if (other is IColor color) return Equals(color.AsRgb());
-            else return false;
-        }
+            other is IColor color && Equals(color.AsCmyk());
         public override int GetHashCode() => base.GetHashCode();
         public override string ToString() => $"{{ c={c:0.00}, m={m:0.00}, y={y:0.00}, k={k:0.00}, a={a:0.00} }}";
 

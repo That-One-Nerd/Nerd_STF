@@ -97,7 +97,7 @@ namespace Nerd_STF.Mathematics
                 double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     switch (c)
                     {
                         case 'w': items[i] = w; break;
@@ -114,7 +114,7 @@ namespace Nerd_STF.Mathematics
                 IEnumerator<double> stepper = value.GetEnumerator();
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     stepper.MoveNext();
                     switch (c)
                     {

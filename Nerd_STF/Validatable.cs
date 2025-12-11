@@ -30,6 +30,12 @@ namespace Nerd_STF
             return cached;
         }
 
+        public void Accept(T newVal)
+        {
+            cached = newVal;
+            validated = true;
+        }
+
         public void Invalidate()
         {
             validated = false;

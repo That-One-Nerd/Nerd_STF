@@ -103,7 +103,7 @@ namespace Nerd_STF.Graphics
                 double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     switch (c)
                     {
                         case 'r': items[i] = r; break;
@@ -120,7 +120,7 @@ namespace Nerd_STF.Graphics
                 IEnumerator<double> stepper = value.GetEnumerator();
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     stepper.MoveNext();
                     switch (c)
                     {
@@ -134,15 +134,15 @@ namespace Nerd_STF.Graphics
             }
         }
 
-        public static ColorRGB Average(double gamma, IEnumerable<ColorRGB> colors)
+        public static ColorRGB Average(IEnumerable<ColorRGB> colors, double gamma = 1.0)
         {
             double avgR = 0, avgG = 0, avgB = 0, avgA = 0;
             int count = 0;
             foreach (ColorRGB color in colors)
             {
-                double correctR = MathE.Pow(color.r, gamma),
-                       correctG = MathE.Pow(color.g, gamma),
-                       correctB = MathE.Pow(color.b, gamma);
+                double correctR = Math.Pow(color.r, gamma),
+                       correctG = Math.Pow(color.g, gamma),
+                       correctB = Math.Pow(color.b, gamma);
                 // Gamma doesn't apply to the alpha channel.
 
                 avgR += correctR;
@@ -156,13 +156,13 @@ namespace Nerd_STF.Graphics
             avgB /= count;
             avgA /= count;
             double invGamma = 1 / gamma;
-            return new ColorRGB(MathE.Pow(avgR, invGamma),
-                                MathE.Pow(avgG, invGamma),
-                                MathE.Pow(avgB, invGamma),
+            return new ColorRGB(Math.Pow(avgR, invGamma),
+                                Math.Pow(avgG, invGamma),
+                                Math.Pow(avgB, invGamma),
                                 avgA);
         }
 #if CS11_OR_GREATER
-        static ColorRGB IColor<ColorRGB>.Average(IEnumerable<ColorRGB> colors) => Average(1, colors);
+        static ColorRGB IColor<ColorRGB>.Average(IEnumerable<ColorRGB> colors) => Average(colors);
 #endif
         public static ColorRGB Clamp(ColorRGB color, ColorRGB min, ColorRGB max) =>
             new ColorRGB(MathE.Clamp(color.r, min.r, max.r),
@@ -309,6 +309,12 @@ namespace Nerd_STF.Graphics
                                  (diffK - b) * invDiffK,
                                  1 - diffK);
         }
+        public ColorYCC AsYcc()
+        {
+            // Most of this work is done in the ColorYCC implementation.
+            Float3 result = ColorYCC.invMatrix.Value * (r, g, b);
+            return new ColorYCC(result.x, result.y, result.z, a);
+        }
 
         public string HexCode() => $"#{(int)(r * 255):X2}{(int)(g * 255):X2}{(int)(b * 255):X2}";
 
@@ -337,19 +343,16 @@ namespace Nerd_STF.Graphics
 
         public bool Equals(ColorRGB other)
         {
-            if (a <= 0 && other.a <= 0) return true;
+            if (a <= 0) return other.a <= 0;
             else return r == other.r && g == other.g && b == other.b && a == other.a;
         }
         public bool Equals(IColor other) => Equals(other.AsRgb());
 #if CS8_OR_GREATER
-        public override bool Equals(object? other)
+        public override bool Equals(object? other) =>
 #else
-        public override bool Equals(object other)
+        public override bool Equals(object other) =>
 #endif
-        {
-            if (other is IColor color) return Equals(color.AsRgb());
-            else return false;
-        }
+            other is IColor color && Equals(color.AsRgb());
         public override int GetHashCode() => base.GetHashCode();
         public override string ToString() => $"{{ r={r:0.00}, g={g:0.00}, b={b:0.00}, a={a:0.00} }}";
 
