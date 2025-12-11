@@ -208,11 +208,11 @@ namespace Nerd_STF.Graphics
             }
             return any ? (r + g + b) : 0;
         }
-        public static ColorRGB Lerp(double gamma, ColorRGB a, ColorRGB b, double t, bool clamp = true)
+        public static ColorRGB Lerp(ColorRGB a, ColorRGB b, double t, double gamma = 1.0, bool clamp = true)
         {
-            double aCorrectedR = MathE.Pow(a.r, gamma), bCorrectedR = MathE.Pow(b.r, gamma),
-                   aCorrectedG = MathE.Pow(a.g, gamma), bCorrectedG = MathE.Pow(b.g, gamma),
-                   aCorrectedB = MathE.Pow(a.b, gamma), bCorrectedB = MathE.Pow(b.b, gamma);
+            double aCorrectedR = Math.Pow(a.r, gamma), bCorrectedR = Math.Pow(b.r, gamma),
+                   aCorrectedG = Math.Pow(a.g, gamma), bCorrectedG = Math.Pow(b.g, gamma),
+                   aCorrectedB = Math.Pow(a.b, gamma), bCorrectedB = Math.Pow(b.b, gamma);
             // Gamma doesn't apply to the alpha channel.
 
             double newR = MathE.Lerp(aCorrectedR, bCorrectedR, t, clamp),
@@ -221,13 +221,13 @@ namespace Nerd_STF.Graphics
                    newA = MathE.Lerp(a.a, b.a, t, clamp);
 
             double invGamma = 1 / gamma;
-            return new ColorRGB(MathE.Pow(newR, invGamma),
-                                MathE.Pow(newG, invGamma),
-                                MathE.Pow(newB, invGamma),
+            return new ColorRGB(Math.Pow(newR, invGamma),
+                                Math.Pow(newG, invGamma),
+                                Math.Pow(newB, invGamma),
                                 newA);
         }
 #if CS11_OR_GREATER
-        static ColorRGB IInterpolable<ColorRGB>.Lerp(ColorRGB a, ColorRGB b, double t, bool clamp) => Lerp(1, a, b, t, clamp);
+        static ColorRGB IInterpolable<ColorRGB>.Lerp(ColorRGB a, ColorRGB b, double t, bool clamp) => Lerp(a, b, t, 1.0, clamp);
 #endif
         public static ColorRGB Product(IEnumerable<ColorRGB> colors)
         {
