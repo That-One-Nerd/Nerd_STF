@@ -18,6 +18,17 @@ namespace Nerd_STF.Mathematics.Discrete
         {
             arr = TargetHelper.EmptyArray<T>();
         }
+        public DiscreteSet(IEnumerable<T> items)
+        {
+            // Kinda gross, we're making a lot of references here.
+            DiscreteSet<T> sub = new DiscreteSet<T>();
+            foreach (T item in items) sub += item;
+            arr = sub.arr;
+        }
+        public DiscreteSet(DiscreteSet<T> copy)
+        {
+            arr = copy.arr;
+        }
 
         public bool Contains(T item)
         {
@@ -37,6 +48,32 @@ namespace Nerd_STF.Mathematics.Discrete
             else if (arr.Length != other.arr.Length) return false;
             for (int i = 0; i < arr.Length; i++) if (!other.Contains(arr[i])) return false;
             return true;
+        }
+#if CS8_OR_GREATER
+        public bool Equals<TSet>(IFiniteSet<TSet, T>? other)
+#else
+        public bool Equals<TSet>(IFiniteSet<TSet, T> other)
+#endif
+            where TSet : IFiniteSet<TSet, T>
+        {
+            if (other is null) return false;
+            else if (arr.Length != other.Count) return false;
+            for (int i = 0; i < arr.Length; i++) if (!other.Contains(arr[i])) return false;
+            return true;
+        }
+#if CS8_OR_GREATER
+        public override bool Equals(object? other)
+#else
+        public override bool Equals(object other)
+#endif
+        {
+            // Note: This implementation won't check for IFiniteSet!
+            //       In most circumstances, that's okay, because the proper
+            //       method overload will be called. But sometimes this may
+            //       cause weird issues.
+            if (other is null) return false;
+            else if (other is DiscreteSet<T> otherSet) return Equals(otherSet);
+            else return false;
         }
 
         public DiscreteSet<T> With(T item)
