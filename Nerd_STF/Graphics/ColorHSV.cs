@@ -132,7 +132,7 @@ namespace Nerd_STF.Graphics
                 double[] items = new double[key.Length];
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     switch (c)
                     {
                         case 'h': items[i] = h.Revolutions; break;
@@ -150,7 +150,7 @@ namespace Nerd_STF.Graphics
                 IEnumerator<double> stepper = value.GetEnumerator();
                 for (int i = 0; i < key.Length; i++)
                 {
-                    char c = key[i];
+                    char c = char.ToLower(key[i]);
                     stepper.MoveNext();
                     switch (c)
                     {
@@ -242,6 +242,7 @@ namespace Nerd_STF.Graphics
             if (type == typeof(ColorRGB)) return (TColor)(object)AsRgb();
             else if (type == typeof(ColorHSV)) return (TColor)(object)this;
             else if (type == typeof(ColorCMYK)) return (TColor)(object)AsCmyk();
+            else if (type == typeof(ColorYCC)) return (TColor)(object)AsYcc();
             else throw new InvalidCastException();
         }
         public ColorRGB AsRgb()
@@ -266,8 +267,9 @@ namespace Nerd_STF.Graphics
             color.b += m;
             return color;
         }
-        public ColorHSV AsHsv() => this;
         public ColorCMYK AsCmyk() => AsRgb().AsCmyk();
+        public ColorHSV AsHsv() => this;
+        public ColorYCC AsYcc() => AsRgb().AsYcc();
 
         public string HexCode() => AsRgb().HexCode();
 
@@ -296,21 +298,18 @@ namespace Nerd_STF.Graphics
 
         public bool Equals(ColorHSV other)
         {
-            if (a <= 0 && other.a <= 0) return true;
-            else if (v <= 0 && other.v <= 0) return true;
-            else if (s <= 0 && other.s <= 0) return true;
+            if (a <= 0) return other.a <= 0;
+            else if (v <= 0) return other.v <= 0;
+            else if (s <= 0) return other.s <= 0;
             else return h == other.h && s == other.s && v == other.v && a == other.a;
         }
         public bool Equals(IColor other) => Equals(other.AsHsv());
 #if CS8_OR_GREATER
-        public override bool Equals(object? other)
+        public override bool Equals(object? other) =>
 #else
-        public override bool Equals(object other)
+        public override bool Equals(object other) =>
 #endif
-        {
-            if (other is IColor color) return Equals(color.AsHsv());
-            else return false;
-        }
+            other is IColor color && Equals(color.AsHsv());
         public override int GetHashCode() => base.GetHashCode();
         public override string ToString() => $"{{ h={h.Degrees:0}°, s={s:0.00}, v={v:0.00}, a={a:0.00} }}";
 

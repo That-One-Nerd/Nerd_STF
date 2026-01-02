@@ -15,7 +15,7 @@
   
   <PropertyGroup>
     <Title>Nerd_STF</Title>
-    <Version>3.0.0</Version>
+    <Version>3.1.0</Version>
     <Authors>That_One_Nerd</Authors>
     <Description>A general-purpose mathematics library for C#.</Description>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
@@ -25,211 +25,129 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation</PackageTags>
+    <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation;discrete mathematics;discrete math;set notation;relation;discrete;ycbcr;ypbpr;ycc</PackageTags>
     
     <!-- Sorry this is stupidly long, wish I could have linked a markdown file instead. -->
-    <PackageReleaseNotes># Nerd_STF Version 3.0
+    <PackageReleaseNotes># Nerd_STF v3.1
 
-It's time to get this thing out of beta.
+Hi! It's been a while, but I've got a few things for you guys.
 
-Nerd_STF 3.0 is finally out! Honestly, there's not a whole lot of tweaks here from the last prerelease, because I got bored of implementing `INumber` methods for the `Quaternion` class, so I'm putting that on hold for now.
+## More color configurations.
 
-For those that haven't seen the pre-releases, the v3.0 update is basically an entire rewrite of the previous library. Almost everything made it over, but there's also a lot of breaking changes. Here's the gist:
+I've been spending a lot of my time recently working on [a Java library for FRC light strips](https://github.com/That-One-Nerd/betterlights) and in the process I made a tool for gradients. I ended up finding myself wishing I had it in here, too, so I've added it.
 
-# What's New
-
-## More Compatibility
-
-Nerd_STF now targets several versions of .NET and .NET Standard, making it basically run anywhere. You can use [this website](https://dotnet.microsoft.com/en-us/platform/dotnet-standard#versions) to see what different versions of .NET Standard support, but if your project uses a version of .NET that was released in the last 10 years, chances are Nerd_STF supports it.
-
-In addition, Nerd_STF uses some of the new C# features while still retaining older compatibility. If you want to use Nerd_STF in your .NET 8.0 project, you will reference the version of Nerd_STF compiled for .NET 7.0 and retain those fancy new interface features (among others) found in C# 11. Nullability support has been added to all versions of .NET that use C# 8 and above. And if I decide to use more new C# features for Nerd_STF, I'll just target another version of .NET.
-
-## Committed to Doubles
-
-Nerd_STF is a precision library, not one meant to be highly optimized at the sacrifice of precision. So I've decided to fully commit to doubles. The double groups are still called `Float2`, `Float3` and `Float4`, because `Double2` doesn't have quite the same ring to it now, does it? Hope it doesn't get too confusing.
-
-But all math functions are now using doubles (with a few exceptions).
-
-## 'w' Goes in Front Now
-
-I think this is how it should have been. I was really breaking the rules of the alphabet before. Previously in a `Float4`, the `w` component was fourth. Now it is first. The order goes w, x, y, z. You know, how it should.
-
-This means though that casting a `Float3` to a `Float4` will put the extra zero at the start, not the end (because `x` -&gt; `x` in the cast).
-```csharp
-Float3  xyz = (5, 6, 7);
-Float4 wxyz = xyz;       // Gives (0, 5, 6, 7)
-```
-This also means that truncating a `Float4` removes the front `w` first, giving some odd results.
-```csharp
-Float2  xy  = (10, 9);
-Float4 wxyz = xy;       // Gives (0, 10, 9, 0)
-```
-```csharp
-Float4 wxyz = (9, 8, 7, 6);
-Float2  xy  = (Float2)wxyz; // Must be explicitly stated. Yields (8, 7)
-```
-
-But `x` always goes to `x` when casting between groups, same with the other variables. Hopefully that'll make more sense.
-
-## Combination Indexers
-
-One thing I've always been envious of was HLSL's ability to easily make a subset of a group.
-```c++
-float3 group = float3(1, 2, 3);
-float2 part = group.yz;         // Like this.
-```
-And I had a crude version of this in Nerd_STF before, with properties for `XY`, `YZW`, and stuff like that. But you couldn't do things out of order (for example, you could never do `.ZY`). Also, the naming scheme would not make very much sense. `x` was always the first item Now, you can do it with an indexer.
+It functions mostly as a list of colors and associated positions for those colors. You can add and remove colors over time, and you index it (or call `.Get()`) with a value between 0 and 1 to determine a color. For example:
 
 ```csharp
-Float4 wxyz = (1, 2, 3, 4);
-IEnumerable&lt;double&gt; zyx = wxyz["zyx"]; // Yields [ 4, 3, 2 ]
+Gradient&lt;ColorRGB&gt; gradient = new()
+{
+    { 0.0, ColorRGB.Red },
+    { 0.5, ColorRGB.Green },
+    { 1.0, ColorRGB.Blue },
+};
+
+Console.WriteLine(gradient[0.2].HexCode()); // #996600
 ```
 
-I think you get it, it makes sense. It returns an IEnumerable though, so support has been added in the group constructors to read data from an IEnumerable. You can also set things this way.
+You can also quickly and easily visualize your gradients right in the console, so long as your console has compatibility for RGB colors.
+
+```
+Console.WriteLine("Our gradient: " + gradient.ToColorString());
+```
+produces this in the terminal:
+&lt;img width="590" height="38" alt="image" src="https://github.com/user-attachments/assets/692b9263-a4f6-4a18-97af-71e9ce830f34" /&gt;
+&lt;sub&gt;Note that the resulting preview is actually a 1668 character string behind the scenes.&lt;/sub&gt;
+
+You can change the way the colors interpolate, if you'd like. Simply set `gradient.Interpolation` to any function that takes two colors and a float, and outputs a color.
 
 ```csharp
-Float4 wxyz = (1, 2, 3, 4);
-wxyz["xy"] = [ 9, 8 ];      // Yields (9, 8, 3, 4)
+Gradient&lt;ColorRGB&gt; gradient = new()
+{
+    { 0.0, ColorRGB.Red },
+    { 0.5, ColorRGB.Green },
+    { 1.0, ColorRGB.Blue },
+};
+
+// Interpolate through white. Don't look at the implementation too
+// much, the point is to demonstrate that it can be set to whatever.
+gradient.Interpolation = (a, b, t) =&gt;
+{
+    ColorRGB c;
+    if (t &lt;= 0.5) (c, t) = (a, t * 2);
+    else (c, t) = (b, -2 * t + 2);
+    return (t, t, t) + c * (1 - t);
+};
+Console.WriteLine("        Through White: " + gradient.ToColorString() + "\n");
+
+// Or you can set it to some simple templates.
+gradient.Interpolation = Gradient&lt;ColorRGB&gt;.Nearest;
+Console.WriteLine("     Nearest Neighbor: " + gradient.ToColorString() + "\n");
+
+gradient.Interpolation = Gradient&lt;ColorRGB&gt;.Lerp;
+Console.WriteLine("Default Interpolation: " + gradient.ToColorString() + "\n");
 ```
 
-You can also have duplicates. Why you would want duplicates is beyond me. And the order can be whatever you'd like.
+For the result:
+&lt;img width="666" height="105" alt="image" src="https://github.com/user-attachments/assets/96c17685-5817-4d70-bdb9-241cb6735309" /&gt;
+
+### `ColorYCC`
+
+In addition, I have also implemented the YC&lt;sub&gt;b&lt;/sub&gt;C&lt;sub&gt;r&lt;/sub&gt; color space in the `ColorYCC` class. [YCbCr](https://en.wikipedia.org/wiki/YCbCr) is a way to convert RGB colors into a luminance value and two chrominance values. The conversion relies on the constants K&lt;sub&gt;r&lt;/sub&gt;, K&lt;sub&gt;g&lt;/sub&gt;, and K&lt;sub&gt;b&lt;/sub&gt;, which can be statically modified in the class. The constants are set to what I'm fairly certain is the most common standard, but the conversion system works for any $K_r + K_g + K_b = 1$.
+
+## `Validatable&lt;T&gt;`
+
+A small object I created mostly for the purposes of RGB &lt;-&gt; YCC conversion. It's done using matrix and vector multiplication, so I've cached the matrices required. However, if the K constants ever got changed, the matrix and its inverse needed to be recomputed. This is the purpose of the `Validatable` class.
+
+When constructed, a method must be passed that "generates" a valid value when requested.
+`Validatable&lt;int&gt; obj = new(() -&gt; ...);`
+
+Afterwards, when `obj.Value` is read, the object either runs the generation function and caches the result, or returns an already cached result.
+
+To force the object to re-generate a value, simply declare it invalidated by `obj.Invalidate()`. This will cause the generator to be re-invoked *only when required*. It's essentially a re-usable version of `System.Lazy&lt;T&gt;`.
+
+## Discrete Math
+
+I took discrete math last semester and decided to implement some of the things we discussed in that class here. Namely, the `Nerd_STF.Mathematics.Discrete` namespace contains mathematically-defined sets and relations. I think I went a little overboard with the abstraction here, I may use a better system in the future. But the important types to note are the `DiscreteSet&lt;T&gt;` and `DiscreteRelation&lt;T1, T2&gt;` types. The `DiscreteSet` contains a unique set of elements of type `T`, and a relation is a mapping of one set to another. Here's an example.
+
 ```csharp
-Float4 wxyz = (1, 2, 3, 4);
-IEnumerable&lt;double&gt; nums = wxyz["wyyxzzwy"]; // Yields [ 1, 3, 3, 2, 4, 4, 1, 3 ]
-```
+DiscreteSet&lt;int&gt; evens = [], odds = [], primes = [];
+for (int i = 0; i &lt; 20; i++)
+{
+    if (i % 2 == 0) evens += i;
+    else odds += i;
 
-## Better Equations
+    if (IsPrime(i)) primes += i;
+}
+Console.WriteLine($"Evens set: {evens}\nOdds set: {odds}\nPrimes set: {primes}");
 
-The previous equation system was just a delegate to a method. While it worked for unoptimized things, it won't automatically give precise results. So that system has been overhauled.
-
-Now, every equation derives from the `IEquation` interface, which defines a few operators (most importantly the `Get(double)` method, which is intended to evaluate the equation at the given input). And there are multiple types. There's the base `Equation` type that replicates the method delegate it used to be, but there are also now `Polynomial` equations which specialize in... uh... polynomials, including `Quadratic` and `Linear` along with the dynamic `Polynomial` type.
-
-The indexer is equivalent to calling the `Get(double)` method.
-
-Creating your own is easy, simply derive from the interface and implement the methods required. You should never throw an exception if the two equations you are adding (or multiplying or whatever) are not the same type. If they cannot be combined in a nice way, you should default to the delegate-based approach. Here is an example:
-```csharp
-public IEquation Add(IEquation other) {
-    if (other is YourEquation yourEqu) {
-        // Properly add your two equations.
-    } else {
-        // Unknown other equation type, do a basic addition system.
-        return new Equation(x =&gt; Get(x) + other.Get(x));
+DiscreteRelation&lt;int, int&gt; relation = new();
+foreach (int odd in odds)
+{
+    if (odd == 1) continue;
+    foreach (int even in evens)
+    {
+        if (even % (odd - 1) == 0) relation += (even, odd);
     }
 }
+Console.WriteLine("\nRelation between evens and odds:\n" + relation);
 ```
 
-And in practice, you should avoid referring to a general equation by its type. Go by the interface operators instead.
-```csharp
-double Fun(double x) =&gt; 0.5 * MathE.Sin(x);
-Equation a = (Equation)Fun; // The traditional delegate approach from previous versions.
-Polynomial b = new Polynomial(1, 5, 4); // x^2 + 5x + 4
+Yields:
+&lt;img width="1083" height="158" alt="image" src="https://github.com/user-attachments/assets/028d1c09-6074-420f-9c34-71c93eaf9348" /&gt;
 
-IEquation c = a.Add(b).Multiply(2); // Result is technically an `Equation`, but we should not cast here.
-```
+Some things were handled better than others. The source code of the `DiscreteRelation` class specifically is a scuffed mess of long type names and abstraction, and none of this is particularly fast or efficient, but it works for simple situations and isn't too abstraction-heavy on the part of the user of this library.
 
-## Renamed the `Mathf` class.
+## Some final thoughts.
 
-I chose that name because I thought Unity did it well, but I also intend for this project to be compatible with Unity. So I've renamed it to `MathE`. I'm still iffy on that name. I'll commit to one before this project goes out of beta, but it might change until then. Other ideas I'm considering are `Mathe` and `Math2`. Feel free to give your input!
+I may in the future condense `DiscreteRelation&lt;T1, T2&gt;` into a single type parameter for both the input and output. It makes things like the relation matrix and symmetry detection easier to implement.
 
-## Support for `System.Drawing` types.
+I don't think I'm done with graphics. I've got some more ideas in the pipeline, but this library obviously takes a while to work on.
 
-I've tried to use this library when working with Windows Forms a few times. Problem is, it sucks having to manually set the variables from `Point` and `Size`. So Nerd_STF 3.0 now does that for you, with implicit casts to and from both, along with their float variations.
-
-**It's worth mentioning that `Float2` is a double group, while `PointF` is a float group. Data *will* be lost slightly when implicitly casting. Watch out!**
-
-## List Tuples
-
-In the beta1, I introduced **Combination Indexers** for the double and int groups, however a problem was that they only returned `IEnumerable`s. So while some interesting things were supported, some things were not.
-
-```csharp
-Float4 wxyz = (1, 2, 3, 4);
-IEnumerable&lt;double&gt; vals1 = wxyz["xy"]; // Yields [2, 3]
-
-Float2 vals2 = wxyz["xy"];              // Not allowed!
-```
-
-And that kind of sucked. So I created the `ListTuple&lt;T&gt;` type. It's job is to act like a regular tuple, but be able to impliclty convert to either an `IEnumerable` or a regular `ValueTuple&lt;T&gt;`, thus allowing conversions to the double and int groups indirectly. Now, all combination indexers return a `ListTuple` instead of an `IEnumerable`.
-
-Under the hood, the `ListTuple` actually uses an array, but you get the idea.
-
-```csharp
-Float4 wxyz = (1, 2, 3, 4);
-ListTuple&lt;double&gt; vals1 = wxyz["xy"]; // Yields (2, 3)
-
-Float2 vals2 = vals1;                 // Yields (2, 3)
-IEnumerable&lt;double&gt; vals3 = vals1;    // Yields [2, 3]
-```
-
-Problem is, now the names have the potential to make much less sense.
-```csharp
-Float4 wxyz = (1, 2, 3, 4);
-Float2 xy = wxyz["xy"];     // x &lt;- x, y &lt;- y
-Float2 wz = wxyz["wz"];     // x &lt;- w, y &lt;- z
-```
-
-But whatever. You can always stick to using `IEnumerable`s if you want.
-
-## No More `*.Abstract`
-
-I got rid of all the `Abstract` namespaces, since they don't really make much sense in the grand scheme of things. They've all been moved to the namespace that applies to them most (eg. `INumberGroup` went to `Nerd_STF.Mathematics`, `ICombinationIndexer` went to `Nerd_STF` since it applies to more than just mathematics).
-
-## The `Fraction` Type
-
-This type originally went under the name of `Rational` in Nerd_STF 2.x, but that name is actually incorrect, right? So in the rework, it changed names. But it also can do much more now thanks to the `INumber` interface added in .NET 7.0. If you're using that framework or above, the fraction type is fully compatible with that type, and all the math functions in `MathE` and elsewhere that use `INumber` will work with it.
-
-Can I just say that the `INumber` interface is really annoying to write a type for? There's so many weird casting functions and a whole lot of methods that even the .NET developers will hide in public declarations. Why have them at all?
-
-## And Best of All, Matrices
-
-Oh yeah, we're adding those things again. We've got hard-coded `Matrix2x2`, `Matrix3x3`, and `Matrix4x4` classes, as well as a dynamic-sized `Matrix` class fully implemented. The `ToString()` methods are much better with the new implementation than previously, and the `GetHashCode()` methods give different results even if the numbers have their positions swapped (which they originally didn't do).
-
-And they're much faster. Much, much faster. Don't get me wrong, multiplying a 4x4 matrix still requires 64 multiplications and 48 additions, which is quite a lot, but my original implementation was littered with many method calls, easily doubling the runtime. I have now super-inlined basically all of the static matrix code. And I mean, replacing all method calls with nothing but multiplication and addition for things like the determinants, the cofactors, the inverses, and more. Don't look at the source, it's really ugly.
-
-**Note that the dynamic matrix class is not optimized this way, only the constant-size classes.**
-
-## `Fill&lt;T&gt;` and `Fill2d&lt;T&gt;` are back!
-
-I thought the `Fill&lt;T&gt;` delegate was slightly redundant, since you could probably just pass an `IEnumerable` or something instead, but I've learned that it's really easy to pass a Fill delegate in places where an IEnumerable would be annoying. I might add support for Fill stuff in the future, such as an extension list, but for now I've just re-added the delegate and made most types support it in a constructor.
-
-## And Best of All: Colors!
-
-I have had plenty of time to think about how I could have done colors better in the previous iteration of the library, and I've come up with this, which I think is slightly better.
-
-First of all, colors derive from the `IColor&lt;TSelf&gt;` interface similarly to how they did before, but no more `IColorFloat`. Now, every color has double-precision channels by default. To handle specific bit sizes, the `IColorFormat` interface has been created. It can of course be derived from, and I think it's pretty easy to use and understand, but hopefully there will be enough color formats already defined that you won't even need to touch it directly. At the moment, there's only one real color format created, `R8G8B8A8`, which is what it sounds like: 8 bits for each of the RGBA channels. There will be plenty more to come.
-
-I have been thinking about writing a stream class that is capable of having a bit-offset. I would use it in tandom with the color formats, as many of them span multiple bytes in ways that don't always align with 8-bit bytes. It seems somewhat out of place, but I think I'll go for it anyway.
-
-There's also a color palette system now. You give it a certain number of colors and it allocates room to the nearest power of two. If you give it 6 colors, it allocates room for 8. This is to always keep the size of the palette identical to its bit depth. 6 colors needs 3 bits per color, so might as well do as much as you can with those 3 bits.
-
-There is also an `IndexedColor` "format," which does not store its color directly. Rather, it stores its index and a reference to the color palette it came from. I understand a true "indexed color" wouldn't store a reference to its palette to save memory, but this is mostly for ease of use. Colors are passed through methods with the `ref` keyword, so you can manipulate them directly.
-
-```csharp
-void MethodA()
-{
-    ColorPalette&lt;ColorRGB&gt; palette = new(8);
-
-    // palette[3] is currently set to black.
-    MethodB(palette[3]);
-    // palette[3] is now set to blue.
-}
-
-void MethodB(IndexedColor&lt;ColorRGB&gt; color)
-{
-    color.Color() = ColorRGB.Blue;
-
-    // You could also:
-    ref ColorRGB val = ref color.Color();
-    val = ColorRGB.Blue;
-}
-```
+I also have a ton of very small tweaks I want to make. Things such as clamping color values in the constructors, or getting rid of `SplitArray` because the `System.Linq` namespace basically does that in a more modular way. Some small patches may be in order, but releasing this is such a pain I like to do it in bulk.
 
 ---
 
-Anyway, that's a lot of stuff. It's a big update. You should download it!
-
-Sorry my original writing has been a bit off. I kind of forgot about this project again. I can't promise a new update any time soon, but maybe there'll be one!
-
-Enjoy the full release!</PackageReleaseNotes>
+Take care, and enjoy 3.1!</PackageReleaseNotes>
   </PropertyGroup>
 
   <!-- ItemGroup customization based on framework. -->

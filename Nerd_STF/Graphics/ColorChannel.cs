@@ -13,6 +13,9 @@
         Magenta,
         Yellow,
         Key,
-        Index
+        Index,
+        Luminance,
+        ChrominanceRed,
+        ChrominanceBlue
     }
 }
