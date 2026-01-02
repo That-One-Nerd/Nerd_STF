@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -77,11 +76,13 @@ namespace Nerd_STF.Graphics
                     return;
                 }
                 else if (entries[index].Key > position) break;
+                index++;
             }
 
             entries.Insert(index, entry);
         }
         public void Add(KeyValuePair<double, TColor> entry) => Add(entry.Key, entry.Value);
+        public void Add((double, TColor) entry) => Add(entry.Item1, entry.Item2);
         public void Clear() => entries.Clear();
         public bool Contains(double entryAtPos, double tolerance = 1e-3)
         {

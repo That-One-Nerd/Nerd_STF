@@ -242,6 +242,7 @@ namespace Nerd_STF.Graphics
             if (type == typeof(ColorRGB)) return (TColor)(object)AsRgb();
             else if (type == typeof(ColorHSV)) return (TColor)(object)this;
             else if (type == typeof(ColorCMYK)) return (TColor)(object)AsCmyk();
+            else if (type == typeof(ColorYCC)) return (TColor)(object)AsYcc();
             else throw new InvalidCastException();
         }
         public ColorRGB AsRgb()
