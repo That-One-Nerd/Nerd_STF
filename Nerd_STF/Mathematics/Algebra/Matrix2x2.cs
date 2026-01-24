@@ -9,8 +9,7 @@ namespace Nerd_STF.Mathematics.Algebra
     public class Matrix2x2 : IMatrix<Matrix2x2>,
                              ISquareMatrix<Matrix2x2>
 #if CS11_OR_GREATER
-                            ,ISplittable<Matrix2x2, (double[] r0c0, double[] r0c1, double[] r1c0, double[] r1c1)>,
-                             IStaticMatrix<Matrix2x2>
+                            ,IStaticMatrix<Matrix2x2>
 #endif
     {
         public static Matrix2x2 Identity =>
@@ -200,21 +199,6 @@ namespace Nerd_STF.Mathematics.Algebra
             Matrix2x2 result = Zero;
             foreach (Matrix2x2 m in vals) result += m;
             return result;
-        }
-
-        public static (double[] r0c0, double[] r0c1, double[] r1c0, double[] r1c1) SplitArray(IEnumerable<Matrix2x2> vals)
-        {
-            int count = vals.Count();
-            double[] r0c0 = new double[count], r0c1 = new double[count],
-                     r1c0 = new double[count], r1c1 = new double[count];
-            int index = 0;
-            foreach (Matrix2x2 m in vals)
-            {
-                r0c0[index] = m.r0c0; r0c1[index] = m.r0c1;
-                r1c0[index] = m.r1c0; r1c1[index] = m.r1c1;
-            }
-            return (r0c0, r0c1,
-                    r1c0, r1c1);
         }
 
         public ListTuple<double> GetRow(int row)

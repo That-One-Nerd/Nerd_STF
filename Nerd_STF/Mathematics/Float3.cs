@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Graphics;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Nerd_STF.Mathematics
                            IPresets2d<Float3>,
                            IRoundable<Float3, Int3>,
                            IRefRoundable<Float3>,
-                           ISplittable<Float3, (double[] Xs, double[] Ys, double[] Zs)>
+                           IVector<Float3>
 #endif
     {
         public static Float3 Backward => new Float3(0, 0, -1);
@@ -234,21 +235,6 @@ namespace Nerd_STF.Mathematics
             return result;
         }
 
-        public static (double[] Xs, double[] Ys, double[] Zs) SplitArray(IEnumerable<Float3> values)
-        {
-            int count = values.Count();
-            double[] Xs = new double[count], Ys = new double[count], Zs = new double[count];
-            int index = 0;
-            foreach (Float3 val in values)
-            {
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                Zs[index] = val.z;
-                index++;
-            }
-            return (Xs, Ys, Zs);
-        }
-
         public void Normalize()
         {
             double invMag = InverseMagnitude;
@@ -321,6 +307,7 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float3(Int2 ints) => new Float3(ints.x, ints.y, 0);
         public static implicit operator Float3(Int3 ints) => new Float3(ints.x, ints.y, ints.z);
         public static explicit operator Float3(Int4 ints) => new Float3(ints.x, ints.y, ints.z);
+        public static explicit operator Float3(Matrix mat) => new Float3(mat.TryGet(0, 0), mat.TryGet(1, 0), mat.TryGet(2, 0));
         public static implicit operator Float3(Vector2 vec) => new Float3(vec.X, vec.Y, 0);
         public static implicit operator Float3(Vector3 vec) => new Float3(vec.X, vec.Y, vec.Z);
         public static explicit operator Float3(Vector4 vec) => new Float3(vec.X, vec.Y, vec.Z);

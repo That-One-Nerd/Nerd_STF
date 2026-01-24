@@ -1,4 +1,5 @@
 ﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace Nerd_STF.Mathematics
                            IPresets2d<Float2>,
                            IRoundable<Float2, Int2>,
                            IRefRoundable<Float2>,
-                           ISplittable<Float2, (double[] Xs, double[] Ys)>
+                           IVector<Float2>
 #endif
     {
         public static Float2 Down => new Float2(0, -1);
@@ -209,20 +210,6 @@ namespace Nerd_STF.Mathematics
             foreach (Float2 val in values) result += val;
             return result;
         }
-        
-        public static (double[] Xs, double[] Ys) SplitArray(IEnumerable<Float2> values)
-        {
-            int count = values.Count();
-            double[] Xs = new double[count], Ys = new double[count];
-            int index = 0;
-            foreach (Float2 val in values)
-            {
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                index++;
-            }
-            return (Xs, Ys);
-        }
 
         public void Normalize()
         {
@@ -292,6 +279,7 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float2(Int2 ints) => new Float2(ints.x, ints.y);
         public static explicit operator Float2(Int3 ints) => new Float2(ints.x, ints.y);
         public static explicit operator Float2(Int4 ints) => new Float2(ints.x, ints.y);
+        public static explicit operator Float2(Matrix mat) => new Float2(mat.TryGet(0, 0), mat.TryGet(1, 0));
         public static implicit operator Float2(Point point) => new Float2(point.X, point.Y);
         public static implicit operator Float2(PointF point) => new Float2(point.X, point.Y);
         public static implicit operator Float2(Size point) => new Float2(point.Width, point.Height);

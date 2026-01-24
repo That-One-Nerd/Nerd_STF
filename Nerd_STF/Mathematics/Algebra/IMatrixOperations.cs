@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace Nerd_STF.Mathematics.Algebra
 {
-    public interface IMatrixOperations<TSelf> : ISimpleMathOperations<TSelf>
+    public interface IMatrixOperations<TSelf> : IProductOperation<TSelf>,
+                                                ISumOperation<TSelf>
         where TSelf : IMatrix<TSelf>, IMatrixOperations<TSelf>
     {
         static abstract TSelf Average(IEnumerable<TSelf> vals);

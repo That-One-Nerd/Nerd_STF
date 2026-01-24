@@ -196,19 +196,6 @@ namespace Nerd_STF.Mathematics
             return sum;
         }
 
-        public static double[] SplitArray(Units unit, IEnumerable<Angle> values)
-        {
-            int count = values.Count();
-            double[] angles = new double[count];
-            int index = 0;
-            foreach (Angle val in values)
-            {
-                angles[index] = val[unit];
-                index++;
-            }
-            return angles;
-        }
-
         public Angle Coterminal(int turns) => new Angle(revTheta + turns);
 
         public int CompareTo(Angle other) => revTheta.CompareTo(other.revTheta);

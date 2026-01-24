@@ -10,9 +10,10 @@ namespace Nerd_STF.Mathematics
                                                   IEquatable<TSelf>,
                                                   INumberGroupBase<TItem>
 #if CS11_OR_GREATER
-                                                 , IInterpolable<TSelf>,
-                                                  ISimpleMathOperations<TSelf>,
-                                                  IVectorOperations<TSelf>
+                                                 ,IInterpolable<TSelf>,
+                                                  ISumOperation<TSelf>,
+                                                  IProductOperation<TSelf>,
+                                                  IVector<TSelf, TItem>
 #endif
         where TSelf : INumberGroup<TSelf, TItem>
 #if CS11_OR_GREATER

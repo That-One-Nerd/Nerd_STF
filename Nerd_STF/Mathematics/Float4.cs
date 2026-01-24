@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Nerd_STF.Exceptions;
 using Nerd_STF.Graphics;
+using Nerd_STF.Mathematics.Algebra;
 
 namespace Nerd_STF.Mathematics
 {
@@ -14,7 +15,7 @@ namespace Nerd_STF.Mathematics
                            IPresets4d<Float4>,
                            IRoundable<Float4, Int4>,
                            IRefRoundable<Float4>,
-                           ISplittable<Float4, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>
+                           IVector<Float4>
 #endif
     {
         public static Float4 Backward => new Float4(0, 0, 0, -1);
@@ -250,22 +251,6 @@ namespace Nerd_STF.Mathematics
             foreach (Float4 val in values) result += val;
             return result;
         }
-        
-        public static (double[] Ws, double[] Xs, double[] Ys, double[] Zs) SplitArray(IEnumerable<Float4> values)
-        {
-            int count = values.Count();
-            double[] Ws = new double[count], Xs = new double[count], Ys = new double[count], Zs = new double[count];
-            int index = 0;
-            foreach (Float4 val in values)
-            {
-                Ws[index] = val.w;
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                Zs[index] = val.z;
-                index++;
-            }
-            return (Ws, Xs, Ys, Zs);
-        }
 
         public void Normalize()
         {
@@ -343,6 +328,7 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float4(Int4 ints) => new Float4(ints.w, ints.x, ints.y, ints.z);
         public static implicit operator Float4(Float2 floats) => new Float4(0, floats.x, floats.y, 0);
         public static implicit operator Float4(Float3 floats) => new Float4(0, floats.x, floats.y, floats.z);
+        public static explicit operator Float4(Matrix mat) => new Float4(mat.TryGet(0, 0), mat.TryGet(1, 0), mat.TryGet(2, 0), mat.TryGet(3, 0));
         public static implicit operator Float4(Numbers.Quaternion quat) => new Float4(quat.w, quat.x, quat.y, quat.z);
         public static implicit operator Float4(Vector2 vec) => new Float4(0, vec.X, vec.Y, 0);
         public static implicit operator Float4(Vector3 vec) => new Float4(0, vec.X, vec.Y, vec.Z);

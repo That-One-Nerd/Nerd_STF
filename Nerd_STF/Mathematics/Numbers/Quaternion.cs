@@ -18,10 +18,10 @@ namespace Nerd_STF.Mathematics.Numbers
                                IFromTuple<Quaternion, (double, double, double, double)>,
                                IInterpolable<Quaternion>,
                                IPresets4d<Quaternion>,
+                               IProductOperation<Quaternion>,
                                IRoundable<Quaternion>,
-                               ISimpleMathOperations<Quaternion>,
-                               ISplittable<Quaternion, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>,
-                               IVectorOperations<Quaternion>
+                               ISumOperation<Quaternion>,
+                               IVector<Quaternion>
 #endif
     {
         public static Quaternion Backward => new Quaternion(0, 0, 0, -1);
@@ -218,25 +218,6 @@ namespace Nerd_STF.Mathematics.Numbers
             return any ? result : Zero;
         }
 
-        public static (double[] Ws, double[] Xs, double[] Ys, double[] Zs) SplitArray(IEnumerable<Quaternion> nums)
-        {
-            int count = nums.Count();
-            double[] Ws = new double[count],
-                     Xs = new double[count],
-                     Ys = new double[count],
-                     Zs = new double[count];
-            int index = 0;
-            foreach (Quaternion q in nums)
-            {
-                Ws[index] = q.w;
-                Xs[index] = q.x;
-                Ys[index] = q.y;
-                Zs[index] = q.z;
-                index++;
-            }
-            return (Ws, Xs, Ys, Zs);
-        }
-
         public IEnumerator<double> GetEnumerator()
         {
             yield return w;
@@ -315,6 +296,7 @@ namespace Nerd_STF.Mathematics.Numbers
                            a.y * b.r + a.z * b.i,
                            a.z * b.r - a.y * b.i);
         public static Quaternion operator *(Quaternion a, double b) => new Quaternion(a.w * b, a.x * b, a.y * b, a.z * b);
+        public static Quaternion operator /(Quaternion a, double b) => new Quaternion(a.w / b, a.x / b, a.y / b, a.z / b);
         public static bool operator ==(Quaternion a, Quaternion b) => a.Equals(b);
         public static bool operator !=(Quaternion a, Quaternion b) => !a.Equals(b);
         public static bool operator >(Quaternion a, Quaternion b) => a.CompareTo(b) > 0;

@@ -10,8 +10,7 @@ namespace Nerd_STF.Mathematics
     public struct Int4 : INumberGroup<Int4, int>
 #if CS11_OR_GREATER
                         ,IFromTuple<Int4, (int, int, int, int)>,
-                         IPresets4d<Int4>,
-                         ISplittable<Int4, (int[] Ws, int[] Xs, int[] Ys, int[] Zs)>
+                         IPresets4d<Int4>
 #endif
     {
         public static Int4 Backward => new Int4(0, 0, 0, -1);
@@ -188,10 +187,6 @@ namespace Nerd_STF.Mathematics
             }
             return w + x + y + z;
         }
-#if CS11_OR_GREATER
-        static double IVectorOperations<Int4>.Dot(Int4 a, Int4 b) => Dot(a, b);
-        static double IVectorOperations<Int4>.Dot(IEnumerable<Int4> vals) => Dot(vals);
-#endif
         public static Int4 Lerp(Int4 a, Int4 b, double t, bool clamp = true) =>
             new Int4(MathE.Lerp(a.w, b.w, t, clamp),
                      MathE.Lerp(a.x, b.x, t, clamp),
@@ -213,22 +208,6 @@ namespace Nerd_STF.Mathematics
             Int4 total = Zero;
             foreach (Int4 val in values) total += val;
             return total;
-        }
-
-        public static (int[] Ws, int[] Xs, int[] Ys, int[] Zs) SplitArray(IEnumerable<Int4> values)
-        {
-            int count = values.Count();
-            int[] Ws = new int[count], Xs = new int[count], Ys = new int[count], Zs = new int[count];
-            int index = 0;
-            foreach (Int4 val in values)
-            {
-                Ws[index] = val.w;
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                Zs[index] = val.z;
-                index++;
-            }
-            return (Ws, Xs, Ys, Zs);
         }
 
         public IEnumerator<int> GetEnumerator()
