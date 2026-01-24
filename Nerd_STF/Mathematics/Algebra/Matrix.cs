@@ -420,5 +420,27 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix operator ~(Matrix a) => a.Inverse();
         public static bool operator ==(Matrix a, Matrix b) => a.Equals(b);
         public static bool operator !=(Matrix a, Matrix b) => !a.Equals(b);
+
+        public static implicit operator Matrix(Float2 vec) => new Matrix((2, 1), new double[] { vec.x, vec.y });
+        public static implicit operator Matrix(Float3 vec) => new Matrix((3, 1), new double[] { vec.x, vec.y, vec.z });
+        public static implicit operator Matrix(Float4 vec) => new Matrix((4, 1), new double[] { vec.w, vec.x, vec.y, vec.z });
+        public static implicit operator Matrix(Matrix2x2 mat) => new Matrix((2, 2), new double[]
+        {
+            mat.r0c0, mat.r0c1,
+            mat.r1c0, mat.r1c1
+        });
+        public static implicit operator Matrix(Matrix3x3 mat) => new Matrix((3, 3), new double[]
+        {
+            mat.r0c0, mat.r0c1, mat.r0c2,
+            mat.r1c0, mat.r1c1, mat.r1c2,
+            mat.r2c0, mat.r2c1, mat.r2c2
+        });
+        public static implicit operator Matrix(Matrix4x4 mat) => new Matrix((4, 4), new double[]
+        {
+            mat.r0c0, mat.r0c1, mat.r0c2, mat.r0c3,
+            mat.r1c0, mat.r1c1, mat.r1c2, mat.r1c3,
+            mat.r2c0, mat.r2c1, mat.r2c2, mat.r2c3,
+            mat.r3c0, mat.r3c1, mat.r3c2, mat.r3c3
+        });
     }
 }

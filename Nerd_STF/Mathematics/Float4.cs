@@ -328,6 +328,7 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float4(Int4 ints) => new Float4(ints.w, ints.x, ints.y, ints.z);
         public static implicit operator Float4(Float2 floats) => new Float4(0, floats.x, floats.y, 0);
         public static implicit operator Float4(Float3 floats) => new Float4(0, floats.x, floats.y, floats.z);
+        public static explicit operator Float4(Matrix mat) => new Float4(mat.TryGet(0, 0), mat.TryGet(1, 0), mat.TryGet(2, 0), mat.TryGet(3, 0));
         public static implicit operator Float4(Numbers.Quaternion quat) => new Float4(quat.w, quat.x, quat.y, quat.z);
         public static implicit operator Float4(Vector2 vec) => new Float4(0, vec.X, vec.Y, 0);
         public static implicit operator Float4(Vector3 vec) => new Float4(0, vec.X, vec.Y, vec.Z);
