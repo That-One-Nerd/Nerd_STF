@@ -1,4 +1,5 @@
 ﻿using Nerd_STF.Exceptions;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ namespace Nerd_STF.Mathematics
                            IPresets2d<Float2>,
                            IRoundable<Float2, Int2>,
                            IRefRoundable<Float2>,
-                           ISplittable<Float2, (double[] Xs, double[] Ys)>
+                           ISplittable<Float2, (double[] Xs, double[] Ys)>,
+                           IVector<Float2>
 #endif
     {
         public static Float2 Down => new Float2(0, -1);

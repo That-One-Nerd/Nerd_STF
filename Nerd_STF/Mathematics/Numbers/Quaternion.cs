@@ -18,10 +18,11 @@ namespace Nerd_STF.Mathematics.Numbers
                                IFromTuple<Quaternion, (double, double, double, double)>,
                                IInterpolable<Quaternion>,
                                IPresets4d<Quaternion>,
+                               IProductOperation<Quaternion>,
                                IRoundable<Quaternion>,
-                               ISimpleMathOperations<Quaternion>,
+                               ISumOperation<Quaternion>,
                                ISplittable<Quaternion, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>,
-                               IVectorOperations<Quaternion>
+                               IVector<Quaternion>
 #endif
     {
         public static Quaternion Backward => new Quaternion(0, 0, 0, -1);
@@ -315,6 +316,7 @@ namespace Nerd_STF.Mathematics.Numbers
                            a.y * b.r + a.z * b.i,
                            a.z * b.r - a.y * b.i);
         public static Quaternion operator *(Quaternion a, double b) => new Quaternion(a.w * b, a.x * b, a.y * b, a.z * b);
+        public static Quaternion operator /(Quaternion a, double b) => new Quaternion(a.w / b, a.x / b, a.y / b, a.z / b);
         public static bool operator ==(Quaternion a, Quaternion b) => a.Equals(b);
         public static bool operator !=(Quaternion a, Quaternion b) => !a.Equals(b);
         public static bool operator >(Quaternion a, Quaternion b) => a.CompareTo(b) > 0;

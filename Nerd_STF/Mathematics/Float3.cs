@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Graphics;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ namespace Nerd_STF.Mathematics
                            IPresets2d<Float3>,
                            IRoundable<Float3, Int3>,
                            IRefRoundable<Float3>,
-                           ISplittable<Float3, (double[] Xs, double[] Ys, double[] Zs)>
+                           ISplittable<Float3, (double[] Xs, double[] Ys, double[] Zs)>,
+                           IVector<Float3>
 #endif
     {
         public static Float3 Backward => new Float3(0, 0, -1);

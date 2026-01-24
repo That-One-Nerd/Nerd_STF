@@ -368,6 +368,7 @@ namespace Nerd_STF.Graphics
         public static ColorRGB operator +(ColorRGB a, ColorRGB b) => new ColorRGB(a.r + b.r, a.g + b.g, a.b + b.b, 1 - (1 - a.a) * (1 - b.a));
         public static ColorRGB operator *(ColorRGB a, ColorRGB b) => new ColorRGB(a.r * b.r, a.g * b.g, a.b * b.b, a.a * b.a);
         public static ColorRGB operator *(ColorRGB a, double b) => new ColorRGB(a.r * b, a.g * b, a.b * b, a.a);
+        public static ColorRGB operator /(ColorRGB a, double b) => new ColorRGB(a.r / b, a.g / b, a.b / b, a.a);
         public static bool operator ==(ColorRGB a, IColor b) => a.Equals(b.AsRgb());
         public static bool operator !=(ColorRGB a, IColor b) => !a.Equals(b.AsRgb());
         public static bool operator ==(ColorRGB a, ColorRGB b) => a.Equals(b);

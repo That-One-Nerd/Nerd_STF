@@ -19,10 +19,11 @@ namespace Nerd_STF.Mathematics.Numbers
                             IFromTuple<Complex, (double, double)>,
                             IInterpolable<Complex>,
                             IPresets2d<Complex>,
+                            IProductOperation<Complex>,
                             IRoundable<Complex>,
-                            ISimpleMathOperations<Complex>,
+                            ISumOperation<Complex>,
                             ISplittable<Complex, (double[] reals, double[] imaginaries)>,
-                            IVectorOperations<Complex>
+                            IVector<Complex>
 #endif
     {
         public static Complex Down => new Complex(0, 1);

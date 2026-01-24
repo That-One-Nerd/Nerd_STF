@@ -179,10 +179,6 @@ namespace Nerd_STF.Mathematics
             }
             return x + y + z;
         }
-#if CS11_OR_GREATER
-        static double IVectorOperations<Int3>.Dot(Int3 a, Int3 b) => Dot(a, b);
-        static double IVectorOperations<Int3>.Dot(IEnumerable<Int3> vals) => Dot(vals);
-#endif
         public static Int3 Lerp(Int3 a, Int3 b, double t, bool clamp = true) =>
             new Int3(MathE.Lerp(a.x, b.x, t, clamp),
                      MathE.Lerp(a.y, b.y, t, clamp),

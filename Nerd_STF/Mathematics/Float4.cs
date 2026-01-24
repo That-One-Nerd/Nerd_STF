@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Nerd_STF.Exceptions;
 using Nerd_STF.Graphics;
+using Nerd_STF.Mathematics.Algebra;
 
 namespace Nerd_STF.Mathematics
 {
@@ -14,7 +15,8 @@ namespace Nerd_STF.Mathematics
                            IPresets4d<Float4>,
                            IRoundable<Float4, Int4>,
                            IRefRoundable<Float4>,
-                           ISplittable<Float4, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>
+                           ISplittable<Float4, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>,
+                           IVector<Float4>
 #endif
     {
         public static Float4 Backward => new Float4(0, 0, 0, -1);

@@ -14,9 +14,10 @@ namespace Nerd_STF.Mathematics.Numbers
                                      ,INumber<Fraction>,
                                       IInterpolable<Fraction>,
                                       IPresets1d<Fraction>,
+                                      IProductOperation<Fraction>,
                                       IRoundable<Fraction>,
-                                      ISimpleMathOperations<Fraction>,
-                                      ISplittable<Fraction, (int[] nums, int[] dens)>
+                                      ISplittable<Fraction, (int[] nums, int[] dens)>,
+                                      ISumOperation<Fraction>
 #endif
     {
         public static Fraction NaN => new Fraction(0, 0);
