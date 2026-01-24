@@ -12,8 +12,7 @@ namespace Nerd_STF.Graphics
                              IEnumerable<double>
 #if CS11_OR_GREATER
                             ,IFromTuple<ColorYCC, (double, double, double)>,
-                             IFromTuple<ColorYCC, (double, double, double, double)>,
-                             ISplittable<ColorYCC, (double[] Ys, double[] Cbs, double[] Crs, double[] As)>
+                             IFromTuple<ColorYCC, (double, double, double, double)>
 #endif
     {
         // Constants that you can change, depending on what specification you're trying to meet.
@@ -273,21 +272,6 @@ namespace Nerd_STF.Graphics
                 result += color;
             }
             return any ? result : Black;
-        }
-        public static (double[] Ys, double[] Cbs, double[] Crs, double[] As) SplitArray(IEnumerable<ColorYCC> colors)
-        {
-            int count = colors.Count();
-            double[] Ys = new double[count], Cbs = new double[count], Crs = new double[count], As = new double[count];
-            int index = 0;
-            foreach (ColorYCC c in colors)
-            {
-                Ys[index] = c.y;
-                Cbs[index] = c.cb;
-                Crs[index] = c.cr;
-                As[index] = c.a;
-                index++;
-            }
-            return (Ys, Cbs, Crs, As);
         }
 
         public Dictionary<ColorChannel, double> GetChannels() => new Dictionary<ColorChannel, double>()

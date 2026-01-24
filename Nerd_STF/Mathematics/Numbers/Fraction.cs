@@ -16,7 +16,6 @@ namespace Nerd_STF.Mathematics.Numbers
                                       IPresets1d<Fraction>,
                                       IProductOperation<Fraction>,
                                       IRoundable<Fraction>,
-                                      ISplittable<Fraction, (int[] nums, int[] dens)>,
                                       ISumOperation<Fraction>
 #endif
     {
@@ -414,19 +413,6 @@ namespace Nerd_STF.Mathematics.Numbers
         static bool INumberBase<Fraction>.TryConvertToSaturating<TOther>(Fraction value, out TOther result) => TryConvertTo(value, out result);
         static bool INumberBase<Fraction>.TryConvertToTruncating<TOther>(Fraction value, out TOther result) => TryConvertTo(value, out result);
 #endif
-
-        public static (int[] nums, int[] dens) SplitArray(IEnumerable<Fraction> vals)
-        {
-            int count = vals.Count();
-            int[] nums = new int[count], dens = new int[count];
-            int index = 0;
-            foreach (Fraction val in vals)
-            {
-                nums[index] = val.num;
-                dens[index] = val.den;
-            }
-            return (nums, dens);
-        }
 
         public double GetValue() => (double)num / den;
 

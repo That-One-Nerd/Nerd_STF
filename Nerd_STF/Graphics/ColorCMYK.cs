@@ -11,8 +11,7 @@ namespace Nerd_STF.Graphics
                               IEnumerable<double>
 #if CS11_OR_GREATER
                              ,IFromTuple<ColorCMYK, (double, double, double, double)>,
-                              IFromTuple<ColorCMYK, (double, double, double, double, double)>,
-                              ISplittable<ColorCMYK, (double[] Cs, double[] Ms, double[] Ys, double[] Ks, double[] As)>
+                              IFromTuple<ColorCMYK, (double, double, double, double, double)>
 #endif
     {
         public static int ChannelCount => 5;
@@ -224,22 +223,6 @@ namespace Nerd_STF.Graphics
                 result += color;
             }
             return any ? result : Black;
-        }
-        public static (double[] Cs, double[] Ms, double[] Ys, double[] Ks, double[] As) SplitArray(IEnumerable<ColorCMYK> colors)
-        {
-            int count = colors.Count();
-            double[] Cs = new double[count], Ms = new double[count], Ys = new double[count], Ks = new double[count], As = new double[count];
-            int index = 0;
-            foreach (ColorCMYK c in colors)
-            {
-                Cs[index] = c.c;
-                Ms[index] = c.m;
-                Ys[index] = c.y;
-                Ks[index] = c.k;
-                As[index] = c.a;
-                index++;
-            }
-            return (Cs, Ms, Ys, Ks, As);
         }
 
         public Dictionary<ColorChannel, double> GetChannels() => new Dictionary<ColorChannel, double>()

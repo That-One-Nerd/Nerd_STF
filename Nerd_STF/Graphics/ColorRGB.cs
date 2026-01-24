@@ -11,8 +11,7 @@ namespace Nerd_STF.Graphics
                              INumberGroup<ColorRGB, double>
 #if CS11_OR_GREATER
                             ,IFromTuple<ColorRGB, (double, double, double)>,
-                             IFromTuple<ColorRGB, (double, double, double, double)>,
-                             ISplittable<ColorRGB, (double[] Rs, double[] Gs, double[] Bs, double[] As)>
+                             IFromTuple<ColorRGB, (double, double, double, double)>
 #endif
     {
         public static int ChannelCount => 4;
@@ -250,21 +249,6 @@ namespace Nerd_STF.Graphics
                 result += color;
             }
             return any ? result : Black;
-        }
-        public static (double[] Rs, double[] Gs, double[] Bs, double[] As) SplitArray(IEnumerable<ColorRGB> colors)
-        {
-            int count = colors.Count();
-            double[] Rs = new double[count], Gs = new double[count], Bs = new double[count], As = new double[count];
-            int index = 0;
-            foreach (ColorRGB c in colors)
-            {
-                Rs[index] = c.r;
-                Gs[index] = c.g;
-                Bs[index] = c.b;
-                As[index] = c.a;
-                index++;
-            }
-            return (Rs, Gs, Bs, As);
         }
 
         public Dictionary<ColorChannel, double> GetChannels() => new Dictionary<ColorChannel, double>()

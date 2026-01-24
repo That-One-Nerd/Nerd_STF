@@ -13,8 +13,7 @@ namespace Nerd_STF.Graphics
                             ,IFromTuple<ColorHSV, (Angle, double, double)>,
                              IFromTuple<ColorHSV, (double, double, double)>,
                              IFromTuple<ColorHSV, (Angle, double, double, double)>,
-                             IFromTuple<ColorHSV, (double, double, double, double)>,
-                             ISplittable<ColorHSV, (Angle[] Hs, double[] Ss, double[] Vs, double[] As)>
+                             IFromTuple<ColorHSV, (double, double, double, double)>
 #endif
     {
         public static int ChannelCount => 4;
@@ -210,22 +209,6 @@ namespace Nerd_STF.Graphics
                 result += color;
             }
             return any ? result : Black;
-        }
-        public static (Angle[] Hs, double[] Ss, double[] Vs, double[] As) SplitArray(IEnumerable<ColorHSV> colors)
-        {
-            int count = colors.Count();
-            Angle[] Hs = new Angle[count];
-            double[] Ss = new double[count], Vs = new double[count], As = new double[count];
-            int index = 0;
-            foreach (ColorHSV c in colors)
-            {
-                Hs[index] = c.h;
-                Ss[index] = c.s;
-                Vs[index] = c.v;
-                As[index] = c.a;
-                index++;
-            }
-            return (Hs, Ss, Vs, As);
         }
 
         public Dictionary<ColorChannel, double> GetChannels() => new Dictionary<ColorChannel, double>()

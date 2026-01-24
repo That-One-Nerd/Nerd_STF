@@ -22,7 +22,6 @@ namespace Nerd_STF.Mathematics.Numbers
                             IProductOperation<Complex>,
                             IRoundable<Complex>,
                             ISumOperation<Complex>,
-                            ISplittable<Complex, (double[] reals, double[] imaginaries)>,
                             IVector<Complex>
 #endif
     {
@@ -386,20 +385,6 @@ namespace Nerd_STF.Mathematics.Numbers
         static bool INumberBase<Complex>.TryConvertToSaturating<TOther>(Complex value, out TOther result) => TryConvertTo(value, out result);
         static bool INumberBase<Complex>.TryConvertToTruncating<TOther>(Complex value, out TOther result) => TryConvertTo(value, out result);
 #endif
-
-        public static (double[] reals, double[] imaginaries) SplitArray(IEnumerable<Complex> vals)
-        {
-            int count = vals.Count();
-            double[] reals = new double[count], imaginaries = new double[count];
-            int index = 0;
-            foreach (Complex val in vals)
-            {
-                reals[index] = val.r;
-                imaginaries[index] = val.i;
-                index++;
-            }
-            return (reals, imaginaries);
-        }
 
         public IEnumerator<double> GetEnumerator()
         {

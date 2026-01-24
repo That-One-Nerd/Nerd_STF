@@ -10,8 +10,7 @@ namespace Nerd_STF.Mathematics
     public struct Int3 : INumberGroup<Int3, int>
 #if CS11_OR_GREATER
                         ,IFromTuple<Int3, (int, int, int)>,
-                         IPresets3d<Int3>,
-                         ISplittable<Int3, (int[] Xs, int[] Ys, int[] Zs)>
+                         IPresets3d<Int3>
 #endif
     {
         public static Int3 Backward => new Int3(0, 0, -1);
@@ -199,21 +198,6 @@ namespace Nerd_STF.Mathematics
             Int3 total = Zero;
             foreach (Int3 val in values) total += val;
             return total;
-        }
-
-        public static (int[] Xs, int[] Ys, int[] Zs) SplitArray(IEnumerable<Int3> values)
-        {
-            int count = values.Count();
-            int[] Xs = new int[count], Ys = new int[count], Zs = new int[count];
-            int index = 0;
-            foreach (Int3 val in values)
-            {
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                Zs[index] = val.z;
-                index++;
-            }
-            return (Xs, Ys, Zs);
         }
 
         public IEnumerator<int> GetEnumerator()

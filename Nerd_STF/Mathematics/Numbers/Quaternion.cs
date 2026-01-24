@@ -21,7 +21,6 @@ namespace Nerd_STF.Mathematics.Numbers
                                IProductOperation<Quaternion>,
                                IRoundable<Quaternion>,
                                ISumOperation<Quaternion>,
-                               ISplittable<Quaternion, (double[] Ws, double[] Xs, double[] Ys, double[] Zs)>,
                                IVector<Quaternion>
 #endif
     {
@@ -217,25 +216,6 @@ namespace Nerd_STF.Mathematics.Numbers
                 result += q;
             }
             return any ? result : Zero;
-        }
-
-        public static (double[] Ws, double[] Xs, double[] Ys, double[] Zs) SplitArray(IEnumerable<Quaternion> nums)
-        {
-            int count = nums.Count();
-            double[] Ws = new double[count],
-                     Xs = new double[count],
-                     Ys = new double[count],
-                     Zs = new double[count];
-            int index = 0;
-            foreach (Quaternion q in nums)
-            {
-                Ws[index] = q.w;
-                Xs[index] = q.x;
-                Ys[index] = q.y;
-                Zs[index] = q.z;
-                index++;
-            }
-            return (Ws, Xs, Ys, Zs);
         }
 
         public IEnumerator<double> GetEnumerator()

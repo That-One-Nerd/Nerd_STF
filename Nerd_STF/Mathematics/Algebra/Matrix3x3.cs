@@ -10,8 +10,7 @@ namespace Nerd_STF.Mathematics.Algebra
                              ISquareMatrix<Matrix3x3>,
                              ISubmatrixOperations<Matrix3x3, Matrix2x2>
 #if CS11_OR_GREATER
-                            ,ISplittable<Matrix3x3, (double[] r0c0, double[] r0c1, double[] r0c2, double[] r1c0, double[] r1c1, double[] r1c2, double[] r2c0, double[] r2c1, double[] r2c2)>,
-                             IStaticMatrix<Matrix3x3>
+                            ,IStaticMatrix<Matrix3x3>
 #endif
     {
         public static Matrix3x3 Identity =>
@@ -232,24 +231,6 @@ namespace Nerd_STF.Mathematics.Algebra
             Matrix3x3 result = Zero;
             foreach (Matrix3x3 m in vals) result += m;
             return result;
-        }
-
-        public static (double[] r0c0, double[] r0c1, double[] r0c2, double[] r1c0, double[] r1c1, double[] r1c2, double[] r2c0, double[] r2c1, double[] r2c2) SplitArray(IEnumerable<Matrix3x3> vals)
-        {
-            int count = vals.Count();
-            double[] r0c0 = new double[count], r0c1 = new double[count], r0c2 = new double[count],
-                     r1c0 = new double[count], r1c1 = new double[count], r1c2 = new double[count],
-                     r2c0 = new double[count], r2c1 = new double[count], r2c2 = new double[count];
-            int index = 0;
-            foreach (Matrix3x3 m in vals)
-            {
-                r0c0[index] = m.r0c0; r0c1[index] = m.r0c1; r0c2[index] = m.r0c2;
-                r1c0[index] = m.r1c0; r1c1[index] = m.r1c1; r1c2[index] = m.r1c2;
-                r2c0[index] = m.r2c0; r2c1[index] = m.r2c1; r2c2[index] = m.r2c2;
-            }
-            return (r0c0, r0c1, r0c2,
-                    r1c0, r1c1, r1c2,
-                    r2c0, r2c1, r2c2);
         }
 
         public ListTuple<double> GetRow(int row)

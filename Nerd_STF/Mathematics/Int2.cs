@@ -12,8 +12,7 @@ namespace Nerd_STF.Mathematics
     public struct Int2 : INumberGroup<Int2, int>
 #if CS11_OR_GREATER
                         ,IFromTuple<Int2, (int, int)>,
-                         IPresets2d<Int2>,
-                         ISplittable<Int2, (int[] Xs, int[] Ys)>
+                         IPresets2d<Int2>
 #endif
     {
         public static Int2 Down => new Int2(0, -1);
@@ -182,20 +181,6 @@ namespace Nerd_STF.Mathematics
             Int2 total = Zero;
             foreach (Int2 val in values) total += val;
             return total;
-        }
-
-        public static (int[] Xs, int[] Ys) SplitArray(IEnumerable<Int2> values)
-        {
-            int count = values.Count();
-            int[] Xs = new int[count], Ys = new int[count];
-            int index = 0;
-            foreach (Int2 val in values)
-            {
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                index++;
-            }
-            return (Xs, Ys);
         }
 
         public IEnumerator<int> GetEnumerator()

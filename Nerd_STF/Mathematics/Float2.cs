@@ -15,7 +15,6 @@ namespace Nerd_STF.Mathematics
                            IPresets2d<Float2>,
                            IRoundable<Float2, Int2>,
                            IRefRoundable<Float2>,
-                           ISplittable<Float2, (double[] Xs, double[] Ys)>,
                            IVector<Float2>
 #endif
     {
@@ -210,20 +209,6 @@ namespace Nerd_STF.Mathematics
             Float2 result = Zero;
             foreach (Float2 val in values) result += val;
             return result;
-        }
-        
-        public static (double[] Xs, double[] Ys) SplitArray(IEnumerable<Float2> values)
-        {
-            int count = values.Count();
-            double[] Xs = new double[count], Ys = new double[count];
-            int index = 0;
-            foreach (Float2 val in values)
-            {
-                Xs[index] = val.x;
-                Ys[index] = val.y;
-                index++;
-            }
-            return (Xs, Ys);
         }
 
         public void Normalize()
