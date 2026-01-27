@@ -423,7 +423,7 @@ namespace Nerd_STF.Mathematics.Algebra
 
         public static implicit operator Matrix(Float2 vec) => new Matrix((2, 1), new double[] { vec.x, vec.y });
         public static implicit operator Matrix(Float3 vec) => new Matrix((3, 1), new double[] { vec.x, vec.y, vec.z });
-        public static implicit operator Matrix(Float4 vec) => new Matrix((4, 1), new double[] { vec.w, vec.x, vec.y, vec.z });
+        public static implicit operator Matrix(Float4 vec) => new Matrix((4, 1), new double[] { vec.x, vec.y, vec.z, vec.w });
         public static implicit operator Matrix(Matrix2x2 mat) => new Matrix((2, 2), new double[]
         {
             mat.r0c0, mat.r0c1,

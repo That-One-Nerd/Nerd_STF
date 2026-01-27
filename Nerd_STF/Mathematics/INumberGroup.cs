@@ -8,6 +8,7 @@ namespace Nerd_STF.Mathematics
     public interface INumberGroup<TSelf, TItem> : ICombinationIndexer<TItem>,
                                                   IEnumerable<TItem>,
                                                   IEquatable<TSelf>,
+                                                  IMagnitudeOperators<TSelf>,
                                                   INumberGroupBase<TItem>
 #if CS11_OR_GREATER
                                                  ,IInterpolable<TSelf>,
