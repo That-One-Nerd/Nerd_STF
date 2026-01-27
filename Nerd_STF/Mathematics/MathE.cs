@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Nerd_STF.Mathematics
 {
@@ -521,25 +522,12 @@ namespace Nerd_STF.Mathematics
             return best;
         }
 
-        public static int ModAbs(int value, int mod)
-        {
-            while (value >= mod) value -= mod;
-            while (value < 0) value += mod;
-            return value;
-        }
-        public static double ModAbs(double value, double mod)
-        {
-            while (value >= mod) value -= mod;
-            while (value < 0) value += mod;
-            return value;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ModAbs(int value, int mod) => (value % mod + mod) % mod;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double ModAbs(double value, double mod) => (value % mod + mod) % mod;
 #if CS11_OR_GREATER
-        public static T ModAbs<T>(T value, T mod) where T : INumber<T>
-        {
-            while (value >= mod) value -= mod;
-            while (value < T.Zero) value += mod;
-            return value;
-        }
+        public static T ModAbs<T>(T value, T mod) where T : INumber<T> => (value % mod + mod) % mod;
 #endif
 
         public static BigInteger NprBig(int n, int r) => FactorialBig(n - r + 1, n);
@@ -651,69 +639,77 @@ namespace Nerd_STF.Mathematics
         public static int Sign(double num) => num > 0 ? 1 : num < 0 ? -1 : 0;
         public static int Sign(int num) => num > 0 ? 1 : num < 0 ? -1 : 0;
 
-        public static double Sin(double rad, int terms = 8)
+        public static double Sin(double rad)
         {
-            bool flip = false;
-            if (rad < 0)
+            // My previous implementation of the taylor series was flawed,
+            // but it doesn't matter because this implementation is more
+            // accurate with less terms.
+
+            // First, constrain the input to [0, 2pi)
+            rad = ModAbs(rad, Constants.Tau);
+
+            // Then constrain to [0, pi)
+            double x;
+            if (rad > Constants.Pi)
             {
-                flip = true;
-                rad = -rad;
+                x = -1;
+                rad = Constants.Tau - rad;
             }
-            if (rad > Constants.Tau) rad %= Constants.Tau;
+            else x = 1;
 
-            double trueX = rad - Constants.Pi;
+            // Then constrain to [0, pi/2)
+            if (rad > Constants.HalfPi) rad = Constants.Pi - rad;
 
-            // Taylor series. More accurate than the polynomial
-            // I used in Nerd_STF 2.0.
-            int sign = 1;
-            int fact = 1;
-            int twoN = 1;
-            double result = trueX, xPow = trueX;
-            for (int n = 1; n < terms; n++)
+            // Then split into two conditions, x > pi/4 or x <= pi/4
+            // We have a different polynomial for each.
+            if (rad <= Constants.HalfPi * 0.5)
             {
-                twoN += 2;
-                fact *= twoN * (twoN - 1);
-                sign = -sign;
-                xPow *= trueX * trueX;
-                result += xPow * sign / fact;
-            }
+                const double c1 =  0.999996294518,
+                             c2 =  0.0000604571732224,
+                             c3 = -0.1669919062,
+                             c4 =  0.000737798693456,
+                             c5 =  0.00768534676739;
 
-            return flip ? result : -result;
+                // Cumulative multiply, a little scuffed but it works.
+                return c1 * (x *= rad) +
+                       c2 * (x *= rad) +
+                       c3 * (x *= rad) +
+                       c4 * (x *= rad) +
+                       c5 * (x *= rad);
+            }
+            else
+            {
+                const double c1 = 0.997825841172,
+                             c2 = 0.00929372002469,
+                             c3 = -0.182014083754,
+                             c4 = 0.0119041921981,
+                             c5 = 0.0044612026723;
+
+                // Cumulative multiply, a little scuffed but it works.
+                return c1 * (x *= rad) +
+                       c2 * (x *= rad) +
+                       c3 * (x *= rad) +
+                       c4 * (x *= rad) +
+                       c5 * (x *= rad);
+            }
         }
-        public static double Sin(Angle angle, int terms = 8) =>
-            Sin(angle.Radians, terms);
-        public static IEquation Sin(IEquation inputRad, int terms = 8) =>
-            new Equation((double x) => Sin(inputRad[x], terms));
-        public static double Cos(double rad, int terms = 8) =>
-            Sin(rad + Constants.HalfPi, terms);
-        public static double Cos(Angle angle, int terms = 8) =>
-            Cos(angle.Radians, terms);
-        public static IEquation Cos(IEquation inputRad, int terms = 8) =>
-            new Equation((double x) => Cos(inputRad[x], terms));
-        public static double Tan(double rad, int terms = 8) =>
-            Sin(rad + Constants.HalfPi, terms) / Sin(rad, terms);
-        public static double Tan(Angle angle, int terms = 8) =>
-            Tan(angle.Radians, terms);
-        public static IEquation Tan(IEquation inputRad, int terms = 8) =>
-            new Equation((double x) => Tan(inputRad[x], terms));
-        public static double Csc(double rad, int terms = 8) =>
-            1 / Sin(rad, terms);
-        public static double Csc(Angle angle, int terms = 8) =>
-            Csc(angle.Radians, terms);
-        public static IEquation Csc(IEquation inputRad, int terms = 8) =>
-            new Equation((double x) => Csc(inputRad[x], terms));
-        public static double Sec(double rad, int terms = 8) =>
-            1 / Sin(rad + Constants.HalfPi, terms);
-        public static double Sec(Angle angle, int terms = 8) =>
-            Sec(angle.Radians, terms);
-        public static IEquation Sec(IEquation inputRad, int terms = 8) =>
-            new Equation((double x) => Sec(inputRad[x], terms));
-        public static double Cot(double rad, int terms = 8) =>
-            Sin(rad, terms) / Sin(rad + Constants.HalfPi, terms);
-        public static double Cot(Angle angle, int terms = 8) =>
-            Cot(angle.Radians, terms);
-        public static IEquation Cot(IEquation inputRad, int terms = 8) =>
-            new Equation((double x) => Cot(inputRad[x], terms));
+        public static double Sin(Angle angle) => Sin(angle.Radians);
+        public static IEquation Sin(IEquation inputRad) => new Equation(x => Sin(inputRad[x]));
+        public static double Cos(double rad) => Sin(rad + Constants.HalfPi);
+        public static double Cos(Angle angle) => Sin(angle.Radians + Constants.HalfPi);
+        public static IEquation Cos(IEquation inputRad) => new Equation(x => Sin(inputRad[x] + Constants.HalfPi));
+        public static double Tan(double rad) => Sin(rad) / Sin(rad + Constants.HalfPi);
+        public static double Tan(Angle angle) => Sin(angle.Radians) / Sin(angle.Radians + Constants.HalfPi);
+        public static IEquation Tan(IEquation inputRad) => new Equation(x => Sin(inputRad[x]) / Sin(inputRad[x] + Constants.HalfPi));
+        public static double Csc(double rad) => 1 / Sin(rad);
+        public static double Csc(Angle angle) => 1 / Sin(angle.Radians);
+        public static IEquation Csc(IEquation inputRad) => new Equation(x => 1 / Sin(inputRad[x]));
+        public static double Sec(double rad) => 1 / Sin(rad + Constants.HalfPi);
+        public static double Sec(Angle angle) => 1 / Sin(angle.Radians + Constants.HalfPi);
+        public static IEquation Sec(IEquation inputRad) => new Equation(x => 1 / Sin(inputRad[x] + Constants.HalfPi));
+        public static double Cot(double rad) => Sin(rad + Constants.HalfPi) / Sin(rad);
+        public static double Cot(Angle angle) => Sin(angle.Radians + Constants.HalfPi) / Sin(angle.Radians);
+        public static IEquation Cot(IEquation inputRad) => new Equation(x => Sin(inputRad[x] + Constants.HalfPi) / Sin(inputRad[x]));
 
         // YOU CANNOT USE POW HERE!!!
         // The CordicHelper uses the Sqrt function for the Pow method.
