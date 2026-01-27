@@ -15,7 +15,7 @@
   
   <PropertyGroup>
     <Title>Nerd_STF</Title>
-    <Version>3.1.0</Version>
+    <Version>3.1.1</Version>
     <Authors>That_One_Nerd</Authors>
     <Description>A general-purpose mathematics library for C#.</Description>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
@@ -28,126 +28,51 @@
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation;discrete mathematics;discrete math;set notation;relation;discrete;ycbcr;ypbpr;ycc</PackageTags>
     
     <!-- Sorry this is stupidly long, wish I could have linked a markdown file instead. -->
-    <PackageReleaseNotes># Nerd_STF v3.1
+    <PackageReleaseNotes>Hi there! I mostly just have a few tweaks for this release, stuff I wanted to get out now so I can use it in other projects. There's plenty more tweaks to come in the future, but who knows when that'll be. Before or after the next major release, I couldn't tell you.
 
-Hi! It's been a while, but I've got a few things for you guys.
+**This update mostly focuses on linear algebra tweaks.** I was messing around with some code to experiment with homework, and I wanted to project one vector upon another. Sometimes they would be 2d vectors, sometimes 3d. Problem was, the `IVectorOperations&lt;T&gt;` interface was really lame and didn't let me do that sort of thing with constraints.
 
-## More color configurations.
-
-I've been spending a lot of my time recently working on [a Java library for FRC light strips](https://github.com/That-One-Nerd/betterlights) and in the process I made a tool for gradients. I ended up finding myself wishing I had it in here, too, so I've added it.
-
-It functions mostly as a list of colors and associated positions for those colors. You can add and remove colors over time, and you index it (or call `.Get()`) with a value between 0 and 1 to determine a color. For example:
-
+So I've fixed that. Here's the simple projection method I wrote. The mathematical formula for projecting a vector $a$ onto $b$ goes like so: $\text{proj}^a_b = \frac{a \cdot b}{b \cdot b}b$. And the code looks like this:
 ```csharp
-Gradient&lt;ColorRGB&gt; gradient = new()
+T Project&lt;T&gt;(T vec, T onto) where T : IVector&lt;T&gt;
 {
-    { 0.0, ColorRGB.Red },
-    { 0.5, ColorRGB.Green },
-    { 1.0, ColorRGB.Blue },
-};
-
-Console.WriteLine(gradient[0.2].HexCode()); // #996600
-```
-
-You can also quickly and easily visualize your gradients right in the console, so long as your console has compatibility for RGB colors.
-
-```
-Console.WriteLine("Our gradient: " + gradient.ToColorString());
-```
-produces this in the terminal:
-&lt;img width="590" height="38" alt="image" src="https://github.com/user-attachments/assets/692b9263-a4f6-4a18-97af-71e9ce830f34" /&gt;
-&lt;sub&gt;Note that the resulting preview is actually a 1668 character string behind the scenes.&lt;/sub&gt;
-
-You can change the way the colors interpolate, if you'd like. Simply set `gradient.Interpolation` to any function that takes two colors and a float, and outputs a color.
-
-```csharp
-Gradient&lt;ColorRGB&gt; gradient = new()
-{
-    { 0.0, ColorRGB.Red },
-    { 0.5, ColorRGB.Green },
-    { 1.0, ColorRGB.Blue },
-};
-
-// Interpolate through white. Don't look at the implementation too
-// much, the point is to demonstrate that it can be set to whatever.
-gradient.Interpolation = (a, b, t) =&gt;
-{
-    ColorRGB c;
-    if (t &lt;= 0.5) (c, t) = (a, t * 2);
-    else (c, t) = (b, -2 * t + 2);
-    return (t, t, t) + c * (1 - t);
-};
-Console.WriteLine("        Through White: " + gradient.ToColorString() + "\n");
-
-// Or you can set it to some simple templates.
-gradient.Interpolation = Gradient&lt;ColorRGB&gt;.Nearest;
-Console.WriteLine("     Nearest Neighbor: " + gradient.ToColorString() + "\n");
-
-gradient.Interpolation = Gradient&lt;ColorRGB&gt;.Lerp;
-Console.WriteLine("Default Interpolation: " + gradient.ToColorString() + "\n");
-```
-
-For the result:
-&lt;img width="666" height="105" alt="image" src="https://github.com/user-attachments/assets/96c17685-5817-4d70-bdb9-241cb6735309" /&gt;
-
-### `ColorYCC`
-
-In addition, I have also implemented the YC&lt;sub&gt;b&lt;/sub&gt;C&lt;sub&gt;r&lt;/sub&gt; color space in the `ColorYCC` class. [YCbCr](https://en.wikipedia.org/wiki/YCbCr) is a way to convert RGB colors into a luminance value and two chrominance values. The conversion relies on the constants K&lt;sub&gt;r&lt;/sub&gt;, K&lt;sub&gt;g&lt;/sub&gt;, and K&lt;sub&gt;b&lt;/sub&gt;, which can be statically modified in the class. The constants are set to what I'm fairly certain is the most common standard, but the conversion system works for any $K_r + K_g + K_b = 1$.
-
-## `Validatable&lt;T&gt;`
-
-A small object I created mostly for the purposes of RGB &lt;-&gt; YCC conversion. It's done using matrix and vector multiplication, so I've cached the matrices required. However, if the K constants ever got changed, the matrix and its inverse needed to be recomputed. This is the purpose of the `Validatable` class.
-
-When constructed, a method must be passed that "generates" a valid value when requested.
-`Validatable&lt;int&gt; obj = new(() -&gt; ...);`
-
-Afterwards, when `obj.Value` is read, the object either runs the generation function and caches the result, or returns an already cached result.
-
-To force the object to re-generate a value, simply declare it invalidated by `obj.Invalidate()`. This will cause the generator to be re-invoked *only when required*. It's essentially a re-usable version of `System.Lazy&lt;T&gt;`.
-
-## Discrete Math
-
-I took discrete math last semester and decided to implement some of the things we discussed in that class here. Namely, the `Nerd_STF.Mathematics.Discrete` namespace contains mathematically-defined sets and relations. I think I went a little overboard with the abstraction here, I may use a better system in the future. But the important types to note are the `DiscreteSet&lt;T&gt;` and `DiscreteRelation&lt;T1, T2&gt;` types. The `DiscreteSet` contains a unique set of elements of type `T`, and a relation is a mapping of one set to another. Here's an example.
-
-```csharp
-DiscreteSet&lt;int&gt; evens = [], odds = [], primes = [];
-for (int i = 0; i &lt; 20; i++)
-{
-    if (i % 2 == 0) evens += i;
-    else odds += i;
-
-    if (IsPrime(i)) primes += i;
+    return onto * (T.Dot(vec, onto) / T.Dot(onto, onto));
 }
-Console.WriteLine($"Evens set: {evens}\nOdds set: {odds}\nPrimes set: {primes}");
-
-DiscreteRelation&lt;int, int&gt; relation = new();
-foreach (int odd in odds)
-{
-    if (odd == 1) continue;
-    foreach (int even in evens)
-    {
-        if (even % (odd - 1) == 0) relation += (even, odd);
-    }
-}
-Console.WriteLine("\nRelation between evens and odds:\n" + relation);
 ```
 
-Yields:
-&lt;img width="1083" height="158" alt="image" src="https://github.com/user-attachments/assets/028d1c09-6074-420f-9c34-71c93eaf9348" /&gt;
-
-Some things were handled better than others. The source code of the `DiscreteRelation` class specifically is a scuffed mess of long type names and abstraction, and none of this is particularly fast or efficient, but it works for simple situations and isn't too abstraction-heavy on the part of the user of this library.
-
-## Some final thoughts.
-
-I may in the future condense `DiscreteRelation&lt;T1, T2&gt;` into a single type parameter for both the input and output. It makes things like the relation matrix and symmetry detection easier to implement.
-
-I don't think I'm done with graphics. I've got some more ideas in the pipeline, but this library obviously takes a while to work on.
-
-I also have a ton of very small tweaks I want to make. Things such as clamping color values in the constructors, or getting rid of `SplitArray` because the `System.Linq` namespace basically does that in a more modular way. Some small patches may be in order, but releasing this is such a pain I like to do it in bulk.
+Nice and simple. It works for all vector types, meaning `Float2`, `Float3`, `Float4`, and even the int equivalents if you substitute `IVector&lt;T&gt;` with `IVector&lt;T, int&gt;`.
 
 ---
 
-Take care, and enjoy 3.1!</PackageReleaseNotes>
+What else... oh right. `ISplittable&lt;T, TTuple&gt;` was completely redundant, and has always been redundant, thanks to `System.Linq`. For example, take a list of `Float3`s, and we want to separate the X components from the rest.
+```csharp
+using System.Linq; // We need this or we'll get a weird compiler error.
+
+List&lt;Float3&gt; items = [
+    (1, 2, 3),
+    (4, 5, 6),
+    (7, 8, 9)
+];
+
+double[] option1 = Float3.SplitArray(items).Xs;           // We could do this and save all three variables in memory...
+IEnumerable&lt;double&gt; option2 = from i in items select i.x; // Or we could do this.
+```
+
+So I removed ISplittable. This is technically a breaking change, but I doubt anyone was using it in any serious measure. Sorry if I screwed up your code :(
+
+---
+
+One last thing, this is a matrix feature (man, I've had matrices in my head a lot this update) that has been missing in 3.x, casting FloatXs to matrices. Now `Float2`, `Float3`, and `Float4`s can all be implicitly converted to column vectors, making them easy to multiply with the general matrix class. I also apparently forgot to create casting from specialized matrix classes to the generalized one, so I also implemented that.
+
+---
+
+Anyway, that's it. Not a huge update, I only spent about an hour implementing these thingies. I'm not done with small stuff, but whether it'll come out before or after the next major update I couldn't say. Wait, didn't I just say that? Call me AI the way I repeat myself but slightly rephrase words.
+
+On that note, don't worry. I never EVER use AI in this project for any reason whatsoever. It's a passion project, why would I delegate something I love making? But yeah, no AI-generated changelog, no @Copilot pull requests, and no AI agent or autocomplete, but you'll have to take my word on that one since you can't really see my development environment.
+
+Anyway, I'm definitely sick and tired of the choice I made way back at the beginning of 3.0: putting `w`s as the first component in `Float4`s. What a terrible idea. I think I'm going to revert that soon. I just keep facepalming every time I see the scuff that gets caused by that design choice. Oopsies.
+
+Take care, enjoy 3.1.1!</PackageReleaseNotes>
   </PropertyGroup>
 
   <!-- ItemGroup customization based on framework. -->
