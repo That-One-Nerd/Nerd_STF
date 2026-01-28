@@ -544,10 +544,10 @@ namespace Nerd_STF.Mathematics.Algebra
                           a.r2c0 * b, a.r2c1 * b, a.r2c2 * b, a.r2c3 * b,
                           a.r3c0 * b, a.r3c1 * b, a.r3c2 * b, a.r3c3 * b);
         public static Float4 operator *(Matrix4x4 a, Float4 b) =>
-            new Float4(a.r0c0 * b.w + a.r0c1 * b.x + a.r0c2 * b.y + a.r0c3 * b.z,
-                       a.r1c0 * b.w + a.r1c1 * b.x + a.r1c2 * b.y + a.r1c3 * b.z,
-                       a.r2c0 * b.w + a.r2c1 * b.x + a.r2c2 * b.y + a.r2c3 * b.z,
-                       a.r3c0 * b.w + a.r3c1 * b.x + a.r3c2 * b.y + a.r3c3 * b.z);
+            new Float4(a.r0c0 * b.x + a.r0c1 * b.y + a.r0c2 * b.z + a.r0c3 * b.w,
+                       a.r1c0 * b.x + a.r1c1 * b.y + a.r1c2 * b.z + a.r1c3 * b.w,
+                       a.r2c0 * b.x + a.r2c1 * b.y + a.r2c2 * b.z + a.r2c3 * b.w,
+                       a.r3c0 * b.x + a.r3c1 * b.y + a.r3c2 * b.z + a.r3c3 * b.w);
         public static Matrix4x4 operator *(Matrix4x4 a, Matrix4x4 b) =>
             new Matrix4x4(a.r0c0 * b.r0c0 + a.r0c1 * b.r1c0 + a.r0c2 * b.r2c0 + a.r0c3 * b.r3c0, a.r0c0 * b.r0c1 + a.r0c1 * b.r1c1 + a.r0c2 * b.r2c1 + a.r0c3 * b.r3c1, a.r0c0 * b.r0c2 + a.r0c1 * b.r1c2 + a.r0c2 * b.r2c2 + a.r0c3 * b.r3c2, a.r0c0 * b.r0c3 + a.r0c1 * b.r1c3 + a.r0c2 * b.r2c3 + a.r0c3 * b.r3c3,
                           a.r1c0 * b.r0c0 + a.r1c1 * b.r1c0 + a.r1c2 * b.r2c0 + a.r1c3 * b.r3c0, a.r1c0 * b.r0c1 + a.r1c1 * b.r1c1 + a.r1c2 * b.r2c1 + a.r1c3 * b.r3c1, a.r1c0 * b.r0c2 + a.r1c1 * b.r1c2 + a.r1c2 * b.r2c2 + a.r1c3 * b.r3c2, a.r1c0 * b.r0c3 + a.r1c1 * b.r1c3 + a.r1c2 * b.r2c3 + a.r1c3 * b.r3c3,
@@ -573,14 +573,14 @@ namespace Nerd_STF.Mathematics.Algebra
                           mat.TryGet(2, 0), mat.TryGet(2, 1), mat.TryGet(2, 2), mat.TryGet(2, 3),
                           mat.TryGet(3, 0), mat.TryGet(3, 1), mat.TryGet(3, 2), mat.TryGet(3, 3));
         public static implicit operator Matrix4x4(Matrix2x2 mat) =>
-            new Matrix4x4(1, 0       , 0       , 0,
-                          0, mat.r0c0, mat.r0c1, 0,
-                          0, mat.r1c0, mat.r1c1, 0,
-                          0, 0       , 0       , 1);
+            new Matrix4x4(mat.r0c0, mat.r0c1, 0, 0,
+                          mat.r1c0, mat.r1c1, 0, 0,
+                          0       , 0       , 1, 0,
+                          0       , 0       , 0, 1);
         public static implicit operator Matrix4x4(Matrix3x3 mat) =>
-            new Matrix4x4(1, 0       , 0       , 0       ,
-                          0, mat.r0c0, mat.r0c1, mat.r0c2,
-                          0, mat.r1c0, mat.r1c1, mat.r1c2,
-                          0, mat.r2c0, mat.r2c1, mat.r2c2);
+            new Matrix4x4(mat.r0c0, mat.r0c1, mat.r0c2, 0,
+                          mat.r1c0, mat.r1c1, mat.r1c2, 0,
+                          mat.r2c0, mat.r2c1, mat.r2c2, 0,
+                          0       , 0       , 0       , 1);
     }
 }

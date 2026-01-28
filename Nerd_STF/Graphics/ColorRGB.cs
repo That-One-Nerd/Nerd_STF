@@ -30,6 +30,7 @@ namespace Nerd_STF.Graphics
         public static ColorRGB Yellow =>  new ColorRGB(1  , 1  , 0  , 1);
 
         public double Magnitude => MathE.Sqrt(r * r + g * g + b * b);
+        public double MagnitudeSqr => r * r + g * g + b * b;
 
         public double r, g, b, a;
 

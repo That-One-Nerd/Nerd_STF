@@ -30,6 +30,7 @@ namespace Nerd_STF.Mathematics
 
         public double InverseMagnitude => MathE.InverseSqrt(x * x + y * y + z * z);
         public double Magnitude => MathE.Sqrt(x * x + y * y + z * z);
+        public double MagnitudeSqr => x * x + y * y + z * z;
         public Float3 Normalized => this * InverseMagnitude;
 
         public double x, y, z;
