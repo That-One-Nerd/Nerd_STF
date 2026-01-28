@@ -15,7 +15,7 @@
   
   <PropertyGroup>
     <Title>Nerd_STF</Title>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <Authors>That_One_Nerd</Authors>
     <Description>A general-purpose mathematics library for C#.</Description>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
@@ -28,51 +28,34 @@
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation;discrete mathematics;discrete math;set notation;relation;discrete;ycbcr;ypbpr;ycc</PackageTags>
     
     <!-- Sorry this is stupidly long, wish I could have linked a markdown file instead. -->
-    <PackageReleaseNotes>Hi there! I mostly just have a few tweaks for this release, stuff I wanted to get out now so I can use it in other projects. There's plenty more tweaks to come in the future, but who knows when that'll be. Before or after the next major release, I couldn't tell you.
+    <PackageReleaseNotes>Welcome! I have some more small tweaks.
 
-**This update mostly focuses on linear algebra tweaks.** I was messing around with some code to experiment with homework, and I wanted to project one vector upon another. Sometimes they would be 2d vectors, sometimes 3d. Problem was, the `IVectorOperations&lt;T&gt;` interface was really lame and didn't let me do that sort of thing with constraints.
+### You Don't Always Start With A `W`.
 
-So I've fixed that. Here's the simple projection method I wrote. The mathematical formula for projecting a vector $a$ onto $b$ goes like so: $\text{proj}^a_b = \frac{a \cdot b}{b \cdot b}b$. And the code looks like this:
-```csharp
-T Project&lt;T&gt;(T vec, T onto) where T : IVector&lt;T&gt;
-{
-    return onto * (T.Dot(vec, onto) / T.Dot(onto, onto));
-}
-```
+I finally got around to making `w` the last item in `Float4`s, `Int4`s, and `Quaternion`s. Really, it was a very peculiar hill I chose to die on there. My reasoning was mostly "w comes first in the alphabet, yeah? So it should contain the first value," but that's a silly argument because it's now no longer backwards compatible with 2s and 3s anymore. So I put it back. I had to do most of these changes manually, so I hope I didn't miss anything.
 
-Nice and simple. It works for all vector types, meaning `Float2`, `Float3`, `Float4`, and even the int equivalents if you substitute `IVector&lt;T&gt;` with `IVector&lt;T, int&gt;`.
+&gt; [!WARNING]
+&gt; This is a breaking change! My *hope* is that anyone using this library was annoyed by this and now enjoys the new fix, but if you relied on this ordering, you might have to tweak some variables. Sorry about that.
 
----
+### A Better `Sin()` function.
 
-What else... oh right. `ISplittable&lt;T, TTuple&gt;` was completely redundant, and has always been redundant, thanks to `System.Linq`. For example, take a list of `Float3`s, and we want to separate the X components from the rest.
-```csharp
-using System.Linq; // We need this or we'll get a weird compiler error.
+For a while now (basically since 3.0), the new Sin() function was quite inaccurate towards zero. It followed a proper Taylor series implementation and I think some floating point error was accumulating there. Not super certain. But I replaced it with another linear regression, like in 2.x. But it's a bit smarter: rather than making a polynomial represent the whole sin function, there are two polynomials that each represent an eighth of the range $[0..2\pi)$, and the rest of the range is mirrored to fit in one of those two categories. This way, the polynomial can be specifically taylored (hehe... taylored) to be good at either close to zero cases or close to one cases. It also uses less terms.
 
-List&lt;Float3&gt; items = [
-    (1, 2, 3),
-    (4, 5, 6),
-    (7, 8, 9)
-];
+Shouldn't change your side very much, it'll just be more accurate. As far as I know, in normal situations the error never goes above 0.00004%.
 
-double[] option1 = Float3.SplitArray(items).Xs;           // We could do this and save all three variables in memory...
-IEnumerable&lt;double&gt; option2 = from i in items select i.x; // Or we could do this.
-```
+### Some small stuff.
 
-So I removed ISplittable. This is technically a breaking change, but I doubt anyone was using it in any serious measure. Sorry if I screwed up your code :(
+That's about all of the big stuff, not a super duper ton.
+
+- I made the `IMagnitudeOperators` interface included in versions of C# &lt; 11.
+  - I might do that with the other interfaces, though I'm not quite sure if it's logical to include interfaces that would be completely empty in some versions of C#.
+  - I also added the `Magnitude` and `MagnitudeSqr` property to the `IMagnitudeOperators` interface.
+- I also added `MagnitudeSqr` to some more types, namely the `FloatX` and `IntX` types.
+- I found a much simpler system for `MathE.ModAbs(num, mod)`. I unfortunately don't remember who I got it from, someone on StackOverflow that I found while looking for something else. It's constant-time rather than linear time. My previous approach was pretty dense if you ask me.
 
 ---
 
-One last thing, this is a matrix feature (man, I've had matrices in my head a lot this update) that has been missing in 3.x, casting FloatXs to matrices. Now `Float2`, `Float3`, and `Float4`s can all be implicitly converted to column vectors, making them easy to multiply with the general matrix class. I also apparently forgot to create casting from specialized matrix classes to the generalized one, so I also implemented that.
-
----
-
-Anyway, that's it. Not a huge update, I only spent about an hour implementing these thingies. I'm not done with small stuff, but whether it'll come out before or after the next major update I couldn't say. Wait, didn't I just say that? Call me AI the way I repeat myself but slightly rephrase words.
-
-On that note, don't worry. I never EVER use AI in this project for any reason whatsoever. It's a passion project, why would I delegate something I love making? But yeah, no AI-generated changelog, no @Copilot pull requests, and no AI agent or autocomplete, but you'll have to take my word on that one since you can't really see my development environment.
-
-Anyway, I'm definitely sick and tired of the choice I made way back at the beginning of 3.0: putting `w`s as the first component in `Float4`s. What a terrible idea. I think I'm going to revert that soon. I just keep facepalming every time I see the scuff that gets caused by that design choice. Oopsies.
-
-Take care, enjoy 3.1.1!</PackageReleaseNotes>
+Anyway, that's all. Enjoy!</PackageReleaseNotes>
   </PropertyGroup>
 
   <!-- ItemGroup customization based on framework. -->
