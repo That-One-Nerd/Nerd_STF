@@ -1,15 +1,14 @@
 # Useless Visual Studio stuff
+*.csproj.user
 .vs/
-/Nerd_STF/.vs/
-/Nerd_STF/Nerd_STF.csproj.user
+/*/.vs/
 
 # I don't want to include my test project.
-/Testing/
-*.sln
+TODO.md
 
 # Build Stuff
-/Nerd_STF/obj
-/Nerd_STF/bin
+/*/obj
+/*/bin
 *.dll
 *.pdb
 
