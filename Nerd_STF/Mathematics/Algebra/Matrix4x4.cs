@@ -337,6 +337,64 @@ namespace Nerd_STF.Mathematics.Algebra
                    r0c3 * (r1c0 * C - r1c1 * E + r1c2 * F);
         }
 
+        public void SwapRows(int r1, int r2)
+        {
+            if (r1 == r2) return; // No swap
+            else
+            {
+                double c0, c1, c2, c3;
+                switch (r1)
+                {
+                    case 0: c0 = r0c0; c1 = r0c1; c2 = r0c2; c3 = r0c3; break;
+                    case 1: c0 = r1c0; c1 = r1c1; c2 = r1c2; c3 = r1c3; break;
+                    case 2: c0 = r2c0; c1 = r2c1; c2 = r2c2; c3 = r2c3; break;
+                    case 3: c0 = r3c0; c1 = r3c1; c2 = r3c2; c3 = r3c3; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(r1));
+                }
+                switch (r2)
+                {
+                    case 0: r0c0 = c0; r0c1 = c1; r0c2 = c2; r0c3 = c3; break;
+                    case 1: r1c0 = c0; r1c1 = c1; r1c2 = c2; r1c3 = c3; break;
+                    case 2: r2c0 = c0; r2c1 = c1; r2c2 = c2; r2c3 = c3; break;
+                    case 3: r3c0 = c0; r3c1 = c1; r3c2 = c2; r3c3 = c3; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(r2));
+                }
+            }
+        }
+        public void ScaleRow(int row, double factor)
+        {
+            switch (row)
+            {
+                case 0: r0c0 *= factor; r0c1 *= factor; r0c2 *= factor; r0c3 *= factor; break;
+                case 1: r1c0 *= factor; r1c1 *= factor; r1c2 *= factor; r1c3 *= factor; break;
+                case 2: r2c0 *= factor; r2c1 *= factor; r2c2 *= factor; r2c3 *= factor; break;
+                case 3: r3c0 *= factor; r3c1 *= factor; r3c2 *= factor; r3c3 *= factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(row));
+            }
+        }
+        public void AddRow(int rDest, double factor, int rSource)
+        {
+            if (rDest == rSource) ScaleRow(rDest, factor + 1);
+
+            double c0, c1, c2, c3;
+            switch (rSource)
+            {
+                case 0: c0 = r0c0; c1 = r0c1; c2 = r0c2; c3 = r0c3; break;
+                case 1: c0 = r1c0; c1 = r1c1; c2 = r1c2; c3 = r1c3; break;
+                case 2: c0 = r2c0; c1 = r2c1; c2 = r2c2; c3 = r2c3; break;
+                case 3: c0 = r3c0; c1 = r3c1; c2 = r3c2; c3 = r3c3; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rSource));
+            }
+            switch (rDest)
+            {
+                case 0: r0c0 += c0 * factor; r0c1 += c1 * factor; r0c2 += c2 * factor; r0c3 += c3 * factor; break;
+                case 1: r1c0 += c0 * factor; r1c1 += c1 * factor; r1c2 += c2 * factor; r1c3 += c3 * factor; break;
+                case 2: r2c0 += c0 * factor; r2c1 += c1 * factor; r2c2 += c2 * factor; r2c3 += c3 * factor; break;
+                case 3: r3c0 += c0 * factor; r3c1 += c1 * factor; r3c2 += c2 * factor; r3c3 += c3 * factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rDest));
+            }
+        }
+
         public Matrix4x4 Adjoint() // Transpose(Cofactor)
         {
             double A = r2c2 * r3c3 - r2c3 * r3c2,

@@ -6,9 +6,6 @@ namespace Nerd_STF.Mathematics.Algebra
     public interface IMatrix<TSelf> : IEnumerable<double>,
                                       IEquatable<TSelf>,
                                       IFormattable
-#if CS11_OR_GREATER
-                                     ,IMatrixOperations<TSelf>
-#endif
         where TSelf : IMatrix<TSelf>
     {
         Int2 Size { get; }
@@ -31,6 +28,17 @@ namespace Nerd_STF.Mathematics.Algebra
         TSelf? Inverse();
 #else
         TSelf Inverse();
+#endif
+
+        void SwapRows(int r1, int r2);
+        void ScaleRow(int row, double factor);
+        void AddRow(int rDest, double factor, int rSource);
+
+#if CS11_OR_GREATER
+        static abstract TSelf operator *(TSelf a, double b);
+        static abstract TSelf operator /(TSelf a, double b);
+        static abstract TSelf operator ^(TSelf a, TSelf b);
+        static abstract TSelf? operator ~(TSelf m);
 #endif
     }
 }

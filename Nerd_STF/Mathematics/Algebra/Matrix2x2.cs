@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Nerd_STF.Mathematics.Algebra
 {
@@ -245,6 +246,46 @@ namespace Nerd_STF.Mathematics.Algebra
         }
 
         public double Determinant() => r0c0 * r1c1 - r0c1 * r1c0;
+
+        public void SwapRows(int r1, int r2)
+        {
+            if (r1 < 0 || r1 >= 2) throw new ArgumentOutOfRangeException(nameof(r1));
+            else if (r2 < 0 || r2 >= 2) throw new ArgumentOutOfRangeException(nameof(r2));
+
+            if (r1 == r2) return; // No swap
+            else
+            {
+                (r0c0, r1c0) = (r1c0, r0c0);
+                (r0c1, r1c1) = (r1c1, r0c1);
+            }
+        }
+        public void ScaleRow(int row, double factor)
+        {
+            switch (row)
+            {
+                case 0: r0c0 *= factor; r0c1 *= factor; break;
+                case 1: r1c0 *= factor; r1c1 *= factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(row));
+            }
+        }
+        public void AddRow(int rDest, double factor, int rSource)
+        {
+            if (rDest == rSource) ScaleRow(rDest, factor + 1);
+
+            double c0, c1;
+            switch (rSource)
+            {
+                case 0: c0 = r0c0; c1 = r0c1; break;
+                case 1: c0 = r1c0; c1 = r1c1; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rSource));
+            }
+            switch (rDest)
+            {
+                case 0: r0c0 += c0 * factor; r0c1 += c1 * factor; break;
+                case 1: r1c0 += c0 * factor; r1c1 += c1 * factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rDest));
+            }
+        }
 
         public Matrix2x2 Adjoint() =>
             new Matrix2x2( r1c1, -r0c1,
