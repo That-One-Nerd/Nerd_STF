@@ -253,13 +253,37 @@ namespace Nerd_STF.Mathematics.Algebra
             else
             {
                 double sum = 0;
+                int sign = 1;
                 for (int c = 0; c < size.y; c++)
                 {
                     Matrix sub = Submatrix(0, c);
-                    if (c % 2 == 0) sum += terms[FlattenIndex(0, c)] * sub.Determinant();
-                    else sum -= terms[FlattenIndex(0, c)] * sub.Determinant();
+                    sum += sign * terms[FlattenIndex(0, c)] * sub.Determinant();
+                    sign *= -1;
                 }
                 return sum;
+            }
+        }
+
+        public void SwapRows(int rA, int rB)
+        {
+            for (int c = 0; c < size.y; c++)
+            {
+                int iA = FlattenIndex(rA, c),
+                    iB = FlattenIndex(rB, c);
+                (terms[iA], terms[iB]) = (terms[iB], terms[iA]);
+            }
+        }
+        public void ScaleRow(int r, double factor)
+        {
+            for (int c = 0; c < size.y; c++) terms[FlattenIndex(r, c)] *= factor;
+        }
+        public void AddRow(int rDest, double factor, int rSource)
+        {
+            for (int c = 0; c < size.y; c++)
+            {
+                int iDest = FlattenIndex(rDest, c),
+                    iSource = FlattenIndex(rSource, c);
+                terms[iDest] += terms[iSource] * factor;
             }
         }
 
