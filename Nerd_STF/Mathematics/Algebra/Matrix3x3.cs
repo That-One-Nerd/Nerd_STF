@@ -490,12 +490,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !a.Equals(b);
 
 
-        public static implicit operator Matrix(Matrix3x3 mat) => new Matrix((3, 3), new double[,]
-        {
-            { mat.r0c0, mat.r0c1, mat.r0c2 },
-            { mat.r1c0, mat.r1c1, mat.r1c2 },
-            { mat.r2c0, mat.r2c1, mat.r2c2 }
-        });
+        public static implicit operator Matrix(Matrix3x3 mat) => new Matrix(mat);
         public static explicit operator Matrix3x3(Matrix mat) =>
             new Matrix3x3(mat.TryGet(0, 0), mat.TryGet(0, 1), mat.TryGet(0, 2),
                           mat.TryGet(1, 0), mat.TryGet(1, 1), mat.TryGet(1, 2),
