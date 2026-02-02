@@ -26,7 +26,8 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix3x3 One => new Matrix3x3(1, 1, 1, 1, 1, 1, 1, 1, 1);
         public static Matrix3x3 Zero => new Matrix3x3(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-        public Int2 Size => (3, 3);
+        public static Int2 Size => (3, 3);
+        Int2 IMatrix<Matrix3x3>.Size => Size;
 
         public double r0c0, r0c1, r0c2,
                       r1c0, r1c1, r1c2,
@@ -289,23 +290,34 @@ namespace Nerd_STF.Mathematics.Algebra
         public void SwapRows(int r1, int r2)
         {
             if (r1 == r2) return; // No swap
-            else
+            if (r1 > r2) (r1, r2) = (r2, r1);
+            switch (r1)
             {
-                double c0, c1, c2;
-                switch (r1)
-                {
-                    case 0: c0 = r0c0; c1 = r0c1; c2 = r0c2; break;
-                    case 1: c0 = r1c0; c1 = r1c1; c2 = r1c2; break;
-                    case 2: c0 = r2c0; c1 = r2c1; c2 = r2c2; break;
-                    default: throw new ArgumentOutOfRangeException(nameof(r1));
-                }
-                switch (r2)
-                {
-                    case 0: r0c0 = c0; r0c1 = c1; r0c2 = c2; break;
-                    case 1: r1c0 = c0; r1c1 = c1; r1c2 = c2; break;
-                    case 2: r2c0 = c0; r2c1 = c1; r2c2 = c2; break;
-                    default: throw new ArgumentOutOfRangeException(nameof(r2));
-                }
+                case 0:
+                    switch (r2)
+                    {
+                        case 1: // Swap row 0 and 1.
+                            (r0c0, r1c0) = (r1c0, r0c0);
+                            (r0c1, r1c1) = (r1c1, r0c1);
+                            (r0c2, r1c2) = (r1c2, r0c2);
+                            break;
+                        case 2: // Swap row 0 and 2.
+                            (r0c0, r2c0) = (r2c0, r0c0);
+                            (r0c1, r2c1) = (r2c1, r0c1);
+                            (r0c2, r2c2) = (r2c2, r0c2);
+                            break;
+                    }
+                    break;
+                case 1:
+                    switch (r2)
+                    {
+                        case 2: // Swap row 1 and 2.
+                            (r1c0, r2c0) = (r2c0, r1c0);
+                            (r1c1, r2c1) = (r2c1, r1c1);
+                            (r1c2, r2c2) = (r2c2, r1c2);
+                            break;
+                    }
+                    break;
             }
         }
         public void ScaleRow(int row, double factor)
@@ -477,6 +489,13 @@ namespace Nerd_STF.Mathematics.Algebra
         public static bool operator ==(Matrix3x3 a, Matrix3x3 b) => a.Equals(b);
         public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !a.Equals(b);
 
+
+        public static implicit operator Matrix(Matrix3x3 mat) => new Matrix((3, 3), new double[,]
+        {
+            { mat.r0c0, mat.r0c1, mat.r0c2 },
+            { mat.r1c0, mat.r1c1, mat.r1c2 },
+            { mat.r2c0, mat.r2c1, mat.r2c2 }
+        });
         public static explicit operator Matrix3x3(Matrix mat) =>
             new Matrix3x3(mat.TryGet(0, 0), mat.TryGet(0, 1), mat.TryGet(0, 2),
                           mat.TryGet(1, 0), mat.TryGet(1, 1), mat.TryGet(1, 2),
