@@ -101,6 +101,7 @@ namespace Nerd_STF.Helpers
                 
                 if (bar && x == size.y - 2)
                 {
+                    totalLen += 2;
                     for (int y = 0; y < size.x; y++) lines[y + 1].Append(" │");
                 }
             }

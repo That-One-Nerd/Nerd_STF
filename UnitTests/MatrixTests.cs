@@ -175,4 +175,16 @@ public sealed class MatrixTests
     }
 
     // TODO: Test for tostring and bar form.
+    [TestMethod]
+    public void TestMatrixBarString()
+    {
+        // Specific case.
+        Matrix m = new((4, 5), (r, c) => 5 * r + c + 1);
+        Assert.AreEqual("┌                  ┐" + Environment.NewLine +
+                        "│  1  2  3  4 │  5 │" + Environment.NewLine +
+                        "│  6  7  8  9 │ 10 │" + Environment.NewLine +
+                        "│ 11 12 13 14 │ 15 │" + Environment.NewLine +
+                        "│ 16 17 18 19 │ 20 │" + Environment.NewLine +
+                        "└                  ┘", m.ToString(bar: true));
+    }
 }
