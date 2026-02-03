@@ -1,4 +1,5 @@
-﻿using Nerd_STF.Mathematics.Algebra;
+﻿using Nerd_STF.Mathematics;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 
 namespace Nerd_STF.UnitTests;
@@ -9,7 +10,7 @@ public sealed class MatrixTests
     [TestMethod] public void TestRowOperationsAcrossMatrix2x2() => TestRowOperationsAcrossMatrixTypes<Matrix2x2>();
     [TestMethod] public void TestRowOperationsAcrossMatrix3x3() => TestRowOperationsAcrossMatrixTypes<Matrix3x3>();
     [TestMethod] public void TestRowOperationsAcrossMatrix4x4() => TestRowOperationsAcrossMatrixTypes<Matrix4x4>();
-    private void TestRowOperationsAcrossMatrixTypes<T>() where T : IStaticMatrix<T>
+    private static void TestRowOperationsAcrossMatrixTypes<T>() where T : IStaticMatrix<T>
     {
         // If I did my row operations correctly, there should be no difference
         // in the results for a static matrix and a casted matrix. This tests that.
@@ -58,6 +59,39 @@ public sealed class MatrixTests
                 mat.AddRow(r1, factor, r2);
                 casted.AddRow(r1, factor, r2);
                 Assert.AreEqual(casted, mat, $"{nameof(Matrix.AddRow)} for {nameof(Matrix)} and {typeof(T).Name} do not agree when adding rows r{r1} += {factor} * r{r2}");
+            }
+        }
+    }
+
+    [TestMethod] public void TestIndexingMatrix2x2() => TestIndexing(new Matrix2x2(new double[,] { { 1, 2 }, { 3, 4 } }));
+    [TestMethod] public void TestIndexingMatrix3x3() => TestIndexing(new Matrix3x3(new double[,] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } }));
+    [TestMethod] public void TestIndexingMatrix4x4() => TestIndexing(new Matrix4x4(new double[,] { { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 }, { 13, 14, 15, 16 } }));
+    [TestMethod] public void TestIndexingDynamicMatrix()
+    {
+        TestIndexing(new Matrix((5, 5), (r, c) => r * 5 + c + 1));
+        TestIndexing(new Matrix((2, 5), (r, c) => r * 5 + c + 1));
+        TestIndexing(new Matrix((5, 2), (r, c) => r * 2 + c + 1));
+    }
+    private static void TestIndexing<T>(T matrix) where T : IMatrix<T>
+    {
+        int r = 0, c = 0;
+        foreach (double expected in matrix)
+        {
+            int rR = matrix.Size.x - r,
+                rC = matrix.Size.y - c;
+
+            Assert.AreEqual(expected, matrix[r, c], 0, $"Indexing is invalid for {typeof(T).Name}[{r}, {c}]");
+            Assert.AreEqual(expected, matrix[(r, c)], 0, $"Indexing is invalid for {typeof(T).Name}[{nameof(Int2)}({r}, {c})]");
+            Assert.AreEqual(expected, matrix[r, RowColumn.Row][c], 0, $"Indexing is invalid for {typeof(T).Name}[{r}, {nameof(RowColumn)}.{nameof(RowColumn.Row)}][{c}]");
+            Assert.AreEqual(expected, matrix[c, RowColumn.Column][r], 0, $"Indexing is invalid for {typeof(T).Name}[{c}, {nameof(RowColumn)}.{nameof(RowColumn.Column)}][{r}]");
+            Assert.AreEqual(expected, matrix[(Index)r, (Index)c], 0, $"Indexing is invalid for {typeof(T).Name}[{nameof(Index)}({r}), {nameof(Index)}({c})]");
+            Assert.AreEqual(expected, matrix[^rR, ^rC], 0, $"Indexing is invalid for {typeof(T).Name}[{nameof(Index)}(^{rR}), {nameof(Index)}(^{rC})]");
+
+            c++;
+            if (c == matrix.Size.y)
+            {
+                r++;
+                c = 0;
             }
         }
     }

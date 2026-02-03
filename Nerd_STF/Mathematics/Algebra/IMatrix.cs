@@ -12,6 +12,9 @@ namespace Nerd_STF.Mathematics.Algebra
 
         double this[int r, int c] { get; set; }
         double this[Int2 index] { get; set; }
+#if CS8_OR_GREATER
+        double this[Index r, Index c] { get; set; }
+#endif
         ListTuple<double> this[int index, RowColumn direction] { get; set; }
 
         ListTuple<double> GetRow(int row);

@@ -180,6 +180,13 @@ namespace Nerd_STF.Mathematics.Algebra
             get => this[index.x, index.y];
             set => this[index.x, index.y] = value;
         }
+#if CS8_OR_GREATER
+        public double this[Index r, Index c]
+        {
+            get => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value];
+            set => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value] = value;
+        }
+#endif
         public ListTuple<double> this[int index, RowColumn direction]
         {
             get
