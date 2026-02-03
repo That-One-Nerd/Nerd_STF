@@ -54,9 +54,9 @@ namespace Nerd_STF.Helpers
         }
 
 #if CS8_OR_GREATER
-        public static string MatrixToString<T>(T matrix, string? format)
+        public static string MatrixToString<T>(T matrix, string? format, bool bar)
 #else
-        public static string MatrixToString<T>(T matrix, string format)
+        public static string MatrixToString<T>(T matrix, string format, bool bar)
 #endif
             where T : IMatrix<T>
         {
@@ -66,6 +66,8 @@ namespace Nerd_STF.Helpers
             string[,] items = new string[size.y, size.x];
             for (int x = 0; x < size.x; x++) for (int y = 0; y < size.y; y++)
                     items[y, x] = matrix[x, y].ToString(format);
+
+            if (size.y < 2) bar = false;
 
             // Then write each line separately.
             StringBuilder[] lines = new StringBuilder[size.x + 2];
@@ -95,6 +97,11 @@ namespace Nerd_STF.Helpers
                     int spacing = maxLen - item.Length;
                     builder.Append(new string(' ', spacing + 1));
                     builder.Append(item);
+                }
+                
+                if (bar && x == size.y - 2)
+                {
+                    for (int y = 0; y < size.x; y++) lines[y + 1].Append(" │");
                 }
             }
 

@@ -623,13 +623,13 @@ namespace Nerd_STF.Mathematics.Algebra
                   (uint)r3c1.GetHashCode() & 0x00000030 |
                   (uint)r3c2.GetHashCode() & 0x0000000C |
                   (uint)r3c3.GetHashCode() & 0x00000003);
-        public override string ToString() => ToStringHelper.MatrixToString(this, null);
+        public override string ToString() => ToStringHelper.MatrixToString(this, null, false);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string? format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string? format, IFormatProvider? provider) => ToString(format);
 #else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string format, IFormatProvider provider) => ToString(format);
 #endif
 
         public static Matrix4x4 operator +(Matrix4x4 a) =>

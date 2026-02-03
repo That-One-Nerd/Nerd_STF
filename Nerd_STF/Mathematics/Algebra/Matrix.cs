@@ -10,9 +10,9 @@ namespace Nerd_STF.Mathematics.Algebra
                           ISubmatrixOperations<Matrix, Matrix>
     {
         public static Matrix Identity(int size) =>
-            new Matrix((size, size), (int r, int c) => r == c ? 1 : 0);
+            new Matrix((size, size), (r, c) => r == c ? 1 : 0);
         public static Matrix IdentityIsh(Int2 size) =>
-            new Matrix(size, (int r, int c) => r == c ? 1 : 0);
+            new Matrix(size, (r, c) => r == c ? 1 : 0);
 
         public static Matrix Empty => new Matrix();
         public static Matrix Zero(Int2 size) => new Matrix(size);
@@ -21,6 +21,9 @@ namespace Nerd_STF.Mathematics.Algebra
 
         private readonly double[] terms;
         private readonly Int2 size;
+        private bool equationBar = false; // Determine if we put a x | y at the end of
+                                          // the matrix. Turned on if you run GaussElimination().
+                                          // Doesn't affect any other functionality.
 
         public Matrix()
         {
@@ -204,7 +207,7 @@ namespace Nerd_STF.Mathematics.Algebra
 
         public static Matrix FromMatrix<T>(T mat)
             where T : IMatrix<T> =>
-            new Matrix(mat.Size, (int r, int c) => mat[r, c]);
+            new Matrix(mat.Size, (r, c) => mat[r, c]);
 
         public static Matrix Average(IEnumerable<Matrix> vals)
         {
@@ -217,7 +220,7 @@ namespace Nerd_STF.Mathematics.Algebra
             foreach (Matrix m in vals)
             {
                 if (result is null) result = m;
-                else ThrowIfSizeDifferent(result, m);
+                else AssertSameSize(result, m);
                 result += m;
                 count++;
             }
@@ -225,7 +228,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public static Matrix Lerp(Matrix a, Matrix b, double t, bool clamp = true)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             if (clamp) MathE.Clamp(ref t, 0, 1);
             double[] vals = new double[a.terms.Length];
             for (int i = 0; i < vals.Length; i++)
@@ -244,7 +247,7 @@ namespace Nerd_STF.Mathematics.Algebra
             foreach (Matrix m in vals)
             {
                 if (result is null) result = m;
-                else ThrowIfSizeDifferent(result, m);
+                else AssertSameSize(result, m);
                 result *= m;
             }
             return result ?? Empty;
@@ -259,7 +262,7 @@ namespace Nerd_STF.Mathematics.Algebra
             foreach (Matrix m in vals)
             {
                 if (result is null) result = m;
-                else ThrowIfSizeDifferent(result, m);
+                else AssertSameSize(result, m);
                 result += m;
             }
             return result ?? Empty;
@@ -305,6 +308,8 @@ namespace Nerd_STF.Mathematics.Algebra
             // Note: This is a greedy algorithm. No idea if it's effective
             //       in all situations, and it probably produces non-ideal
             //       solutions sometimes.
+
+            equationBar = true;
 
             // input: column, output: the rows its managed by
             // affected[c] is read as "c is affected by: output"
@@ -375,7 +380,7 @@ namespace Nerd_STF.Mathematics.Algebra
 
         public double Determinant()
         {
-            ThrowIfNotSquare();
+            AssertSquare();
 
             if (size.x == 1) return terms[0];
             else if (size.x == 2) return terms[0] * terms[3] - terms[1] * terms[2];
@@ -419,10 +424,10 @@ namespace Nerd_STF.Mathematics.Algebra
 
         public Matrix Adjoint() => Cofactor().Transpose();
         public Matrix Cofactor() =>
-            new Matrix(size, (int r, int c) => Submatrix(r, c).Determinant() * ((r + c) % 2 == 0 ? 1 : -1));
+            new Matrix(size, (r, c) => Submatrix(r, c).Determinant() * ((r + c) % 2 == 0 ? 1 : -1));
         public Matrix Inverse() => Adjoint() / Determinant();
         public Matrix Transpose() =>
-            new Matrix((size.y, size.x), (int r, int c) => terms[FlattenIndex(c, r)]);
+            new Matrix((size.y, size.x), (r, c) => terms[FlattenIndex(c, r)]);
         public Matrix Submatrix(int r, int c)
         {
             if (size.x <= 1 || size.y <= 1) throw new InvalidOperationException($"This matrix is too small to contain any sub-matrices.");
@@ -455,7 +460,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public double Trace()
         {
-            ThrowIfNotSquare();
+            AssertSquare();
             double sum = 0;
             for (int i = 0; i < size.x; i++) sum += terms[FlattenIndex(i, i)];
             return sum;
@@ -505,23 +510,25 @@ namespace Nerd_STF.Mathematics.Algebra
             }
             return total;
         }
-        public override string ToString() => ToStringHelper.MatrixToString(this, null);
+        public override string ToString() => ToStringHelper.MatrixToString(this, null, equationBar);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string? format = null, bool bar = false) => ToStringHelper.MatrixToString(this, format, equationBar || bar);
+        string IFormattable.ToString(string? format, IFormatProvider? provider) => ToString(format);
 #else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string format = null, bool bar = false) => ToStringHelper.MatrixToString(this, format, equationBar || bar);
+        string IFormattable.ToString(string format, IFormatProvider provider) => ToString(format);
 #endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int FlattenIndex(int r, int c) => r * size.y + c;
 
-        private void ThrowIfNotSquare()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AssertSquare()
         {
             if (size.x != size.y) throw new InvalidOperationException("This operation only applies to a square matrix.");
         }
-        private static void ThrowIfSizeDifferent(Matrix a, Matrix b)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AssertSameSize(Matrix a, Matrix b)
         {
             if (a.size != b.size) throw new InvalidOperationException("This operation only applies to matrices with the same dimensions.");
         }
@@ -529,7 +536,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix operator +(Matrix a) => new Matrix(a);
         public static Matrix operator +(Matrix a, Matrix b)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             double[] terms = new double[a.terms.Length];
             for (int i = 0; i < a.terms.Length; i++) terms[i] = a.terms[i] + b.terms[i];
             return new Matrix(a.size, terms);
@@ -542,7 +549,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public static Matrix operator -(Matrix a, Matrix b)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             double[] terms = new double[a.terms.Length];
             for (int i = 0; i < a.terms.Length; i++) terms[i] = a.terms[i] - b.terms[i];
             return new Matrix(a.size, terms);
@@ -556,7 +563,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix operator *(Matrix a, Matrix b)
         {
             if (a.size.y != b.size.x) throw new InvalidOperationException("The dimensions of these matrices are incompatible with one another.");
-            return new Matrix((a.size.x, b.size.y), (int r, int c) => MathE.Dot(a.GetRow(r), b.GetColumn(c)));
+            return new Matrix((a.size.x, b.size.y), (r, c) => MathE.Dot(a.GetRow(r), b.GetColumn(c)));
         }
         public static Matrix operator /(Matrix a, double b)
         {
@@ -566,7 +573,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public static Matrix operator ^(Matrix a, Matrix b)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             double[] terms = new double[a.terms.Length];
             for (int i = 0; i < a.terms.Length; i++) terms[i] = a.terms[i] * b.terms[i];
             return new Matrix(a.size, terms);

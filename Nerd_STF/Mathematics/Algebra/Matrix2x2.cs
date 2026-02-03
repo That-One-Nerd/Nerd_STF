@@ -352,13 +352,13 @@ namespace Nerd_STF.Mathematics.Algebra
                   (uint)r0c1.GetHashCode() & 0x00FF0000 |
                   (uint)r1c0.GetHashCode() & 0x0000FF00 |
                   (uint)r1c1.GetHashCode() & 0x000000FF);
-        public override string ToString() => ToStringHelper.MatrixToString(this, null);
+        public override string ToString() => ToStringHelper.MatrixToString(this, null, false);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string? format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string? format, IFormatProvider? provider) => ToString(format);
 #else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string format, IFormatProvider provider) => ToString(format);
 #endif
 
         public static Matrix2x2 operator +(Matrix2x2 a) =>

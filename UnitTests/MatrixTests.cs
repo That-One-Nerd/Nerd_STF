@@ -173,4 +173,6 @@ public sealed class MatrixTests
             { 0, 0, 0, 0 }
         }), m, "Gaussian elimination failure.");
     }
+
+    // TODO: Test for tostring and bar form.
 }
