@@ -132,6 +132,43 @@ namespace Nerd_STF.Mathematics.Algebra
             get => terms[FlattenIndex(r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value)];
             set => terms[FlattenIndex(r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value)] = value;
         }
+        public Matrix this[Range r, Range c]
+        {
+            get
+            {
+                int rowStart = r.Start.IsFromEnd ? Size.x - r.Start.Value : r.Start.Value,
+                    rowEnd = r.End.IsFromEnd ? Size.x - r.End.Value : r.End.Value;
+                int colStart = c.Start.IsFromEnd ? Size.y - c.Start.Value : c.Start.Value,
+                    colEnd = c.End.IsFromEnd ? Size.y - c.End.Value : c.End.Value;
+
+                Matrix result = new Matrix((rowEnd - rowStart, colEnd - colStart));
+                for (int r1 = rowStart; r1 < rowEnd; r1++)
+                {
+                    for (int c1 = colStart; c1 < colEnd; c1++)
+                    {
+                        result[r1 - rowStart, c1 - colStart] = terms[FlattenIndex(r1, c1)];
+                    }
+                }
+                return result;
+            }
+            set
+            {
+                int rowStart = r.Start.IsFromEnd ? Size.x - r.Start.Value : r.Start.Value,
+                    rowEnd = r.End.IsFromEnd ? Size.x - r.End.Value : r.End.Value;
+                int colStart = c.Start.IsFromEnd ? Size.y - c.Start.Value : c.Start.Value,
+                    colEnd = c.End.IsFromEnd ? Size.y - c.End.Value : c.End.Value;
+
+                Int2 size = (rowEnd - rowStart, colEnd - colStart);
+                if (value.size != size) throw new ArgumentOutOfRangeException($"Expected a {size.x}x{size.y} matrix, got a {value.size.x}x{value.size.y} matrix.");
+                for (int r1 = rowStart; r1 < rowEnd; r1++)
+                {
+                    for (int c1 = colStart; c1 < colEnd; c1++)
+                    {
+                        terms[FlattenIndex(r1, c1)] = value[r1 - rowStart, c1 - colStart];
+                    }
+                }
+            }
+        }
 #endif
         public ListTuple<double> this[int index, RowColumn direction]
         {

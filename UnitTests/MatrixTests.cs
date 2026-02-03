@@ -7,6 +7,8 @@ namespace Nerd_STF.UnitTests;
 [TestClass]
 public sealed class MatrixTests
 {
+    private static Fill<double> Count => i => i + 1;
+
     [TestMethod] public void TestRowOperationsAcrossMatrix2x2() => TestRowOperationsAcrossMatrixTypes<Matrix2x2>();
     [TestMethod] public void TestRowOperationsAcrossMatrix3x3() => TestRowOperationsAcrossMatrixTypes<Matrix3x3>();
     [TestMethod] public void TestRowOperationsAcrossMatrix4x4() => TestRowOperationsAcrossMatrixTypes<Matrix4x4>();
@@ -63,9 +65,9 @@ public sealed class MatrixTests
         }
     }
 
-    [TestMethod] public void TestIndexingMatrix2x2() => TestIndexing(new Matrix2x2(new double[,] { { 1, 2 }, { 3, 4 } }));
-    [TestMethod] public void TestIndexingMatrix3x3() => TestIndexing(new Matrix3x3(new double[,] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } }));
-    [TestMethod] public void TestIndexingMatrix4x4() => TestIndexing(new Matrix4x4(new double[,] { { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 }, { 13, 14, 15, 16 } }));
+    [TestMethod] public void TestIndexingMatrix2x2() => TestIndexing(new Matrix2x2(Count));
+    [TestMethod] public void TestIndexingMatrix3x3() => TestIndexing(new Matrix3x3(Count));
+    [TestMethod] public void TestIndexingMatrix4x4() => TestIndexing(new Matrix4x4(Count));
     [TestMethod] public void TestIndexingDynamicMatrix()
     {
         TestIndexing(new Matrix((5, 5), (r, c) => r * 5 + c + 1));
@@ -92,6 +94,59 @@ public sealed class MatrixTests
             {
                 r++;
                 c = 0;
+            }
+        }
+    }
+
+    [TestMethod] public void TestRangeMatrix2x2() => TestRange(new Matrix2x2(Count));
+    [TestMethod] public void TestRangeMatrix3x3() => TestRange(new Matrix3x3(Count));
+    [TestMethod] public void TestRangeMatrix4x4() => TestRange(new Matrix4x4(Count));
+    [TestMethod] public void TestRangeDynamicMatrix()
+    {
+        TestRange(new Matrix((5, 5), (r, c) => r * 5 + c + 1));
+        TestRange(new Matrix((2, 5), (r, c) => r * 5 + c + 1));
+        TestRange(new Matrix((5, 2), (r, c) => r * 2 + c + 1));
+    }
+    private static void TestRange<T>(T matrix) where T : IMatrix<T>
+    {
+        // General test
+        Random rand = new();
+        for (int rMin = 0; rMin <= matrix.Size.x; rMin++)
+        {
+            for (int rMax = rMin; rMax <= matrix.Size.x; rMax++)
+            {
+                for (int cMin = 0; cMin <= matrix.Size.y; cMin++)
+                {
+                    for (int cMax = cMin; cMax <= matrix.Size.y; cMax++)
+                    {
+                        Matrix subWrite = new((rMax - rMin, cMax - cMin), (r, c) => rand.NextDouble());
+                        matrix[rMin..rMax, cMin..cMax] = subWrite;
+
+                        Matrix subRead = matrix[rMin..rMax, cMin..cMax];
+                        Assert.AreEqual(subWrite, subRead, "Submatrices failed: read and write disagree.");
+
+                        int invRmin = matrix.Size.x - rMin,
+                            invRmax = matrix.Size.x - rMax,
+                            invCmin = matrix.Size.y - cMin,
+                            invCmax = matrix.Size.y - cMax;
+
+                        Assert.AreEqual(subRead, matrix[rMin..rMax, cMin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[rMin..rMax, ^invCmin..cMax]);
+                        Assert.AreEqual(subRead, matrix[rMin..rMax, ^invCmin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[rMin..^invRmax, cMin..cMax]);
+                        Assert.AreEqual(subRead, matrix[rMin..^invRmax, cMin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[rMin..^invRmax, ^invCmin..cMax]);
+                        Assert.AreEqual(subRead, matrix[rMin..^invRmax, ^invCmin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..rMax, cMin..cMax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..rMax, cMin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..rMax, ^invCmin..cMax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..rMax, ^invCmin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..^invRmax, cMin..cMax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..^invRmax, cMin..^invCmax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..^invRmax, ^invCmin..cMax]);
+                        Assert.AreEqual(subRead, matrix[^invRmin..^invRmax, ^invCmin..^invCmax]);
+                    }
+                }
             }
         }
     }

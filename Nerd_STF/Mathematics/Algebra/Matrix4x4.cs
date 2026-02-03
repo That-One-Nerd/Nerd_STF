@@ -221,6 +221,19 @@ namespace Nerd_STF.Mathematics.Algebra
             get => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value];
             set => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value] = value;
         }
+        public Matrix this[Range r, Range c]
+        {
+            get => ((Matrix)this)[r, c];
+            set
+            {
+                Matrix result = this;
+                result[r, c] = value;
+                r0c0 = result[0, 0]; r0c1 = result[0, 1]; r0c2 = result[0, 2]; r0c3 = result[0, 3];
+                r1c0 = result[1, 0]; r1c1 = result[1, 1]; r1c2 = result[1, 2]; r1c3 = result[1, 3];
+                r2c0 = result[2, 0]; r2c1 = result[2, 1]; r2c2 = result[2, 2]; r2c3 = result[2, 3];
+                r3c0 = result[3, 0]; r3c1 = result[3, 1]; r3c2 = result[3, 2]; r3c3 = result[3, 3];
+            }
+        }
 #endif
         public ListTuple<double> this[int index, RowColumn direction]
         {

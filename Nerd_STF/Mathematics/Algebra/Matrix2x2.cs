@@ -154,6 +154,17 @@ namespace Nerd_STF.Mathematics.Algebra
             get => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value];
             set => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value] = value;
         }
+        public Matrix this[Range r, Range c]
+        {
+            get => ((Matrix)this)[r, c];
+            set
+            {
+                Matrix result = this;
+                result[r, c] = value;
+                r0c0 = result[0, 0]; r0c1 = result[0, 1];
+                r1c0 = result[1, 0]; r1c1 = result[1, 1];
+            }
+        }
 #endif
         public ListTuple<double> this[int index, RowColumn direction]
         {
