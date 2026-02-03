@@ -130,6 +130,7 @@ public sealed class MatrixTests
                             invCmin = matrix.Size.y - cMin,
                             invCmax = matrix.Size.y - cMax;
 
+                        // Probably don't need all 15, 3 would probably work.
                         Assert.AreEqual(subRead, matrix[rMin..rMax, cMin..^invCmax]);
                         Assert.AreEqual(subRead, matrix[rMin..rMax, ^invCmin..cMax]);
                         Assert.AreEqual(subRead, matrix[rMin..rMax, ^invCmin..^invCmax]);
@@ -149,5 +150,27 @@ public sealed class MatrixTests
                 }
             }
         }
+    }
+
+    [TestMethod]
+    public void TestGaussElimination()
+    {
+        // Specific case. Not super sure how this could be generalized.
+        Matrix m = new((4, 4), new double[,]
+        {
+            { 1, 0, 4, 2 },
+            { 1, 2, 6, 2 },
+            { 2, 0, 8, 8 },
+            { 2, 1, 9, 4 }
+        });
+
+        m.GaussElimination();
+        Assert.AreEqual(new Matrix((4, 4), new double[,]
+        {
+            { 1, 0, 4, 2 },
+            { 0, 1, 1, 0 },
+            { 0, 0, 0, 4 },
+            { 0, 0, 0, 0 }
+        }), m, "Gaussian elimination failure.");
     }
 }

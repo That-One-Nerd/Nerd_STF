@@ -288,6 +288,91 @@ namespace Nerd_STF.Mathematics.Algebra
             for (int r = 0; r < size.x; r++) terms[FlattenIndex(r, col)] = vals[r];
         }
 
+        public void GaussElimination()
+        {
+            // The goal here is to create a triangle of zeroes under the matrix.
+            // Helps a lot with linear equations. For example:
+            //   x y z           x y z
+            // [ 1 0 4 2 ]     [ 1 0 4 2 ]
+            // [ 1 2 6 2 ]     [   1 1 0 ]
+            // [ 2 0 8 8 ] --> [       4 ]
+            // [ 2 1 9 4 ]     [         ]
+            // The last column is left alone, because it symbolizes the other side
+            // of the equals sign. The matrix would read as:
+            // x + 4z = 2
+            // y +  z = 0
+
+            // Note: This is a greedy algorithm. No idea if it's effective
+            //       in all situations, and it probably produces non-ideal
+            //       solutions sometimes.
+
+            // input: column, output: the rows its managed by
+            // affected[c] is read as "c is affected by: output"
+            Span<int> affected = stackalloc int[Size.y - 1];
+
+            int activeRow = 0;
+            for (int c = 0; c < Size.y - 1; c++)
+            {
+                // Start by finding a row with a '1' in this position.
+                int focusOne = -1, focusNonZero = -1;
+                double fac = 1;
+                for (int r = 0; r < Size.x; r++)
+                {
+                    double val = this[r, c];
+                    if (val == 1)
+                    {
+                        focusOne = r;
+                        break;
+                    }
+                    else if (val != 0)
+                    {
+                        focusNonZero = r;
+                        fac = val;
+                    }
+                }
+
+                // Move this row to the active row. Prefer 1s over non-0s.
+                if (focusOne != -1)
+                {
+                    if (focusOne >= c) SwapRows(focusOne, activeRow);
+                    else activeRow = focusOne;
+                }
+                else if (focusNonZero != -1)
+                {
+                    // We need to do an extra scaling step here.
+                    ScaleRow(focusNonZero, 1 / fac);
+                    if (focusNonZero >= c) SwapRows(focusNonZero, activeRow);
+                    else activeRow = focusNonZero;
+                }
+                else continue; // If this entire column is zeroes, we can't really do much.
+
+                affected[c] = activeRow;
+
+                // Now we have a row for this specific index,
+                // and it's scaled to 1. Now we try to zero-out
+                // as much of the other rows as possible.
+                for (int r = 0; r < Size.x; r++)
+                {
+                    if (r == activeRow) continue;
+                    fac = this[r, c];
+                    bool prev = false;
+                    for (int c1 = 0; c1 < c; c1++)
+                    {
+                        if (affected[c1] == r)
+                        {
+                            prev = true;
+                            break;
+                        }
+                    }
+
+                    if (fac != 0 && !prev) AddRow(r, -fac, activeRow);
+                }
+
+                // We're probably done.
+                activeRow++;
+            }
+        }
+
         public double Determinant()
         {
             ThrowIfNotSquare();
