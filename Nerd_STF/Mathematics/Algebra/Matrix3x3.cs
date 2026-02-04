@@ -110,6 +110,47 @@ namespace Nerd_STF.Mathematics.Algebra
             }
         }
 
+        public static Matrix3x3 Rotation(double aroundX, double aroundY, double aroundZ) =>
+            Rotation(Angle.FromRadians(aroundX), Angle.FromRadians(aroundY), Angle.FromRadians(aroundZ));
+        public static Matrix3x3 Rotation(Angle aroundX, Angle aroundY, Angle aroundZ)
+        {
+            // Pitch = aroundX
+            //   Yaw = aroundY
+            //  Roll = aroundZ
+
+            double xCos = MathE.Cos(aroundX), xSin = MathE.Sin(aroundX),
+                   yCos = MathE.Cos(aroundY), ySin = MathE.Sin(aroundY),
+                   zCos = MathE.Cos(aroundZ), zSin = MathE.Sin(aroundZ);
+
+            // Basically a hard-coded version of these matrices:
+            // [  xCos 0 xSin ]   [ 1    0     0 ]   [ zCos -zSin 0 ]
+            // [    0 1     0 ] * [ 0 yCos -ySin ] * [ zSin  zCos 0 ]
+            // [ -xSin 0 xCos ]   [ 0 ySin  yCos ] * [    0     0 1 ]
+
+            // TODO: Hard code this matrix multiplication.
+
+            Matrix3x3 xMat = new Matrix3x3(new double[,]
+            {
+                {  xCos, 0, xSin },
+                {    0, 1, 0     },
+                { -xSin, 0, xCos }
+            });
+            Matrix3x3 yMat = new Matrix3x3(new double[,]
+            {
+                { 1, 0, 0        },
+                { 0, yCos, -ySin },
+                { 0, ySin,  yCos }
+            });
+            Matrix3x3 zMat = new Matrix3x3(new double[,]
+            {
+                { zCos, -zSin, 0 },
+                { zSin,  zCos, 0 },
+                {        0, 0, 1 }
+            });
+
+            return xMat * yMat * zMat;
+        }
+
         public double this[int r, int c]
         {
             get
