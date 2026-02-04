@@ -98,6 +98,11 @@ namespace Nerd_STF.Mathematics.Algebra
             }
         }
 
+        public static Matrix2x2 Rotation(Angle angle) => Rotation(angle.Radians);
+        public static Matrix2x2 Rotation(double radians) =>
+            new Matrix2x2(MathE.Cos(radians), -MathE.Sin(radians),
+                          MathE.Sin(radians),  MathE.Cos(radians));
+
         public double this[int r, int c]
         {
             get

@@ -1,6 +1,7 @@
 ﻿using Nerd_STF.Mathematics;
 using Nerd_STF.Mathematics.Algebra;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -371,7 +372,29 @@ public sealed class MatrixTests
         }
     }
 
-    private static void AssertMatrix<T>(Fill2d<double> expected, T actual, double delta = 0, string? message = "") where T : IMatrix<T>
+    [TestMethod] public void TestRotation2x2()
+    {
+        double rad;
+        Angle rot;
+        Matrix2x2 mat;
+        Random rand = new();
+
+        for (int i = 0; i < 1000; i++)
+        {
+            rad = rand.NextDouble() * Math.PI * 2;
+            rot = Angle.FromRadians(rad);
+            mat = Matrix2x2.Rotation(rot);
+
+            Float2 input = (10 * rand.NextDouble(), 10 * rand.NextDouble());
+
+            Float2 expected = (input.x * Math.Cos(rad) - input.y * Math.Sin(rad), input.y * Math.Cos(rad) + input.x * Math.Sin(rad));
+            Float2 actual = mat * input;
+
+            AssertVals(expected, actual, 1e-4);
+        }
+    }
+
+    private static void AssertMatrix<T>(Fill2d<double> expected, T actual, double delta = 0, string message = "") where T : IMatrix<T>
     {
         for (int r = 0; r < actual.Size.x; r++)
         {
@@ -382,5 +405,16 @@ public sealed class MatrixTests
                 Assert.AreEqual(valExpected, valActual, delta, message);
             }
         }
+    }
+    private static void AssertVals(IEnumerable<double> expected, IEnumerable<double> actual, double delta = 0, string message = "")
+    {
+        IEnumerator<double> expectedEnum = expected.GetEnumerator();
+        IEnumerator<double> actualEnum = actual.GetEnumerator();
+        while (expectedEnum.MoveNext() && actualEnum.MoveNext())
+        {
+            Assert.AreEqual(expectedEnum.Current, actualEnum.Current, delta, message, expected.ToString()!, actual.ToString()!);
+        }
+
+        if (expectedEnum.MoveNext() || actualEnum.MoveNext()) Assert.Fail(message);
     }
 }
