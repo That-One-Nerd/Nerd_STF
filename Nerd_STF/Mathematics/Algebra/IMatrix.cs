@@ -39,6 +39,8 @@ namespace Nerd_STF.Mathematics.Algebra
         void AddRow(int rDest, double factor, int rSource);
 
 #if CS11_OR_GREATER
+        static abstract TSelf operator +(TSelf a, TSelf b);
+        static abstract TSelf operator *(TSelf a, TSelf b);
         static abstract TSelf operator *(TSelf a, double b);
         static abstract TSelf operator /(TSelf a, double b);
         static abstract TSelf operator ^(TSelf a, TSelf b);

@@ -1,6 +1,7 @@
 ﻿using Nerd_STF.Mathematics;
 using Nerd_STF.Mathematics.Algebra;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Nerd_STF.UnitTests;
@@ -10,7 +11,7 @@ public sealed class MatrixTests
 {
     private static Fill<double> Count => i => i + 1;
 
-    public void TestMatrixConstructionByFill()
+    [TestMethod] public void TestMatrixConstructionByFill()
     {
         // Specific case, byRows=default (false)
         Matrix m = new((3, 5), Count);
@@ -174,8 +175,7 @@ public sealed class MatrixTests
         }
     }
 
-    [TestMethod]
-    public void TestGaussElimination()
+    [TestMethod] public void TestGaussElimination()
     {
         // Specific case. Not super sure how this could be generalized.
         Matrix m = new((4, 4), new double[,]
@@ -196,8 +196,7 @@ public sealed class MatrixTests
         }), m, "Gaussian elimination failure.");
     }
 
-    [TestMethod]
-    public void TestMatrixBarString()
+    [TestMethod] public void TestMatrixBarString()
     {
         // Specific case.
         Matrix m = new((4, 5), (r, c) => 5 * r + c + 1);
@@ -218,6 +217,169 @@ public sealed class MatrixTests
                 int lines = m.ToString(bar: true).Count('│');
                 if (cols >= 2) Assert.AreEqual(3 * rows, lines);
                 else Assert.AreEqual(2 * rows, lines);
+            }
+        }
+    }
+
+    [TestMethod] public void TestMultiplication2x2()
+    {
+        // General test.
+        TestGeneralMultiplication<Matrix2x2>();
+
+        // Specific test: (2x2)x(2x2)
+        Matrix2x2 m1 = new(new double[,]
+        {
+            { 7, 1 },
+            { 6, 5 }
+        });
+        Matrix2x2 m2 = new(new double[,]
+        {
+            { 2, 7 },
+            { 5, 0 }
+        });
+        Assert.AreEqual(new Matrix2x2(new double[,]
+        {
+            { 19, 49 },
+            { 37, 42 }
+        }), m1 * m2);
+        Assert.AreEqual(new Matrix2x2(new double[,]
+        {
+            { 56, 37 },
+            { 35,  5 }
+        }), m2 * m1);
+
+        Assert.AreEqual((44, 46), m1 * (6, 2)); // Specific test: (2x2)x(2x1)
+        Assert.AreEqual((41, 15), m2 * (3, 5)); // ...
+    }
+    [TestMethod] public void TestMultiplication3x3()
+    {
+        // General test.
+        TestGeneralMultiplication<Matrix3x3>();
+
+        // Specific test: (3x3)x(3x3)
+        Matrix3x3 m1 = new(new double[,]
+        {
+            { 4, 8, 3 },
+            { 2, 9, 5 },
+            { 9, 2, 8 }
+        });
+        Matrix3x3 m2 = new(new double[,]
+        {
+            { 5, 4, 2 },
+            { 1, 7, 6 },
+            { 1, 5, 5 }
+        });
+        Assert.AreEqual(new Matrix3x3(new double[,]
+        {
+            { 31, 87, 71 },
+            { 24, 96, 83 },
+            { 55, 90, 70 }
+        }), m1 * m2);
+        Assert.AreEqual(new Matrix3x3(new double[,]
+        {
+            { 46, 80, 51 },
+            { 72, 83, 86 },
+            { 59, 63, 68 }
+        }), m2 * m1);
+
+        Assert.AreEqual((105, 122, 101), m1 * (3, 9, 7)); // Specific test: (3x3)x(3x1)
+        Assert.AreEqual(( 58,  83,  64), m2 * (4, 7, 5)); // ...
+    }
+    [TestMethod] public void TestMultiplication4x4()
+    {
+        // General test.
+        TestGeneralMultiplication<Matrix4x4>();
+
+        // Specific test: (4x4)x(4x4)
+        Matrix4x4 m1 = new(new double[,]
+        {
+            { 1, 6, 5, 3 },
+            { 5, 7, 3, 1 },
+            { 4, 4, 9, 3 },
+            { 2, 1, 6, 5 }
+        });
+        Matrix4x4 m2 = new(new double[,]
+        {
+            { 4, 6, 9, 5 },
+            { 8, 5, 6, 9 },
+            { 1, 6, 9, 3 },
+            { 5, 1, 6, 2 }
+        });
+        Assert.AreEqual(new Matrix4x4(new double[,]
+        {
+            {  72,  69, 108,  80 },
+            {  84,  84, 120,  99 },
+            {  72, 101, 159,  89 },
+            {  47,  58, 108,  47 }
+        }), m1 * m2);
+        Assert.AreEqual(new Matrix4x4(new double[,]
+        {
+            {  80, 107, 149,  70 },
+            {  75, 116, 163,  92 },
+            {  73,  87, 122,  51 },
+            {  38,  63,  94,  44 }
+        }), m2 * m1);
+
+        Assert.AreEqual(( 48,  62,  63,  41), m1 * (5, 4, 2, 3)); // Specific test: (4x4)x(4x1)
+        Assert.AreEqual(( 88, 137,  54,  59), m2 * (6, 1, 2, 8)); // ...
+    }
+    private static void TestGeneralMultiplication<T>() where T : IStaticMatrix<T>
+    {
+        T mat = T.Identity;
+        for (int r = 0; r < T.Size.x; r++)
+        {
+            for (int c = 0; c < T.Size.y; c++)
+            {
+                mat[r, c] = r * T.Size.y + c + 1;
+            }
+        }
+
+        // Scalar multiplication.
+        AssertMatrix((r, c) => mat[r, c] * 2, mat * 2);
+        AssertMatrix((r, c) => mat[r, c] * -3.5, mat * -3.5);
+
+        Assert.AreEqual(mat, mat * T.Identity); // A * I = A
+        Assert.AreEqual(T.Zero, mat * T.Zero);  // A * 0 = 0
+
+        Assert.AreEqual(mat * 2.3, mat * (T.Identity * 2.3)); // A * 2.3I = 2.3A
+
+        // Multiply by a matrix that's all ones.
+        // When you do that, the result is a matrix where
+        // all elements of a row are equal to the sum of
+        // the elements in that row of the previous matrix.
+        // For example:
+        // [ 1 2 ]   [ 1 1 ]   [ 3 3 ]
+        // [ 3 4 ] * [ 1 1 ] = [ 7 7 ]
+        AssertMatrix((r, c) => mat.GetRow(r).Sum(), mat * T.One);
+        AssertMatrix((r, c) => mat.GetRow(r).Sum() * 3.4, mat * (T.One * 3.4), delta: 1e-4);
+
+        // One more true test. Cast to a dynamic matrix and multiply.
+        // The two results should always be the same.
+        T m1 = T.Identity, m2 = T.Identity;
+        Random rand = new();
+        for (int i = 0; i < 100; i++)
+        {
+            for (int r = 0; r < T.Size.x; r++)
+            {
+                for (int c = 0; c < T.Size.y; c++)
+                {
+                    m1[r, c] = rand.NextDouble();
+                    m2[r, c] = rand.NextDouble();
+                }
+            }
+            Assert.AreEqual(m1 * m2, (Matrix)m1 * (Matrix)m2);
+        }
+    }
+
+    private static void AssertMatrix<T>(Fill2d<double> expected, T actual, double delta = 0, string? message = "") where T : IMatrix<T>
+    {
+        for (int r = 0; r < actual.Size.x; r++)
+        {
+            for (int c = 0; c < actual.Size.y; c++)
+            {
+                double valExpected = expected(r, c);
+                double valActual = actual[r, c];
+                Assert.AreEqual(valExpected, valActual, delta, message);
             }
         }
     }
