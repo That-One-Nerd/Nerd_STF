@@ -1,6 +1,7 @@
 ﻿using Nerd_STF.Mathematics;
 using Nerd_STF.Mathematics.Algebra;
 using System;
+using System.Linq;
 
 namespace Nerd_STF.UnitTests;
 
@@ -8,6 +9,27 @@ namespace Nerd_STF.UnitTests;
 public sealed class MatrixTests
 {
     private static Fill<double> Count => i => i + 1;
+
+    public void TestMatrixConstructionByFill()
+    {
+        // Specific case, byRows=default (false)
+        Matrix m = new((3, 5), Count);
+        Assert.AreEqual(new Matrix((3, 5), new double[,]
+        {
+            {  1,  2,  3,  4,  5 },
+            {  6,  7,  8,  9, 10 },
+            { 11, 12, 13, 14, 15 }
+        }), m, $"{nameof(Matrix)}({nameof(Fill<>)}) construction failed.");
+
+        // Specific case, byRows=true
+        m = new((3, 5), Count, true);
+        Assert.AreEqual(new Matrix((3, 5), new double[,]
+        {
+            {  1,  4,  7, 10, 13 },
+            {  2,  5,  8, 11, 14 },
+            {  3,  6,  9, 12, 15 }
+        }), m, $"{nameof(Matrix)}({nameof(Fill<>)}) construction failed.");
+    }
 
     [TestMethod] public void TestRowOperationsAcrossMatrix2x2() => TestRowOperationsAcrossMatrixTypes<Matrix2x2>();
     [TestMethod] public void TestRowOperationsAcrossMatrix3x3() => TestRowOperationsAcrossMatrixTypes<Matrix3x3>();
@@ -70,9 +92,9 @@ public sealed class MatrixTests
     [TestMethod] public void TestIndexingMatrix4x4() => TestIndexing(new Matrix4x4(Count));
     [TestMethod] public void TestIndexingDynamicMatrix()
     {
-        TestIndexing(new Matrix((5, 5), (r, c) => r * 5 + c + 1));
-        TestIndexing(new Matrix((2, 5), (r, c) => r * 5 + c + 1));
-        TestIndexing(new Matrix((5, 2), (r, c) => r * 2 + c + 1));
+        TestIndexing(new Matrix((5, 5), Count));
+        TestIndexing(new Matrix((3, 5), Count));
+        TestIndexing(new Matrix((5, 3), Count));
     }
     private static void TestIndexing<T>(T matrix) where T : IMatrix<T>
     {
@@ -103,9 +125,9 @@ public sealed class MatrixTests
     [TestMethod] public void TestRangeMatrix4x4() => TestRange(new Matrix4x4(Count));
     [TestMethod] public void TestRangeDynamicMatrix()
     {
-        TestRange(new Matrix((5, 5), (r, c) => r * 5 + c + 1));
-        TestRange(new Matrix((2, 5), (r, c) => r * 5 + c + 1));
-        TestRange(new Matrix((5, 2), (r, c) => r * 2 + c + 1));
+        TestRange(new Matrix((5, 5), Count));
+        TestRange(new Matrix((3, 5), Count));
+        TestRange(new Matrix((5, 3), Count));
     }
     private static void TestRange<T>(T matrix) where T : IMatrix<T>
     {
@@ -174,7 +196,6 @@ public sealed class MatrixTests
         }), m, "Gaussian elimination failure.");
     }
 
-    // TODO: Test for tostring and bar form.
     [TestMethod]
     public void TestMatrixBarString()
     {
@@ -186,5 +207,18 @@ public sealed class MatrixTests
                         "│ 11 12 13 14 │ 15 │" + Environment.NewLine +
                         "│ 16 17 18 19 │ 20 │" + Environment.NewLine +
                         "└                  ┘", m.ToString(bar: true));
+
+        // General case. There should always be 3 line symbols for each row.
+        //               One for the bar and two for the edges.
+        for (int rows = 0; rows <= 10; rows++)
+        {
+            for (int cols = 0; cols <= 10; cols++)
+            {
+                m = new((rows, cols), (r, c) => cols * r + c + 1);
+                int lines = m.ToString(bar: true).Count('│');
+                if (cols >= 2) Assert.AreEqual(3 * rows, lines);
+                else Assert.AreEqual(2 * rows, lines);
+            }
+        }
     }
 }

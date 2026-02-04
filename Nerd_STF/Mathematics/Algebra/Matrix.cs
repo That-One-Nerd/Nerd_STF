@@ -113,6 +113,36 @@ namespace Nerd_STF.Mathematics.Algebra
                 }
             }
         }
+        /// <param name="byRows"><see langword="true"/> if the fill is a collection of rows (form [c, r]), <see langword="false"/> if the fill is a collection of columns (form [r, c]).</param>
+        public Matrix(Int2 size, Fill<double> fill, bool byRows = false)
+        {
+            this.size = size;
+            terms = new double[size.x * size.y];
+            if (byRows)
+            {
+                int i = 0;
+                for (int c = 0; c < size.y; c++)
+                {
+                    for (int r = 0; r < size.x; r++)
+                    {
+                        terms[FlattenIndex(r, c)] = fill(i);
+                        i++;
+                    }
+                }
+            }
+            else
+            {
+                int i = 0;
+                for (int r = 0; r < size.x; r++)
+                {
+                    for (int c = 0; c < size.y; c++)
+                    {
+                        terms[FlattenIndex(r, c)] = fill(i);
+                        i++;
+                    }
+                }
+            }
+        }
         private Matrix(Int2 size, double[] terms)
         {
             this.size = size;
