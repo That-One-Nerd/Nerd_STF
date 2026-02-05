@@ -393,6 +393,27 @@ public sealed class MatrixTests
             AssertVals(expected, actual, 1e-4);
         }
     }
+    [TestMethod] public void TestRotation3x3()
+    {
+        // General test. Rotation along a specific axis should be the same
+        // as the Matrix2x2 rotation.
+        Random rand = new();
+        for (double r = 0; r < 1; r += 1e-3)
+        {
+            Angle rot2d = Angle.FromRevolutions(r);
+            Float2 input2d = (rand.NextDouble(), rand.NextDouble());
+            Matrix2x2 mat2d = Matrix2x2.Rotation(rot2d);
+
+            Float2 expected2d = mat2d * input2d;
+
+            AssertVals(expected2d, (Matrix3x3.Rotation(Angle.Zero, Angle.Zero, rot2d) * (input2d.x, input2d.y, 0))["xy"], 1e-4, $"Rotation around Z doesn't line up.");
+            AssertVals(expected2d, (Matrix3x3.Rotation(Angle.Zero, rot2d, Angle.Zero) * (input2d.x, 0, input2d.y))["xz"], 1e-4, $"Rotation around Y doesn't line up.");
+            AssertVals(expected2d, (Matrix3x3.Rotation(rot2d, Angle.Zero, Angle.Zero) * (0, input2d.x, input2d.y))["yz"], 1e-4, $"Rotation around X doesn't line up.");
+        }
+
+        // I'll need a specific test sometime.
+        // I also want to visualize this and make sure I'm on the right track.
+    }
 
     private static void AssertMatrix<T>(Fill2d<double> expected, T actual, double delta = 0, string message = "") where T : IMatrix<T>
     {

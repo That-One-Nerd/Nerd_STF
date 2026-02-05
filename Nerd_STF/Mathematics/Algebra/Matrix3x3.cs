@@ -123,23 +123,23 @@ namespace Nerd_STF.Mathematics.Algebra
                    zCos = MathE.Cos(aroundZ), zSin = MathE.Sin(aroundZ);
 
             // Basically a hard-coded version of these matrices:
-            // [  xCos 0 xSin ]   [ 1    0     0 ]   [ zCos -zSin 0 ]
-            // [    0 1     0 ] * [ 0 yCos -ySin ] * [ zSin  zCos 0 ]
-            // [ -xSin 0 xCos ]   [ 0 ySin  yCos ] * [    0     0 1 ]
+            // [ 1    0     0 ]   [ yCos 0 -ySin ]   [ zCos -zSin 0 ]
+            // [ 0 xCos -xSin ] * [    0 1     0 ] * [ zSin  zCos 0 ]
+            // [ 0 xSin  xCos ]   [ ySin 0  yCos ]   [    0     0 1 ]
 
             // TODO: Hard code this matrix multiplication.
 
             Matrix3x3 xMat = new Matrix3x3(new double[,]
             {
-                {  xCos, 0, xSin },
-                {    0, 1, 0     },
-                { -xSin, 0, xCos }
+                { 1, 0, 0        },
+                { 0, xCos, -xSin },
+                { 0, xSin,  xCos }
             });
             Matrix3x3 yMat = new Matrix3x3(new double[,]
             {
-                { 1, 0, 0        },
-                { 0, yCos, -ySin },
-                { 0, ySin,  yCos }
+                { yCos, 0, -ySin },
+                {    0, 1, 0     },
+                { ySin, 0,  yCos }
             });
             Matrix3x3 zMat = new Matrix3x3(new double[,]
             {
