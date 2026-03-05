@@ -230,13 +230,13 @@ namespace Nerd_STF.Mathematics
         {
             if (fromInclusive > toInclusive) throw new ClampOrderMismatchException();
             BigInteger result = 1;
-            for (int i =  fromInclusive; i <= toInclusive; i++) result *= i;
+            for (int i = fromInclusive; i <= toInclusive; i++) result *= i;
             return result;
         }
         public static ulong Factorial(int num)
         {
             if (num < 0) return 0;
-            else if (num > 20) throw new ArgumentOutOfRangeException(nameof(num), "Resulting number is too big to fit in a ulong.");
+            else if (num > 20) throw new OverflowException("Resulting number is too big to fit in a ulong.");
 
             ulong result = 1, ulNum = (ulong)num;
             for (ulong i = 2; i <= ulNum; i++) result *= i;

@@ -2,7 +2,6 @@
 using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Nerd_STF.UnitTests;
