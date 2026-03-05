@@ -2,6 +2,7 @@
 using Nerd_STF.Helpers;
 using Nerd_STF.Mathematics.Equations;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -341,6 +342,25 @@ namespace Nerd_STF.Mathematics
                 if (valid) return i;
             }
             return -1; // Will only get here if there are negative numbers in the collection.
+        }
+
+        public static IEnumerable<int> GeneratePrimes(int maximum)
+        {
+            // Sieve of Eratosthenes
+            BitArray bits = new BitArray(maximum - 1, true);
+            int n = 1;
+            while (++n <= maximum)
+            {
+                if (bits.Get(n - 2))
+                {
+                    // This one is prime.
+                    yield return n;
+
+                    // Eliminate all factors of this number.
+                    for (int i = 2 * n; i <= maximum; i += n) bits.Set(i - 2, false);
+                }
+                // else continue; Otherwise skip this number.
+            }
         }
 
         public static double InverseSqrt(double num) => 1 / Sqrt(num);

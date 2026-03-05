@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Mathematics;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace Nerd_STF.UnitTests;
@@ -63,5 +64,48 @@ public sealed class MathTests
             Assert.AreEqual(expected, MathE.Abs(number), $"{nameof(MathE.Abs)} is wrong.");
             // Can't assert parity since Math.Abs isn't guaranteed to support this type.
         }
+    }
+
+    [TestMethod] public void TestGeneratePrimes()
+    {
+        // Manually check a few inputs.
+        AssertArrayEquals([2, 3], MathE.GeneratePrimes(4));
+        AssertArrayEquals([2, 3, 5, 7], MathE.GeneratePrimes(10));
+        AssertArrayEquals([2, 3, 5, 7, 11], MathE.GeneratePrimes(11));
+        AssertArrayEquals([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31], MathE.GeneratePrimes(31));
+
+        // Use a more basic prime detection system to determine the rest.
+        // Should always be in parity.
+        AssertArrayEquals(GetPrimesBasic(10000), MathE.GeneratePrimes(10000));
+
+        static IEnumerable<int> GetPrimesBasic(int maximum)
+        {
+            for (int i = 2; i <= maximum; i++)
+            {
+                bool prime = true;
+                for (int j = 2; j < i; j++)
+                {
+                    if (i % j == 0)
+                    {
+                        prime = false;
+                        break;
+                    }
+                }
+                if (prime) yield return i;
+            }
+        }
+    }
+
+    private static void AssertArrayEquals<T>(IEnumerable<T> expected, IEnumerable<T> actual, string message = "")
+    {
+        IEnumerator<T> e1 = expected.GetEnumerator();
+        IEnumerator<T> e2 = actual.GetEnumerator();
+
+        while (e1.MoveNext())
+        {
+            if (!e2.MoveNext()) Assert.Fail(message); // len(e1) > len(e2)
+            Assert.AreEqual(e1.Current, e2.Current, message, e1.Current?.ToString() ?? "", e2.Current?.ToString() ?? "");
+        }
+        if (e2.MoveNext()) Assert.Fail($"extra param! {e2.Current}");      // len(e1) < len(e2)
     }
 }
