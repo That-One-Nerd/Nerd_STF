@@ -10,9 +10,9 @@ namespace Nerd_STF.Mathematics.Algebra
                           ISubmatrixOperations<Matrix, Matrix>
     {
         public static Matrix Identity(int size) =>
-            new Matrix((size, size), (int r, int c) => r == c ? 1 : 0);
+            new Matrix((size, size), (r, c) => r == c ? 1 : 0);
         public static Matrix IdentityIsh(Int2 size) =>
-            new Matrix(size, (int r, int c) => r == c ? 1 : 0);
+            new Matrix(size, (r, c) => r == c ? 1 : 0);
 
         public static Matrix Empty => new Matrix();
         public static Matrix Zero(Int2 size) => new Matrix(size);
@@ -21,6 +21,9 @@ namespace Nerd_STF.Mathematics.Algebra
 
         private readonly double[] terms;
         private readonly Int2 size;
+        private bool equationBar = false; // Determine if we put a x | y at the end of
+                                          // the matrix. Turned on if you run GaussElimination().
+                                          // Doesn't affect any other functionality.
 
         public Matrix()
         {
@@ -110,6 +113,36 @@ namespace Nerd_STF.Mathematics.Algebra
                 }
             }
         }
+        /// <param name="byRows"><see langword="true"/> if the fill is a collection of rows (form [c, r]), <see langword="false"/> if the fill is a collection of columns (form [r, c]).</param>
+        public Matrix(Int2 size, Fill<double> fill, bool byRows = false)
+        {
+            this.size = size;
+            terms = new double[size.x * size.y];
+            if (byRows)
+            {
+                int i = 0;
+                for (int c = 0; c < size.y; c++)
+                {
+                    for (int r = 0; r < size.x; r++)
+                    {
+                        terms[FlattenIndex(r, c)] = fill(i);
+                        i++;
+                    }
+                }
+            }
+            else
+            {
+                int i = 0;
+                for (int r = 0; r < size.x; r++)
+                {
+                    for (int c = 0; c < size.y; c++)
+                    {
+                        terms[FlattenIndex(r, c)] = fill(i);
+                        i++;
+                    }
+                }
+            }
+        }
         private Matrix(Int2 size, double[] terms)
         {
             this.size = size;
@@ -126,6 +159,50 @@ namespace Nerd_STF.Mathematics.Algebra
             get => terms[FlattenIndex(index.x, index.y)];
             set => terms[FlattenIndex(index.x, index.y)] = value;
         }
+#if CS8_OR_GREATER
+        public double this[Index r, Index c]
+        {
+            get => terms[FlattenIndex(r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value)];
+            set => terms[FlattenIndex(r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value)] = value;
+        }
+        public Matrix this[Range r, Range c]
+        {
+            get
+            {
+                int rowStart = r.Start.IsFromEnd ? Size.x - r.Start.Value : r.Start.Value,
+                    rowEnd = r.End.IsFromEnd ? Size.x - r.End.Value : r.End.Value;
+                int colStart = c.Start.IsFromEnd ? Size.y - c.Start.Value : c.Start.Value,
+                    colEnd = c.End.IsFromEnd ? Size.y - c.End.Value : c.End.Value;
+
+                Matrix result = new Matrix((rowEnd - rowStart, colEnd - colStart));
+                for (int r1 = rowStart; r1 < rowEnd; r1++)
+                {
+                    for (int c1 = colStart; c1 < colEnd; c1++)
+                    {
+                        result[r1 - rowStart, c1 - colStart] = terms[FlattenIndex(r1, c1)];
+                    }
+                }
+                return result;
+            }
+            set
+            {
+                int rowStart = r.Start.IsFromEnd ? Size.x - r.Start.Value : r.Start.Value,
+                    rowEnd = r.End.IsFromEnd ? Size.x - r.End.Value : r.End.Value;
+                int colStart = c.Start.IsFromEnd ? Size.y - c.Start.Value : c.Start.Value,
+                    colEnd = c.End.IsFromEnd ? Size.y - c.End.Value : c.End.Value;
+
+                Int2 size = (rowEnd - rowStart, colEnd - colStart);
+                if (value.size != size) throw new ArgumentOutOfRangeException($"Expected a {size.x}x{size.y} matrix, got a {value.size.x}x{value.size.y} matrix.");
+                for (int r1 = rowStart; r1 < rowEnd; r1++)
+                {
+                    for (int c1 = colStart; c1 < colEnd; c1++)
+                    {
+                        terms[FlattenIndex(r1, c1)] = value[r1 - rowStart, c1 - colStart];
+                    }
+                }
+            }
+        }
+#endif
         public ListTuple<double> this[int index, RowColumn direction]
         {
             get
@@ -160,7 +237,7 @@ namespace Nerd_STF.Mathematics.Algebra
 
         public static Matrix FromMatrix<T>(T mat)
             where T : IMatrix<T> =>
-            new Matrix(mat.Size, (int r, int c) => mat[r, c]);
+            new Matrix(mat.Size, (r, c) => mat[r, c]);
 
         public static Matrix Average(IEnumerable<Matrix> vals)
         {
@@ -173,7 +250,7 @@ namespace Nerd_STF.Mathematics.Algebra
             foreach (Matrix m in vals)
             {
                 if (result is null) result = m;
-                else ThrowIfSizeDifferent(result, m);
+                else AssertSameSize(result, m);
                 result += m;
                 count++;
             }
@@ -181,7 +258,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public static Matrix Lerp(Matrix a, Matrix b, double t, bool clamp = true)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             if (clamp) MathE.Clamp(ref t, 0, 1);
             double[] vals = new double[a.terms.Length];
             for (int i = 0; i < vals.Length; i++)
@@ -200,7 +277,7 @@ namespace Nerd_STF.Mathematics.Algebra
             foreach (Matrix m in vals)
             {
                 if (result is null) result = m;
-                else ThrowIfSizeDifferent(result, m);
+                else AssertSameSize(result, m);
                 result *= m;
             }
             return result ?? Empty;
@@ -215,7 +292,7 @@ namespace Nerd_STF.Mathematics.Algebra
             foreach (Matrix m in vals)
             {
                 if (result is null) result = m;
-                else ThrowIfSizeDifferent(result, m);
+                else AssertSameSize(result, m);
                 result += m;
             }
             return result ?? Empty;
@@ -244,31 +321,143 @@ namespace Nerd_STF.Mathematics.Algebra
             for (int r = 0; r < size.x; r++) terms[FlattenIndex(r, col)] = vals[r];
         }
 
+        public void GaussElimination()
+        {
+            // The goal here is to create a triangle of zeroes under the matrix.
+            // Helps a lot with linear equations. For example:
+            //   x y z           x y z
+            // [ 1 0 4 2 ]     [ 1 0 4 2 ]
+            // [ 1 2 6 2 ]     [   1 1 0 ]
+            // [ 2 0 8 8 ] --> [       4 ]
+            // [ 2 1 9 4 ]     [         ]
+            // The last column is left alone, because it symbolizes the other side
+            // of the equals sign. The matrix would read as:
+            // x + 4z = 2
+            // y +  z = 0
+
+            // Note: This is a greedy algorithm. No idea if it's effective
+            //       in all situations, and it probably produces non-ideal
+            //       solutions sometimes.
+
+            equationBar = true;
+
+            // input: column, output: the rows its managed by
+            // affected[c] is read as "c is affected by: output"
+            Span<int> affected = stackalloc int[Size.y - 1];
+
+            int activeRow = 0;
+            for (int c = 0; c < Size.y - 1; c++)
+            {
+                // Start by finding a row with a '1' in this position.
+                int focusOne = -1, focusNonZero = -1;
+                double fac = 1;
+                for (int r = 0; r < Size.x; r++)
+                {
+                    double val = this[r, c];
+                    if (val == 1)
+                    {
+                        focusOne = r;
+                        break;
+                    }
+                    else if (val != 0)
+                    {
+                        focusNonZero = r;
+                        fac = val;
+                    }
+                }
+
+                // Move this row to the active row. Prefer 1s over non-0s.
+                if (focusOne != -1)
+                {
+                    if (focusOne >= c) SwapRows(focusOne, activeRow);
+                    else activeRow = focusOne;
+                }
+                else if (focusNonZero != -1)
+                {
+                    // We need to do an extra scaling step here.
+                    ScaleRow(focusNonZero, 1 / fac);
+                    if (focusNonZero >= c) SwapRows(focusNonZero, activeRow);
+                    else activeRow = focusNonZero;
+                }
+                else continue; // If this entire column is zeroes, we can't really do much.
+
+                affected[c] = activeRow;
+
+                // Now we have a row for this specific index,
+                // and it's scaled to 1. Now we try to zero-out
+                // as much of the other rows as possible.
+                for (int r = 0; r < Size.x; r++)
+                {
+                    if (r == activeRow) continue;
+                    fac = this[r, c];
+                    bool prev = false;
+                    for (int c1 = 0; c1 < c; c1++)
+                    {
+                        if (affected[c1] == r)
+                        {
+                            prev = true;
+                            break;
+                        }
+                    }
+
+                    if (fac != 0 && !prev) AddRow(r, -fac, activeRow);
+                }
+
+                // We're probably done.
+                activeRow++;
+            }
+        }
+
         public double Determinant()
         {
-            ThrowIfNotSquare();
+            AssertSquare();
 
             if (size.x == 1) return terms[0];
             else if (size.x == 2) return terms[0] * terms[3] - terms[1] * terms[2];
             else
             {
                 double sum = 0;
+                int sign = 1;
                 for (int c = 0; c < size.y; c++)
                 {
                     Matrix sub = Submatrix(0, c);
-                    if (c % 2 == 0) sum += terms[FlattenIndex(0, c)] * sub.Determinant();
-                    else sum -= terms[FlattenIndex(0, c)] * sub.Determinant();
+                    sum += sign * terms[FlattenIndex(0, c)] * sub.Determinant();
+                    sign *= -1;
                 }
                 return sum;
             }
         }
 
+        public void SwapRows(int rA, int rB)
+        {
+            for (int c = 0; c < size.y; c++)
+            {
+                int iA = FlattenIndex(rA, c),
+                    iB = FlattenIndex(rB, c);
+                (terms[iA], terms[iB]) = (terms[iB], terms[iA]);
+            }
+        }
+        public void ScaleRow(int r, double factor)
+        {
+            for (int c = 0; c < size.y; c++) terms[FlattenIndex(r, c)] *= factor;
+        }
+        public void AddRow(int rDest, double factor, int rSource)
+        {
+            if (rDest == rSource) ScaleRow(rDest, factor + 1);
+            for (int c = 0; c < size.y; c++)
+            {
+                int iDest = FlattenIndex(rDest, c),
+                    iSource = FlattenIndex(rSource, c);
+                terms[iDest] += terms[iSource] * factor;
+            }
+        }
+
         public Matrix Adjoint() => Cofactor().Transpose();
         public Matrix Cofactor() =>
-            new Matrix(size, (int r, int c) => Submatrix(r, c).Determinant() * ((r + c) % 2 == 0 ? 1 : -1));
+            new Matrix(size, (r, c) => Submatrix(r, c).Determinant() * ((r + c) % 2 == 0 ? 1 : -1));
         public Matrix Inverse() => Adjoint() / Determinant();
         public Matrix Transpose() =>
-            new Matrix((size.y, size.x), (int r, int c) => terms[FlattenIndex(c, r)]);
+            new Matrix((size.y, size.x), (r, c) => terms[FlattenIndex(c, r)]);
         public Matrix Submatrix(int r, int c)
         {
             if (size.x <= 1 || size.y <= 1) throw new InvalidOperationException($"This matrix is too small to contain any sub-matrices.");
@@ -301,7 +490,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public double Trace()
         {
-            ThrowIfNotSquare();
+            AssertSquare();
             double sum = 0;
             for (int i = 0; i < size.x; i++) sum += terms[FlattenIndex(i, i)];
             return sum;
@@ -351,23 +540,25 @@ namespace Nerd_STF.Mathematics.Algebra
             }
             return total;
         }
-        public override string ToString() => ToStringHelper.MatrixToString(this, null);
+        public override string ToString() => ToStringHelper.MatrixToString(this, null, equationBar);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string? format = null, bool bar = false) => ToStringHelper.MatrixToString(this, format, equationBar || bar);
+        string IFormattable.ToString(string? format, IFormatProvider? provider) => ToString(format);
 #else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string format = null, bool bar = false) => ToStringHelper.MatrixToString(this, format, equationBar || bar);
+        string IFormattable.ToString(string format, IFormatProvider provider) => ToString(format);
 #endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int FlattenIndex(int r, int c) => r * size.y + c;
 
-        private void ThrowIfNotSquare()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AssertSquare()
         {
             if (size.x != size.y) throw new InvalidOperationException("This operation only applies to a square matrix.");
         }
-        private static void ThrowIfSizeDifferent(Matrix a, Matrix b)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void AssertSameSize(Matrix a, Matrix b)
         {
             if (a.size != b.size) throw new InvalidOperationException("This operation only applies to matrices with the same dimensions.");
         }
@@ -375,7 +566,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix operator +(Matrix a) => new Matrix(a);
         public static Matrix operator +(Matrix a, Matrix b)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             double[] terms = new double[a.terms.Length];
             for (int i = 0; i < a.terms.Length; i++) terms[i] = a.terms[i] + b.terms[i];
             return new Matrix(a.size, terms);
@@ -388,7 +579,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public static Matrix operator -(Matrix a, Matrix b)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             double[] terms = new double[a.terms.Length];
             for (int i = 0; i < a.terms.Length; i++) terms[i] = a.terms[i] - b.terms[i];
             return new Matrix(a.size, terms);
@@ -402,7 +593,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix operator *(Matrix a, Matrix b)
         {
             if (a.size.y != b.size.x) throw new InvalidOperationException("The dimensions of these matrices are incompatible with one another.");
-            return new Matrix((a.size.x, b.size.y), (int r, int c) => MathE.Dot(a.GetRow(r), b.GetColumn(c)));
+            return new Matrix((a.size.x, b.size.y), (r, c) => MathE.Dot(a.GetRow(r), b.GetColumn(c)));
         }
         public static Matrix operator /(Matrix a, double b)
         {
@@ -412,7 +603,7 @@ namespace Nerd_STF.Mathematics.Algebra
         }
         public static Matrix operator ^(Matrix a, Matrix b)
         {
-            ThrowIfSizeDifferent(a, b);
+            AssertSameSize(a, b);
             double[] terms = new double[a.terms.Length];
             for (int i = 0; i < a.terms.Length; i++) terms[i] = a.terms[i] * b.terms[i];
             return new Matrix(a.size, terms);
@@ -424,23 +615,5 @@ namespace Nerd_STF.Mathematics.Algebra
         public static implicit operator Matrix(Float2 vec) => new Matrix((2, 1), new double[] { vec.x, vec.y });
         public static implicit operator Matrix(Float3 vec) => new Matrix((3, 1), new double[] { vec.x, vec.y, vec.z });
         public static implicit operator Matrix(Float4 vec) => new Matrix((4, 1), new double[] { vec.x, vec.y, vec.z, vec.w });
-        public static implicit operator Matrix(Matrix2x2 mat) => new Matrix((2, 2), new double[]
-        {
-            mat.r0c0, mat.r0c1,
-            mat.r1c0, mat.r1c1
-        });
-        public static implicit operator Matrix(Matrix3x3 mat) => new Matrix((3, 3), new double[]
-        {
-            mat.r0c0, mat.r0c1, mat.r0c2,
-            mat.r1c0, mat.r1c1, mat.r1c2,
-            mat.r2c0, mat.r2c1, mat.r2c2
-        });
-        public static implicit operator Matrix(Matrix4x4 mat) => new Matrix((4, 4), new double[]
-        {
-            mat.r0c0, mat.r0c1, mat.r0c2, mat.r0c3,
-            mat.r1c0, mat.r1c1, mat.r1c2, mat.r1c3,
-            mat.r2c0, mat.r2c1, mat.r2c2, mat.r2c3,
-            mat.r3c0, mat.r3c1, mat.r3c2, mat.r3c3
-        });
     }
 }

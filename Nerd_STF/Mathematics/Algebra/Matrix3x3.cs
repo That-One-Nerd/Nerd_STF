@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace Nerd_STF.Mathematics.Algebra
 {
@@ -25,7 +26,8 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix3x3 One => new Matrix3x3(1, 1, 1, 1, 1, 1, 1, 1, 1);
         public static Matrix3x3 Zero => new Matrix3x3(0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-        public Int2 Size => (3, 3);
+        public static Int2 Size => (3, 3);
+        Int2 IMatrix<Matrix3x3>.Size => Size;
 
         public double r0c0, r0c1, r0c2,
                       r1c0, r1c1, r1c2,
@@ -108,6 +110,47 @@ namespace Nerd_STF.Mathematics.Algebra
             }
         }
 
+        public static Matrix3x3 Rotation(double aroundX, double aroundY, double aroundZ) =>
+            Rotation(Angle.FromRadians(aroundX), Angle.FromRadians(aroundY), Angle.FromRadians(aroundZ));
+        public static Matrix3x3 Rotation(Angle aroundX, Angle aroundY, Angle aroundZ)
+        {
+            // Pitch = aroundX
+            //   Yaw = aroundY
+            //  Roll = aroundZ
+
+            double xCos = MathE.Cos(aroundX), xSin = MathE.Sin(aroundX),
+                   yCos = MathE.Cos(aroundY), ySin = MathE.Sin(aroundY),
+                   zCos = MathE.Cos(aroundZ), zSin = MathE.Sin(aroundZ);
+
+            // Basically a hard-coded version of these matrices:
+            // [ 1    0     0 ]   [ yCos 0 -ySin ]   [ zCos -zSin 0 ]
+            // [ 0 xCos -xSin ] * [    0 1     0 ] * [ zSin  zCos 0 ]
+            // [ 0 xSin  xCos ]   [ ySin 0  yCos ]   [    0     0 1 ]
+
+            // TODO: Hard code this matrix multiplication.
+
+            Matrix3x3 xMat = new Matrix3x3(new double[,]
+            {
+                { 1, 0, 0        },
+                { 0, xCos, -xSin },
+                { 0, xSin,  xCos }
+            });
+            Matrix3x3 yMat = new Matrix3x3(new double[,]
+            {
+                { yCos, 0, -ySin },
+                {    0, 1, 0     },
+                { ySin, 0,  yCos }
+            });
+            Matrix3x3 zMat = new Matrix3x3(new double[,]
+            {
+                { zCos, -zSin, 0 },
+                { zSin,  zCos, 0 },
+                {        0, 0, 1 }
+            });
+
+            return xMat * yMat * zMat;
+        }
+
         public double this[int r, int c]
         {
             get
@@ -178,6 +221,25 @@ namespace Nerd_STF.Mathematics.Algebra
             get => this[index.x, index.y];
             set => this[index.x, index.y] = value;
         }
+#if CS8_OR_GREATER
+        public double this[Index r, Index c]
+        {
+            get => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value];
+            set => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value] = value;
+        }
+        public Matrix this[Range r, Range c]
+        {
+            get => ((Matrix)this)[r, c];
+            set
+            {
+                Matrix result = this;
+                result[r, c] = value;
+                r0c0 = result[0, 0]; r0c1 = result[0, 1]; r0c2 = result[0, 2];
+                r1c0 = result[1, 0]; r1c1 = result[1, 1]; r1c2 = result[1, 2];
+                r2c0 = result[2, 0]; r2c1 = result[2, 1]; r2c2 = result[2, 2];
+            }
+        }
+#endif
         public ListTuple<double> this[int index, RowColumn direction]
         {
             get
@@ -285,6 +347,70 @@ namespace Nerd_STF.Mathematics.Algebra
             r0c1 * (r1c0 * r2c2 - r1c2 * r2c0) +
             r0c2 * (r1c0 * r2c1 - r1c1 * r2c0);
 
+        public void SwapRows(int r1, int r2)
+        {
+            if (r1 == r2) return; // No swap
+            if (r1 > r2) (r1, r2) = (r2, r1);
+            switch (r1)
+            {
+                case 0:
+                    switch (r2)
+                    {
+                        case 1: // Swap row 0 and 1.
+                            (r0c0, r1c0) = (r1c0, r0c0);
+                            (r0c1, r1c1) = (r1c1, r0c1);
+                            (r0c2, r1c2) = (r1c2, r0c2);
+                            break;
+                        case 2: // Swap row 0 and 2.
+                            (r0c0, r2c0) = (r2c0, r0c0);
+                            (r0c1, r2c1) = (r2c1, r0c1);
+                            (r0c2, r2c2) = (r2c2, r0c2);
+                            break;
+                    }
+                    break;
+                case 1:
+                    switch (r2)
+                    {
+                        case 2: // Swap row 1 and 2.
+                            (r1c0, r2c0) = (r2c0, r1c0);
+                            (r1c1, r2c1) = (r2c1, r1c1);
+                            (r1c2, r2c2) = (r2c2, r1c2);
+                            break;
+                    }
+                    break;
+            }
+        }
+        public void ScaleRow(int row, double factor)
+        {
+            switch (row)
+            {
+                case 0: r0c0 *= factor; r0c1 *= factor; r0c2 *= factor; break;
+                case 1: r1c0 *= factor; r1c1 *= factor; r1c2 *= factor; break;
+                case 2: r2c0 *= factor; r2c1 *= factor; r2c2 *= factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(row));
+            }
+        }
+        public void AddRow(int rDest, double factor, int rSource)
+        {
+            if (rDest == rSource) ScaleRow(rDest, factor + 1);
+
+            double c0, c1, c2;
+            switch (rSource)
+            {
+                case 0: c0 = r0c0; c1 = r0c1; c2 = r0c2; break;
+                case 1: c0 = r1c0; c1 = r1c1; c2 = r1c2; break;
+                case 2: c0 = r2c0; c1 = r2c1; c2 = r2c2; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rSource));
+            }
+            switch (rDest)
+            {
+                case 0: r0c0 += c0 * factor; r0c1 += c1 * factor; r0c2 += c2 * factor; break;
+                case 1: r1c0 += c0 * factor; r1c1 += c1 * factor; r1c2 += c2 * factor; break;
+                case 2: r2c0 += c0 * factor; r2c1 += c1 * factor; r2c2 += c2 * factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rDest));
+            }
+        }
+
         public Matrix3x3 Adjoint() => // Transpose(Cofactor)
             new Matrix3x3(r1c1 * r2c2 - r1c2 * r2c1, r0c2 * r2c1 - r0c1 * r2c2, r0c1 * r1c2 - r0c2 * r1c1,
                           r1c2 * r2c0 - r1c0 * r2c2, r0c0 * r2c2 - r0c2 * r2c0, r0c2 * r1c0 - r0c0 * r1c2,
@@ -374,13 +500,13 @@ namespace Nerd_STF.Mathematics.Algebra
                   (uint)r2c0.GetHashCode() & 0x00000700 |
                   (uint)r2c1.GetHashCode() & 0x000000F0 |
                   (uint)r2c2.GetHashCode() & 0x0000000F);
-        public override string ToString() => ToStringHelper.MatrixToString(this, null);
+        public override string ToString() => ToStringHelper.MatrixToString(this, null, false);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string? format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string? format, IFormatProvider? provider) => ToString(format);
 #else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string format, IFormatProvider provider) => ToString(format);
 #endif
 
         public static Matrix3x3 operator +(Matrix3x3 a) =>
@@ -423,6 +549,8 @@ namespace Nerd_STF.Mathematics.Algebra
         public static bool operator ==(Matrix3x3 a, Matrix3x3 b) => a.Equals(b);
         public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !a.Equals(b);
 
+
+        public static implicit operator Matrix(Matrix3x3 mat) => new Matrix(mat);
         public static explicit operator Matrix3x3(Matrix mat) =>
             new Matrix3x3(mat.TryGet(0, 0), mat.TryGet(0, 1), mat.TryGet(0, 2),
                           mat.TryGet(1, 0), mat.TryGet(1, 1), mat.TryGet(1, 2),

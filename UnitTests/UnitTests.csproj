@@ -1,0 +1,17 @@
+﻿<Project Sdk="MSTest.Sdk/4.0.1">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TestingExtensionsProfile>AllMicrosoft</TestingExtensionsProfile>
+    <RootNamespace>Nerd_STF.UnitTests</RootNamespace>
+    <AssemblyName>Nerd_STF.UnitTests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nerd_STF\Nerd_STF.csproj" />
+  </ItemGroup>
+
+</Project>

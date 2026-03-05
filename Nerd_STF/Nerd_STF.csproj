@@ -15,7 +15,7 @@
   
   <PropertyGroup>
     <Title>Nerd_STF</Title>
-    <Version>3.1.2</Version>
+    <Version>3.2.0</Version>
     <Authors>That_One_Nerd</Authors>
     <Description>A general-purpose mathematics library for C#.</Description>
     <PackageProjectUrl>https://github.com/That-One-Nerd/Nerd_STF</PackageProjectUrl>
@@ -28,34 +28,48 @@
     <PackageTags>c#;csharp;c sharp;math;mathematics;mathametics;maths;color;rgb;rgba;cmyk;cmyka;hsv;hsva;calculus;linear algebra;linalg;linearalgebra;matrix;matrix2x2;matrix 2x2;matrix3x3;matrix 3x3;matrix4x4;matrix 4x4;matrix multiplication;vector;vector2d;vector3d;vector2;vector3;float2;float3;float4;int2;int3;int4;angle;geometry;vert;line;polygon;triangle;quadrilateral;sphere;circle;number system;numbersystem;complex numbers;complex;2d numbers;2dnumbers;quaternions;4d numbers;4dnumbers;equation;equations;polynomial;quadratic;linear equation;discrete mathematics;discrete math;set notation;relation;discrete;ycbcr;ypbpr;ycc</PackageTags>
     
     <!-- Sorry this is stupidly long, wish I could have linked a markdown file instead. -->
-    <PackageReleaseNotes>Welcome! I have some more small tweaks.
+    <PackageReleaseNotes>Hi! This update spent a while idle before I got around to releasing it, whoops. Here, we're focusing on linear algebra changes.
 
-### You Don't Always Start With A `W`.
+## But first, Unit Tests!
 
-I finally got around to making `w` the last item in `Float4`s, `Int4`s, and `Quaternion`s. Really, it was a very peculiar hill I chose to die on there. My reasoning was mostly "w comes first in the alphabet, yeah? So it should contain the first value," but that's a silly argument because it's now no longer backwards compatible with 2s and 3s anymore. So I put it back. I had to do most of these changes manually, so I hope I didn't miss anything.
+I finally got around to experimenting with a test suite. I'm fairly new to this whole schpeel, so some of my tests might not be great. And there also aren't a ton right now. But I'll add many more over time. Hopefully I'll eventually get to testing nearly everything in Nerd_STF. But for now, it's cool to see the little check mark next to the commit.
 
-&gt; [!WARNING]
-&gt; This is a breaking change! My *hope* is that anyone using this library was annoyed by this and now enjoys the new fix, but if you relied on this ordering, you might have to tweak some variables. Sorry about that.
+One of the reasons I started writing tests is because I've had plenty of incidents where I missed bugs that occurred down the line when I would change a function. This hopefully prevents that.
 
-### A Better `Sin()` function.
+Now the .sln file is finally exposed to the repo. Previously, I've had to hide it because my "messing around" project would be referenced and would cause compiler errors. I've replaced the messing around project with this new test project.
 
-For a while now (basically since 3.0), the new Sin() function was quite inaccurate towards zero. It followed a proper Taylor series implementation and I think some floating point error was accumulating there. Not super certain. But I replaced it with another linear regression, like in 2.x. But it's a bit smarter: rather than making a polynomial represent the whole sin function, there are two polynomials that each represent an eighth of the range $[0..2\pi)$, and the rest of the range is mirrored to fit in one of those two categories. This way, the polynomial can be specifically taylored (hehe... taylored) to be good at either close to zero cases or close to one cases. It also uses less terms.
+## More Matrix Operations
 
-Shouldn't change your side very much, it'll just be more accurate. As far as I know, in normal situations the error never goes above 0.00004%.
+Like I said, this update concerns itself mainly with linear algebra. Some concepts have been added from that field of mathematics. Namely, I re-implemented the `SwapRows()`, `ScaleRow()`, and `AddRow()` operations from the 2.x versions. Here, `SwapRows(int, int)` swaps two rows of a matrix, `ScaleRow(int, double)` scales one by a certain factor, and `AddRow(int, double, int)` adds a scaled version of one row to another. In general, they're all basic row operations for matrices.
 
-### Some small stuff.
+In addition, I also implemented a basic Row-Echelon solver. It's a simple Gaussian reduction algorithm and it is by no means perfect, but it kind of works. I may well make a better one in the future.
 
-That's about all of the big stuff, not a super duper ton.
+&gt; [!NOTE]
+&gt; The row-echelon solver is only defined in the dynamic `Matrix` class. Call it using `Matrix.GaussElimination()`.
 
-- I made the `IMagnitudeOperators` interface included in versions of C# &lt; 11.
-  - I might do that with the other interfaces, though I'm not quite sure if it's logical to include interfaces that would be completely empty in some versions of C#.
-  - I also added the `Magnitude` and `MagnitudeSqr` property to the `IMagnitudeOperators` interface.
-- I also added `MagnitudeSqr` to some more types, namely the `FloatX` and `IntX` types.
-- I found a much simpler system for `MathE.ModAbs(num, mod)`. I unfortunately don't remember who I got it from, someone on StackOverflow that I found while looking for something else. It's constant-time rather than linear time. My previous approach was pretty dense if you ask me.
+Range operations also are implemented in all matrix types now. You can use range operators to get particular rows and columns from a Matrix. Can be fairly useful in some circumstances. Here's an example:
+```csharp
+using Nerd_STF.Mathematics.Algebra;
+
+// r  c 0: 1: 2:
+// 0: [ 1, 2, 3 ]
+// 1: [ 4, 5, 6 ]
+// 2: [ 7, 8, 9 ]
+Matrix m = new((3, 3), (x, y) =&gt; x * 3 + y + 1);
+
+Matrix sub = m[1..3, 0..^1];
+// Output:
+// [ 4, 5 ]
+// [ 7, 8 ]
+```
+
+Remember that matrix rows and columns are indexed 0-based.
+
+One more thing before we end this part. To improve the use of generics again, I moved all declarations of `IMatrixOperations` into `IMatrix` for simplicity's sake.
 
 ---
 
-Anyway, that's all. Enjoy!</PackageReleaseNotes>
+That's about it. Enjoy the update! I'll be cranking out more unit tests and probably fixing bugs for a while.</PackageReleaseNotes>
   </PropertyGroup>
 
   <!-- ItemGroup customization based on framework. -->

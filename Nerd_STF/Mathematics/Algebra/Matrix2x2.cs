@@ -22,7 +22,8 @@ namespace Nerd_STF.Mathematics.Algebra
         public static Matrix2x2 One => new Matrix2x2(1, 1, 1, 1);
         public static Matrix2x2 Zero => new Matrix2x2(0, 0, 0, 0);
 
-        public Int2 Size => (2, 2);
+        public static Int2 Size => (2, 2);
+        Int2 IMatrix<Matrix2x2>.Size => Size;
 
         public double r0c0, r0c1,
                       r1c0, r1c1;
@@ -97,6 +98,14 @@ namespace Nerd_STF.Mathematics.Algebra
             }
         }
 
+        public static Matrix2x2 Rotation(double radians) => Rotation(Angle.FromRadians(radians));
+        public static Matrix2x2 Rotation(Angle angle)
+        {
+            double cos = MathE.Cos(angle), sin = MathE.Sin(angle);
+            return new Matrix2x2(cos, -sin,
+                                 sin,  cos);
+        }
+
         public double this[int r, int c]
         {
             get
@@ -147,6 +156,24 @@ namespace Nerd_STF.Mathematics.Algebra
             get => this[index.x, index.y];
             set => this[index.x, index.y] = value;
         }
+#if CS8_OR_GREATER
+        public double this[Index r, Index c]
+        {
+            get => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value];
+            set => this[r.IsFromEnd ? Size.x - r.Value : r.Value, c.IsFromEnd ? Size.y - c.Value : c.Value] = value;
+        }
+        public Matrix this[Range r, Range c]
+        {
+            get => ((Matrix)this)[r, c];
+            set
+            {
+                Matrix result = this;
+                result[r, c] = value;
+                r0c0 = result[0, 0]; r0c1 = result[0, 1];
+                r1c0 = result[1, 0]; r1c1 = result[1, 1];
+            }
+        }
+#endif
         public ListTuple<double> this[int index, RowColumn direction]
         {
             get
@@ -246,6 +273,46 @@ namespace Nerd_STF.Mathematics.Algebra
 
         public double Determinant() => r0c0 * r1c1 - r0c1 * r1c0;
 
+        public void SwapRows(int r1, int r2)
+        {
+            if (r1 < 0 || r1 >= 2) throw new ArgumentOutOfRangeException(nameof(r1));
+            else if (r2 < 0 || r2 >= 2) throw new ArgumentOutOfRangeException(nameof(r2));
+
+            if (r1 == r2) return; // No swap
+            else
+            {
+                (r0c0, r1c0) = (r1c0, r0c0);
+                (r0c1, r1c1) = (r1c1, r0c1);
+            }
+        }
+        public void ScaleRow(int row, double factor)
+        {
+            switch (row)
+            {
+                case 0: r0c0 *= factor; r0c1 *= factor; break;
+                case 1: r1c0 *= factor; r1c1 *= factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(row));
+            }
+        }
+        public void AddRow(int rDest, double factor, int rSource)
+        {
+            if (rDest == rSource) ScaleRow(rDest, factor + 1);
+
+            double c0, c1;
+            switch (rSource)
+            {
+                case 0: c0 = r0c0; c1 = r0c1; break;
+                case 1: c0 = r1c0; c1 = r1c1; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rSource));
+            }
+            switch (rDest)
+            {
+                case 0: r0c0 += c0 * factor; r0c1 += c1 * factor; break;
+                case 1: r1c0 += c0 * factor; r1c1 += c1 * factor; break;
+                default: throw new ArgumentOutOfRangeException(nameof(rDest));
+            }
+        }
+
         public Matrix2x2 Adjoint() =>
             new Matrix2x2( r1c1, -r0c1,
                           -r1c0,  r0c0);
@@ -293,13 +360,13 @@ namespace Nerd_STF.Mathematics.Algebra
                   (uint)r0c1.GetHashCode() & 0x00FF0000 |
                   (uint)r1c0.GetHashCode() & 0x0000FF00 |
                   (uint)r1c1.GetHashCode() & 0x000000FF);
-        public override string ToString() => ToStringHelper.MatrixToString(this, null);
+        public override string ToString() => ToStringHelper.MatrixToString(this, null, false);
 #if CS8_OR_GREATER
-        public string ToString(string? format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string? format, IFormatProvider? provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string? format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string? format, IFormatProvider? provider) => ToString(format);
 #else
-        public string ToString(string format) => ToStringHelper.MatrixToString(this, format);
-        public string ToString(string format, IFormatProvider provider) => ToStringHelper.MatrixToString(this, format);
+        public string ToString(string format = null) => ToStringHelper.MatrixToString(this, format, false);
+        string IFormattable.ToString(string format, IFormatProvider provider) => ToString(format);
 #endif
 
         public static Matrix2x2 operator +(Matrix2x2 a) =>
@@ -333,6 +400,8 @@ namespace Nerd_STF.Mathematics.Algebra
         public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => a.Equals(b);
         public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !a.Equals(b);
 
+
+        public static implicit operator Matrix(Matrix2x2 mat) => new Matrix(mat);
         public static explicit operator Matrix2x2(Matrix mat) =>
             new Matrix2x2(mat.TryGet(0, 0), mat.TryGet(0, 1),
                           mat.TryGet(1, 0), mat.TryGet(1, 1));
