@@ -13,7 +13,14 @@ namespace Nerd_STF
                                          ,ITuple
 #endif
     {
-        public int Length => items.Length;
+        public int Length
+        {
+            get
+            {
+                if (items is null) return 0; // In case of parameterless constructor.
+                else return items.Length;
+            }
+        }
 
         private readonly T[] items;
 
@@ -44,14 +51,16 @@ namespace Nerd_STF
 #endif
 #endif
 
-        public Enumerator GetEnumerator() => new Enumerator(this);
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public bool Equals(ListTuple<T> other)
         {
-            if (Length != other.Length) return false;
-            for (int i = 0; i < Length; i++)
+            int lenA = Length, lenB = other.Length;
+            if (lenA == 0) return lenB == 0;
+            else if (lenB == 0) return lenA == 0;
+            else if (lenA != lenB) return false;
+            for (int i = 0; i < lenA; i++)
             {
                 T itemA = items[i], itemB = other.items[i];
                 if (itemA == null || itemB == null)
@@ -86,6 +95,8 @@ namespace Nerd_STF
             return builder.ToString();
         }
 
+        public T[] ToArray() => items;
+        public List<T> ToList() => new List<T>(items);
         public Fill<T> ToFill()
         {
             T[] items = this.items;
@@ -113,7 +124,7 @@ namespace Nerd_STF
         public static implicit operator ListTuple<T>((T, T, T, T, T, T, T) tuple) => new ListTuple<T>(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, tuple.Item6, tuple.Item7);
         public static implicit operator ListTuple<T>(T[] array) => new ListTuple<T>(array);
 
-        public struct Enumerator : IEnumerator<T>
+        private struct Enumerator : IEnumerator<T>
         {
             private int index;
             private readonly ListTuple<T> tuple;
@@ -126,6 +137,8 @@ namespace Nerd_STF
 #endif
             public bool MoveNext()
             {
+                if (tuple.items is null) return false; // In case of parameterless constructor.
+
                 index++;
                 return index < tuple.items.Length;
             }
@@ -135,7 +148,7 @@ namespace Nerd_STF
             }
             public void Dispose() { }
 
-            internal Enumerator(ListTuple<T> tuple)
+            public Enumerator(ListTuple<T> tuple)
             {
                 index = -1;
                 this.tuple = tuple;
