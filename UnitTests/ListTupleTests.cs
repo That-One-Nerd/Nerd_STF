@@ -77,6 +77,43 @@ public sealed class ListTupleTests
         Assert.AreEqual("(1, 2, 3, 4)", new ListTuple<int>(1, 2, 3, 4).ToString());
     }
 
+    [TestMethod] public void TestHashCode()
+    {
+        // I dunno what a better GetHashCode test would be,
+        // I don't use this function very often.
+        for (int i = 0; i < 1000; i++)
+        {
+            ListTuple<int> a = new(RandomData),
+                           b = new(RandomData);
+            if (a == b) Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
+            else Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
+        }
+    }
+
+    [TestMethod] public void TestEquality()
+    {
+        // Equals(ListTuple)
+        Assert.IsTrue(new ListTuple<int>(1, 2, 3, 4, 5).Equals(new ListTuple<int>(1, 2, 3, 4, 5)));
+        Assert.IsTrue(new ListTuple<int>(1, 2, 3, 4, 5) == new ListTuple<int>(1, 2, 3, 4, 5));
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5) != new ListTuple<int>(1, 2, 3, 4, 5));
+
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5).Equals(new ListTuple<int>(5, 4, 3, 2, 1)));
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5) == new ListTuple<int>(5, 4, 3, 2, 1));
+        Assert.IsTrue(new ListTuple<int>(1, 2, 3, 4, 5) != new ListTuple<int>(5, 4, 3, 2, 1));
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5).Equals(new ListTuple<int>(1, 2, 3, 4)));
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5).Equals(new ListTuple<int>()));
+        Assert.IsFalse(new ListTuple<int>().Equals(new ListTuple<int>(1, 2, 3, 4, 5)));
+
+        Assert.IsTrue(new ListTuple<int?>(1, 2, null, 4, 5).Equals(new ListTuple<int?>(1, 2, null, 4, 5)));
+        Assert.IsFalse(new ListTuple<int?>(1, 2, null, 4, 5).Equals(new ListTuple<int?>(1, 2, 3, 4, 5)));
+        Assert.IsFalse(new ListTuple<int?>(1, 2, 3, 4, 5).Equals(new ListTuple<int?>(1, 2, null, 4, 5)));
+
+        // Equals(object?)
+        Assert.IsTrue(new ListTuple<int>(1, 2, 3, 4, 5).Equals((object?)new ListTuple<int>(1, 2, 3, 4, 5)));
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5).Equals((object?)null));
+        Assert.IsFalse(new ListTuple<int>(1, 2, 3, 4, 5).Equals((object?)5));
+    }
+
     [TestMethod] public void TestToArray()
     {
         int[] expected = RandomData;
@@ -168,5 +205,8 @@ public sealed class ListTupleTests
             Assert.AreEqual(expected[i], ((IEnumerator)values).Current); // Test non-generic interface form.
         }
         Assert.IsFalse(values.MoveNext());
+
+        // One more enumerator test.
+        AssertEnumeratorEquals(tuple.GetEnumerator(), ((IEnumerable)tuple).GetEnumerator());
     }
 }
