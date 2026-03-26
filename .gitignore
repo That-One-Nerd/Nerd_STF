@@ -12,6 +12,9 @@ TODO.md
 *.dll
 *.pdb
 
+# Test Stuff
+TestResults/
+
 # Nuget
 /Nerd_STF/LICENSE
 *.nupkg
