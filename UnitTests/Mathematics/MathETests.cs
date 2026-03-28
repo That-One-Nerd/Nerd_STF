@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Numerics;
 using static Nerd_STF.UnitTests.TestHelperMethods;
 
-namespace Nerd_STF.UnitTests;
+namespace Nerd_STF.UnitTests.Mathematics;
 
 [TestClass]
-public sealed class MathTests
+public sealed class MathETests
 {
     [TestMethod] public void TestIntAbs()
     {

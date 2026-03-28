@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Nerd_STF.UnitTests;
+namespace Nerd_STF.UnitTests.Mathematics.Algebra;
 
 [TestClass]
 public sealed class MatrixTests

@@ -107,5 +107,9 @@ namespace Nerd_STF.Mathematics
             }
             return result.ToString();
         }
+
+        public static implicit operator int[](FactorArray factors) => factors.ToArray();
+        public static implicit operator List<int>(FactorArray factors) => factors.ToList();
+        public static implicit operator ListTuple<int>(FactorArray factors) => factors.ToArray();
     }
 }
