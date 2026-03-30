@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Nerd_STF.Mathematics
@@ -21,8 +21,9 @@ namespace Nerd_STF.Mathematics
         }
 
         private readonly SortedDictionary<int, int> factorDict;
+        private readonly int num;
 
-        internal FactorArray(IEnumerable<int> factors)
+        internal FactorArray(int num, IEnumerable<int> factors)
         {
             factorDict = new SortedDictionary<int, int>();
             foreach (int f in factors)
@@ -30,6 +31,7 @@ namespace Nerd_STF.Mathematics
                 if (factorDict.TryGetValue(f, out int count)) factorDict[f] = count + 1;
                 else factorDict.Add(f, 1);
             }
+            this.num = num;
         }
 
         public IEnumerable<int> EnumerateFactors()
@@ -39,13 +41,20 @@ namespace Nerd_STF.Mathematics
                 for (int i = 0; i < f.Value; i++) yield return f.Key;
             }
         }
-        public IEnumerable<KeyValuePair<int, int>> GetFactors() => factorDict;
+        public ReadOnlyDictionary<int, int> GetFactors() => new ReadOnlyDictionary<int, int>(factorDict);
         public IEnumerable<int> GetDistinctFactors() => factorDict.Keys;
         public int GetMultiplicity(int factor)
         {
-            if (factorDict.TryGetValue(factor, out int mult)) return mult;
-            else return 0;
+            int count = 0, check = num;
+            while (check % factor == 0)
+            {
+                count++;
+                check /= factor;
+            }
+            return count;
         }
+
+        public bool IsFactor(int factor) => num % factor == 0;
 
         public int[] ToArray() => ToList().ToArray(); // Not weird syntax at all, wdym?
         public List<int> ToList()

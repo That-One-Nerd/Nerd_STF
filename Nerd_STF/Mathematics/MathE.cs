@@ -570,7 +570,7 @@ namespace Nerd_STF.Mathematics
         public static double Pow(double @base, double pow) =>
             CordicHelper.PowAnyBase(@base, pow, 8);
 
-        public static FactorArray PrimeFactors(int num) => new FactorArray(PrimeFactorsE(num));
+        public static FactorArray PrimeFactors(int num) => new FactorArray(num, PrimeFactorsE(num));
         public static IEnumerable<int> PrimeFactorsE(int num)
         {
             int i = 2;
