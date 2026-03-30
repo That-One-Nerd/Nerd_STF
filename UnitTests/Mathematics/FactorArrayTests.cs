@@ -68,13 +68,20 @@ public sealed class FactorArrayTests
             // Assert distinct factors.
             AssertArrayEquals(expected.Distinct(), factors.GetDistinctFactors());
 
-            // Test multiplicity.
+            // Test multiplicity and IsFactor.
             index = 0;
             int count = 0, lastNum = -1;
             do
             {
-                int n = index == expected.Length ? -1 : expected[index];
+                int n;
+                if (index == expected.Length) n = -1;
+                else
+                {
+                    n = expected[index];
+                    Assert.IsTrue(factors.IsFactor(n));
+                }
                 index++;
+
                 if (n != lastNum)
                 {
                     if (lastNum != -1)
@@ -107,6 +114,51 @@ public sealed class FactorArrayTests
                 Assert.AreEqual(expected[j], fill(j));
             }
             Assert.Throws<Exception>(() => fill(expected.Length));
+        }
+    }
+
+    [TestMethod] public void TestEquals()
+    {
+        FactorArray factors;
+        for (int i = 0; i < 1000; i++)
+        {
+            int num1 = RandomInput(out _), num2;
+            do { num2 = RandomInput(out _); } while (num1 == num2);
+
+            factors = FactorArray.GetPrimeFactors(num1);
+            Assert.IsTrue(factors.Equals(factors));                                    // Equals(FactorArray)
+            Assert.IsTrue(factors.Equals(FactorArray.GetPrimeFactors(num1)));          // Equals(FactorArray)
+            Assert.IsTrue(factors.Equals((object)FactorArray.GetPrimeFactors(num1)));  // Equals(object)
+            Assert.IsTrue(factors == FactorArray.GetPrimeFactors(num1));               // FactorArray == FactorArray
+            Assert.IsTrue(factors != FactorArray.GetPrimeFactors(num2));               // FactorArray != FactorArray
+
+            Assert.IsFalse(factors.Equals(FactorArray.GetPrimeFactors(num2)));         // Equals(FactorArray)
+            Assert.IsFalse(factors.Equals(null));                                      // Equals(FactorArray)
+            Assert.IsFalse(factors.Equals((object)FactorArray.GetPrimeFactors(num2))); // Equals(object)
+            Assert.IsFalse(factors.Equals((object?)null));                             // Equals(object)
+            Assert.IsFalse(factors == FactorArray.GetPrimeFactors(num2));              // FactorArray == FactorArray
+            Assert.IsFalse(factors != FactorArray.GetPrimeFactors(num1));              // FactorArray != FactorArray
+        }
+    }
+
+    [TestMethod] public void TestHashCode() => TestGetHashCode(() => FactorArray.GetPrimeFactors(RandomInput(out _)));
+
+    [TestMethod] public void TestToString()
+    {
+        // Hard-coded example that tests most of the possibilities.
+        Assert.AreEqual("2^3 * 3 * 5^2 * 7^2 * 11 * 19^2", FactorArray.GetPrimeFactors(116_747_400).ToString());
+        Assert.AreEqual("50087", FactorArray.GetPrimeFactors(50087).ToString());
+    }
+
+    [TestMethod] public void TestCasts()
+    {
+        FactorArray factors;
+        for (int i = 0; i < 1000; i++)
+        {
+            factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
+            AssertArrayEquals(expected, (int[])factors);
+            AssertArrayEquals(expected, (List<int>)factors);
+            AssertArrayEquals(expected, (ListTuple<int>)factors);
         }
     }
 

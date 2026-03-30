@@ -82,16 +82,7 @@ namespace Nerd_STF.Mathematics
 #else
         public bool Equals(FactorArray other)
 #endif
-        {
-            if (other is null) return false;
-            else if (factorDict.Count != other.factorDict.Count) return false;
-            else foreach (int key in factorDict.Keys)
-            {
-                if (!other.factorDict.TryGetValue(key, out int otherFactors)) return false;
-                else if (factorDict[key] != otherFactors) return false;
-            }
-            return true;
-        }
+            => !(other is null) && num == other.num; // In normal states, this will always mean the factors are the same.
 #if CS8_OR_GREATER
         public override bool Equals(object? obj)
 #else
@@ -116,6 +107,9 @@ namespace Nerd_STF.Mathematics
             }
             return result.ToString();
         }
+
+        public static bool operator ==(FactorArray a, FactorArray b) => a.Equals(b);
+        public static bool operator !=(FactorArray a, FactorArray b) => !a.Equals(b);
 
         public static implicit operator int[](FactorArray factors) => factors.ToArray();
         public static implicit operator List<int>(FactorArray factors) => factors.ToList();
