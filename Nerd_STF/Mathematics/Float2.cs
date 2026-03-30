@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Numerics;
 
 namespace Nerd_STF.Mathematics
@@ -268,6 +267,7 @@ namespace Nerd_STF.Mathematics
         public static Float2 operator -(Float2 a) => new Float2(-a.x, -a.y);
         public static Float2 operator -(Float2 a, Float2 b) => new Float2(a.x - b.x, a.y - b.y);
         public static Float2 operator *(Float2 a, double b) => new Float2(a.x * b, a.y * b);
+        public static Float2 operator *(double a, Float2 b) => new Float2(a * b.x, a * b.y);
         public static Float2 operator *(Float2 a, Float2 b) => new Float2(a.x * b.x, a.y * b.y);
         public static Float2 operator /(Float2 a, double b) => new Float2(a.x / b, a.y / b);
         public static Float2 operator /(Float2 a, Float2 b) => new Float2(a.x / b.x, a.y / b.y);

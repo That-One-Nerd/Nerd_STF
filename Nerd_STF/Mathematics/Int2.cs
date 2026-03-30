@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 namespace Nerd_STF.Mathematics
 {
@@ -234,6 +233,7 @@ namespace Nerd_STF.Mathematics
         public static Int2 operator -(Int2 a) => new Int2(-a.x, -a.y);
         public static Int2 operator -(Int2 a, Int2 b) => new Int2(a.x - b.x, a.y - b.y);
         public static Int2 operator *(Int2 a, int b) => new Int2(a.x * b, a.y * b);
+        public static Int2 operator *(int a, Int2 b) => new Int2(a * b.x, a * b.y);
         public static Int2 operator *(Int2 a, Int2 b) => new Int2(a.x * b.x, a.y * b.y);
         public static Int2 operator /(Int2 a, int b) => new Int2(a.x / b, a.y / b);
         public static Int2 operator /(Int2 a, Int2 b) => new Int2(a.x / b.x, a.y / b.y);

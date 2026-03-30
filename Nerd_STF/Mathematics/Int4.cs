@@ -1,9 +1,9 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Mathematics.Algebra;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Nerd_STF.Mathematics
 {
@@ -267,6 +267,7 @@ namespace Nerd_STF.Mathematics
         public static Int4 operator -(Int4 a) => new Int4(-a.x, -a.y, -a.z, -a.w);
         public static Int4 operator -(Int4 a, Int4 b) => new Int4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
         public static Int4 operator *(Int4 a, int b) => new Int4(a.x * b, a.y * b, a.z * b, a.w * b);
+        public static Int4 operator *(int a, Int4 b) => new Int4(a * b.x, a * b.y, a * b.z, a * b.w);
         public static Int4 operator *(Int4 a, Int4 b) => new Int4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
         public static Int4 operator /(Int4 a, int b) => new Int4(a.x / b, a.y / b, a.z / b, a.w / b);
         public static Int4 operator /(Int4 a, Int4 b) => new Int4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
@@ -281,7 +282,7 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int4(Float2 floats) => new Int4((int)floats.x, (int)floats.y, 0, 0);
         public static explicit operator Int4(Float3 floats) => new Int4((int)floats.x, (int)floats.y, (int)floats.z, 0);
         public static explicit operator Int4(Float4 floats) => new Int4((int)floats.x, (int)floats.y, (int)floats.z, (int)floats.w);
-        public static explicit operator Int4(Numbers.Quaternion quat) => new Int4((int)quat.x, (int)quat.y, (int)quat.z, (int)quat.w);
+        public static explicit operator Int4(Quaternion quat) => new Int4((int)quat.x, (int)quat.y, (int)quat.z, (int)quat.w);
         public static explicit operator Int4(ListTuple<double> tuple) => new Int4((int)tuple[0], (int)tuple[1], (int)tuple[2], (int)tuple[3]);
         public static implicit operator Int4(ListTuple<int> tuple) => new Int4(tuple[0], tuple[1], tuple[2], tuple[3]);
         public static implicit operator Int4((int, int, int, int) tuple) => new Int4(tuple.Item1, tuple.Item2, tuple.Item3, tuple.Item4);

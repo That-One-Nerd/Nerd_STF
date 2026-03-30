@@ -3,7 +3,6 @@ using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Nerd_STF.Mathematics
 {
@@ -254,6 +253,7 @@ namespace Nerd_STF.Mathematics
         public static Int3 operator -(Int3 a) => new Int3(-a.x, -a.y, -a.z);
         public static Int3 operator -(Int3 a, Int3 b) => new Int3(a.x - b.x, a.y - b.y, a.z - b.z);
         public static Int3 operator *(Int3 a, int b) => new Int3(a.x * b, a.y * b, a.z * b);
+        public static Int3 operator *(int a, Int3 b) => new Int3(a * b.x, a * b.y, a * b.z);
         public static Int3 operator *(Int3 a, Int3 b) => new Int3(a.x * b.x, a.y * b.y, a.z * b.z);
         public static Int3 operator /(Int3 a, int b) => new Int3(a.x / b, a.y / b, a.z / b);
         public static Int3 operator /(Int3 a, Int3 b) => new Int3(a.x / b.x, a.y / b.y, a.z / b.z);

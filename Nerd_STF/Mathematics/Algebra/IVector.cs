@@ -12,6 +12,7 @@ namespace Nerd_STF.Mathematics.Algebra
         where TNumber : INumber<TNumber>
     {
         static abstract TSelf operator *(TSelf a, TNumber b);
+        static abstract TSelf operator *(TNumber a, TSelf b);
         static abstract TSelf operator /(TSelf a, TNumber b);
     }
 }

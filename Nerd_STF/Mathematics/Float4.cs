@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using Nerd_STF.Exceptions;
 using Nerd_STF.Graphics;
@@ -317,6 +316,7 @@ namespace Nerd_STF.Mathematics
         public static Float4 operator -(Float4 a) => new Float4(-a.x, -a.y, -a.z, -a.w);
         public static Float4 operator -(Float4 a, Float4 b) => new Float4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
         public static Float4 operator *(Float4 a, double b) => new Float4(a.x * b, a.y * b, a.z * b, a.w * b);
+        public static Float4 operator *(double a, Float4 b) => new Float4(a * b.x, a * b.y, a * b.z, a * b.w);
         public static Float4 operator *(Float4 a, Float4 b) => new Float4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
         public static Float4 operator /(Float4 a, double b) => new Float4(a.x / b, a.y / b, a.z / b, a.w / b);
         public static Float4 operator /(Float4 a, Float4 b) => new Float4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);

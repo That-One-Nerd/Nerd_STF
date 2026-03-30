@@ -4,7 +4,6 @@ using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace Nerd_STF.Mathematics
@@ -296,6 +295,7 @@ namespace Nerd_STF.Mathematics
         public static Float3 operator -(Float3 a) => new Float3(-a.x, -a.y, -a.z);
         public static Float3 operator -(Float3 a, Float3 b) => new Float3(a.x - b.x, a.y - b.y, a.z - b.z);
         public static Float3 operator *(Float3 a, double b) => new Float3(a.x * b, a.y * b, a.z * b);
+        public static Float3 operator *(double a, Float3 b) => new Float3(a * b.x, a * b.y, a * b.z);
         public static Float3 operator *(Float3 a, Float3 b) => new Float3(a.x * b.x, a.y * b.y, a.z * b.z);
         public static Float3 operator /(Float3 a, double b) => new Float3(a.x / b, a.y / b, a.z / b);
         public static Float3 operator /(Float3 a, Float3 b) => new Float3(a.x / b.x, a.y / b.y, a.z / b.z);

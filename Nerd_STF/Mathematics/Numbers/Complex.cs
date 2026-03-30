@@ -462,6 +462,7 @@ namespace Nerd_STF.Mathematics.Numbers
         public static Complex operator -(Complex a, double b) => new Complex(a.r - b, a.i);
         public static Complex operator *(Complex a, Complex b) => new Complex(a.r * b.r - a.i * b.i, a.r * b.i + a.i * b.r);
         public static Complex operator *(Complex a, double b) => new Complex(a.r * b, a.i * b);
+        public static Complex operator *(double a, Complex b) => new Complex(a * b.r, a * b.i);
         public static Complex operator /(Complex a, Complex b)
         {
             double scaleFactor = 1 / (b.r * b.r + b.i * b.i);

@@ -4,8 +4,6 @@ using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 
 namespace Nerd_STF.Mathematics.Numbers
 {
@@ -296,6 +294,7 @@ namespace Nerd_STF.Mathematics.Numbers
                            a.z * b.r + a.w * b.i,
                            a.w * b.r - a.z * b.i);
         public static Quaternion operator *(Quaternion a, double b) => new Quaternion(a.x * b, a.y * b, a.z * b, a.w * b);
+        public static Quaternion operator *(double a, Quaternion b) => new Quaternion(a * b.x, a * b.y, a * b.z, a * b.w);
         public static Quaternion operator /(Quaternion a, double b) => new Quaternion(a.x / b, a.y / b, a.z / b, a.w / b);
         public static bool operator ==(Quaternion a, Quaternion b) => a.Equals(b);
         public static bool operator !=(Quaternion a, Quaternion b) => !a.Equals(b);
