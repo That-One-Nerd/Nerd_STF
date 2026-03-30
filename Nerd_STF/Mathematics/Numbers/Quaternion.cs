@@ -37,6 +37,7 @@ namespace Nerd_STF.Mathematics.Numbers
         public Quaternion Conjugate => new Quaternion(-x, -y, -z, w);
         public double Magnitude => MathE.Sqrt(x * x + y * y + z * z + w * w);
         public double MagnitudeSqr => x * x + y * y + z * z + w * w;
+        public Quaternion Normalized => this / Magnitude;
 
         public double x, y, z, w;
 
@@ -214,6 +215,15 @@ namespace Nerd_STF.Mathematics.Numbers
                 result += q;
             }
             return any ? result : Zero;
+        }
+
+        public void Normalize()
+        {
+            double invMag = 1 / Magnitude;
+            x *= invMag;
+            y *= invMag;
+            z *= invMag;
+            w *= invMag;
         }
 
         public IEnumerator<double> GetEnumerator()

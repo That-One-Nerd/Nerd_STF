@@ -38,6 +38,7 @@ namespace Nerd_STF.Mathematics.Numbers
         public Complex Conjugate => new Complex(r, -i);
         public double Magnitude => MathE.Sqrt(r * r + i * i);
         public double MagnitudeSqr => r * r + i * i;
+        public Complex Normalized => this / Magnitude;
 
         public double Real
         {
@@ -280,6 +281,13 @@ namespace Nerd_STF.Mathematics.Numbers
                 resultI += val.i;
             }
             return new Complex(resultR, resultI);
+        }
+
+        public void Normalize()
+        {
+            double invMag = 1 / Magnitude;
+            r *= invMag;
+            i *= invMag;
         }
 
 #if CS8_OR_GREATER
