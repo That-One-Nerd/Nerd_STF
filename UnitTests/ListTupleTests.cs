@@ -77,18 +77,7 @@ public sealed class ListTupleTests
         Assert.AreEqual("(1, 2, 3, 4)", new ListTuple<int>(1, 2, 3, 4).ToString());
     }
 
-    [TestMethod] public void TestHashCode()
-    {
-        // I dunno what a better GetHashCode test would be,
-        // I don't use this function very often.
-        for (int i = 0; i < 1000; i++)
-        {
-            ListTuple<int> a = new(RandomData),
-                           b = new(RandomData);
-            if (a == b) Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
-            else Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
-        }
-    }
+    [TestMethod] public void TestHashCode() => TestGetHashCode(() => new ListTuple<int>(RandomData));
 
     [TestMethod] public void TestEquality()
     {

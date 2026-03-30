@@ -20,5 +20,10 @@ namespace Nerd_STF.Mathematics
 #if CS11_OR_GREATER
         where TItem : INumber<TItem>
 #endif
-    { }
+    {
+#if CS11_OR_GREATER
+        static abstract implicit operator TSelf(ListTuple<TItem> tuple);
+        static abstract implicit operator ListTuple<TItem>(TSelf group);
+#endif
+    }
 }
