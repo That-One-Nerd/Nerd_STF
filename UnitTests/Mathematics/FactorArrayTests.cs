@@ -1,7 +1,9 @@
 ﻿using Nerd_STF.Mathematics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using static Nerd_STF.UnitTests.TestHelperMethods;
 
 namespace Nerd_STF.UnitTests.Mathematics;
 
@@ -17,6 +19,17 @@ public sealed class FactorArrayTests
 
             Assert.AreEqual(expected.Length, factors.Count);
             Assert.AreEqual(expected.Distinct().Count(), factors.Distinct);
+        }
+    }
+
+    [TestMethod] public void TestEnumerator()
+    {
+        FactorArray factors;
+        for (int i = 0; i < 1000; i++)
+        {
+            factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
+            AssertArrayEquals(expected, factors);
+            AssertEnumeratorEquals(factors.GetEnumerator(), ((IEnumerable)factors).GetEnumerator());
         }
     }
 
