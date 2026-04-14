@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Mathematics.Algebra;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -247,6 +248,24 @@ namespace Nerd_STF.Mathematics
         public override string ToString() => $"({x}, {y})";
         public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)})";
 
+        public Polar2d ToPolar()
+        {
+            // If either one of the values are zero,
+            // we fit into an edge case (atan won't work).
+            if (x == 0)
+            {
+                // Honestly this could (and maybe should)
+                // be made branchless, and it would probably
+                // be better.
+                if (y > 0) return new Polar2d(Angle.Up, y);
+                else if (y < 0) return new Polar2d(Angle.Down, -y);
+                else return Polar2d.Zero;
+            }
+
+            double angle = Math.Atan2(y, x);
+            return new Polar2d(Angle.FromRadians(angle), Magnitude);
+        }
+
         public double[] ToArray() => new double[] { x, y };
         public Fill<double> ToFill()
         {
@@ -274,7 +293,7 @@ namespace Nerd_STF.Mathematics
         public static bool operator ==(Float2 a, Float2 b) => a.Equals(b);
         public static bool operator !=(Float2 a, Float2 b) => !a.Equals(b);
 
-        public static explicit operator Float2(Complex complex) => new Float2(complex.Real, complex.Imaginary);
+        public static explicit operator Float2(System.Numerics.Complex complex) => new Float2(complex.Real, complex.Imaginary);
         public static explicit operator Float2(Float3 floats) => new Float2(floats.x, floats.y);
         public static explicit operator Float2(Float4 floats) => new Float2(floats.x, floats.y);
         public static implicit operator Float2(Int2 ints) => new Float2(ints.x, ints.y);

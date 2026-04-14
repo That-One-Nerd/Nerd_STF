@@ -2,14 +2,13 @@
 
 namespace Nerd_STF.Mathematics.Algebra
 {
-    public interface IVector<TSelf> : IVector<TSelf, double>, INumberGroup<TSelf, double> where TSelf : IVector<TSelf>
+    public interface IVector<TSelf> : IVector<TSelf, double> where TSelf : IVector<TSelf>
     {
         TSelf Normalized { get; }
 
         void Normalize();
     }
-    public interface IVector<TSelf, TNumber> : IMagnitudeOperators<TSelf>,
-                                               INumberGroupBase<TNumber>
+    public interface IVector<TSelf, TNumber> : IMagnitudeOperators<TSelf>
 #if CS11_OR_GREATER
                                               ,IDotOperation<TSelf, TNumber>,
                                              //IMultiplyOperators<TSelf, TNumber, TSelf>, // stupid "unification" problem in INumberGroup if uncommented

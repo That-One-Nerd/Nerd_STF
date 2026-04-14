@@ -718,6 +718,8 @@ namespace Nerd_STF.Mathematics
         public static double Cos(double rad) => Sin(rad + Constants.HalfPi);
         public static double Cos(Angle angle) => Sin(angle.Radians + Constants.HalfPi);
         public static IEquation Cos(IEquation inputRad) => new Equation(x => Sin(inputRad[x] + Constants.HalfPi));
+        public static (double cos, double sin) CosAndSin(double rad) => (Cos(rad), Sin(rad));
+        public static (double cos, double sin) CosAndSin(Angle angle) => (Cos(angle.Radians), Sin(angle.Radians));
         public static double Tan(double rad) => Sin(rad) / Sin(rad + Constants.HalfPi);
         public static double Tan(Angle angle) => Sin(angle.Radians) / Sin(angle.Radians + Constants.HalfPi);
         public static IEquation Tan(IEquation inputRad) => new Equation(x => Sin(inputRad[x]) / Sin(inputRad[x] + Constants.HalfPi));
