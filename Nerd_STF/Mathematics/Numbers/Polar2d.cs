@@ -217,12 +217,11 @@ namespace Nerd_STF.Mathematics.Numbers
         public static implicit operator Polar2d(Vector4 vec) => ((Float2)vec).ToPolar();
         public static implicit operator Polar2d((Angle, double) tuple) => new Polar2d(tuple.Item1, tuple.Item2);
 
-        public static implicit operator Float2(Polar2d polar) => polar.ToXyz();
-        public static implicit operator Float3(Polar2d polar) => polar.ToXyz();
-        public static implicit operator Float4(Polar2d polar) => polar.ToXyz();
-        public static explicit operator Int2(Polar2d polar) => (Int2)polar.ToXyz();
-        public static explicit operator Int3(Polar2d polar) => (Int3)polar.ToXyz();
-        public static explicit operator Int4(Polar2d polar) => (Int4)polar.ToXyz();
-        // TODO
+        public static explicit operator Point(Polar2d polar) => (Point)polar.ToXyz();
+        public static explicit operator PointF(Polar2d polar) => polar.ToXyz();
+        public static implicit operator Vector2(Polar2d polar) => polar.ToXyz();
+        public static implicit operator Vector3(Polar2d polar) => polar.ToXyz();
+        public static implicit operator Vector4(Polar2d polar) => polar.ToXyz();
+        public static implicit operator ValueTuple<Angle, double>(Polar2d polar) => (polar.a, polar.m);
     }
 }

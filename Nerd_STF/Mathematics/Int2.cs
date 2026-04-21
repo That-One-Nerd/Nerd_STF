@@ -184,6 +184,8 @@ namespace Nerd_STF.Mathematics
             return total;
         }
 
+        public Polar2d ToPolar() => ((Float2)this).ToPolar();
+
         public IEnumerator<int> GetEnumerator()
         {
             yield return x;
@@ -251,6 +253,7 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int2(Int4 ints) => new Int2(ints.x, ints.y);
         public static implicit operator Int2(Point point) => new Int2(point.X, point.Y);
         public static explicit operator Int2(PointF point) => new Int2((int)point.X, (int)point.Y);
+        public static explicit operator Int2(Polar2d polar) => (Int2)polar.ToXyz();
         public static implicit operator Int2(Size size) => new Int2(size.Width, size.Height);
         public static explicit operator Int2(SizeF size) => new Int2((int)size.Width, (int)size.Height);
         public static explicit operator Int2(ListTuple<double> tuple) => new Int2((int)tuple[0], (int)tuple[1]);

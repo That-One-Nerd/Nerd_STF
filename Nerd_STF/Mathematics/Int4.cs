@@ -282,6 +282,7 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int4(Float2 floats) => new Int4((int)floats.x, (int)floats.y, 0, 0);
         public static explicit operator Int4(Float3 floats) => new Int4((int)floats.x, (int)floats.y, (int)floats.z, 0);
         public static explicit operator Int4(Float4 floats) => new Int4((int)floats.x, (int)floats.y, (int)floats.z, (int)floats.w);
+        public static explicit operator Int4(Polar2d polar) => (Int4)polar.ToXyz();
         public static explicit operator Int4(Quaternion quat) => new Int4((int)quat.x, (int)quat.y, (int)quat.z, (int)quat.w);
         public static explicit operator Int4(ListTuple<double> tuple) => new Int4((int)tuple[0], (int)tuple[1], (int)tuple[2], (int)tuple[3]);
         public static implicit operator Int4(ListTuple<int> tuple) => new Int4(tuple[0], tuple[1], tuple[2], tuple[3]);

@@ -302,6 +302,7 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Float2(Matrix mat) => new Float2(mat.TryGet(0, 0), mat.TryGet(1, 0));
         public static implicit operator Float2(Point point) => new Float2(point.X, point.Y);
         public static implicit operator Float2(PointF point) => new Float2(point.X, point.Y);
+        public static implicit operator Float2(Polar2d polar) => polar.ToXyz();
         public static implicit operator Float2(Size point) => new Float2(point.Width, point.Height);
         public static implicit operator Float2(SizeF size) => new Float2(size.Width, size.Height);
         public static implicit operator Float2(Vector2 vec) => new Float2(vec.X, vec.Y);

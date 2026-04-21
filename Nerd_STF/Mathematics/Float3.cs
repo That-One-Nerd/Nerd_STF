@@ -1,6 +1,7 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Graphics;
 using Nerd_STF.Mathematics.Algebra;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -309,6 +310,7 @@ namespace Nerd_STF.Mathematics
         public static implicit operator Float3(Int3 ints) => new Float3(ints.x, ints.y, ints.z);
         public static explicit operator Float3(Int4 ints) => new Float3(ints.x, ints.y, ints.z);
         public static explicit operator Float3(Matrix mat) => new Float3(mat.TryGet(0, 0), mat.TryGet(1, 0), mat.TryGet(2, 0));
+        public static implicit operator Float3(Polar2d polar) => polar.ToXyz();
         public static implicit operator Float3(Vector2 vec) => new Float3(vec.X, vec.Y, 0);
         public static implicit operator Float3(Vector3 vec) => new Float3(vec.X, vec.Y, vec.Z);
         public static explicit operator Float3(Vector4 vec) => new Float3(vec.X, vec.Y, vec.Z);

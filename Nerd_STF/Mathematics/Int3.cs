@@ -1,5 +1,6 @@
 ﻿using Nerd_STF.Exceptions;
 using Nerd_STF.Mathematics.Algebra;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -268,6 +269,7 @@ namespace Nerd_STF.Mathematics
         public static explicit operator Int3(Float2 floats) => new Int3((int)floats.x, (int)floats.y, 0);
         public static explicit operator Int3(Float3 floats) => new Int3((int)floats.x, (int)floats.y, (int)floats.z);
         public static explicit operator Int3(Float4 floats) => new Int3((int)floats.x, (int)floats.y, (int)floats.z);
+        public static explicit operator Int3(Polar2d polar) => (Int3)polar.ToXyz();
         public static explicit operator Int3(ListTuple<double> tuple) => new Int3((int)tuple[0], (int)tuple[1], (int)tuple[2]);
         public static implicit operator Int3(ListTuple<int> tuple) => new Int3(tuple[0], tuple[1], tuple[2]);
         public static implicit operator Int3((int, int, int) tuple) => new Int3(tuple.Item1, tuple.Item2, tuple.Item3);
