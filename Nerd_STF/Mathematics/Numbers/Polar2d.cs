@@ -1,6 +1,5 @@
 ﻿using Nerd_STF.Mathematics.Algebra;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -150,9 +149,20 @@ namespace Nerd_STF.Mathematics.Numbers
             new Polar2d(value.a, MathE.Clamp(value.m, minMag, maxMag));
         public static void ClampMagnitude(ref Polar2d value, double minMag, double maxMag) =>
             MathE.Clamp(ref value.m, minMag, maxMag);
+#if CS11_OR_GREATER
+        static double IDotOperation<Polar2d, double>.Dot(Polar2d a, Polar2d b) => Float2.Dot(a, b);
+        static double IDotOperation<Polar2d, double>.Dot(IEnumerable<Polar2d> vals) => Float2.Dot(vals.Cast<Float2>());
+#endif
         public static Polar2d Lerp(Polar2d a, Polar2d b, double t, bool clamp = true) =>
             new Polar2d(Angle.Lerp(a.a, b.a, t, clamp),
                         MathE.Lerp(a.m, b.m, t, clamp));
+        public static Polar2d Sum(IEnumerable<Polar2d> vals)
+        {
+            Polar2d result = Zero;
+            foreach (Polar2d val in vals) result += val;
+            return result;
+        }
+
         public void Normalize()
         {
             if (m < 0)
