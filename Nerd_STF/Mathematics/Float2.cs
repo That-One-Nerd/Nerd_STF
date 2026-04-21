@@ -219,6 +219,24 @@ namespace Nerd_STF.Mathematics
             y *= invMag;
         }
 
+        public Polar2d ToPolar()
+        {
+            // If either one of the values are zero,
+            // we fit into an edge case (atan won't work).
+            if (x == 0)
+            {
+                // Honestly this could (and maybe should)
+                // be made branchless, and it would probably
+                // be better.
+                if (y > 0) return new Polar2d(Angle.Up, y);
+                else if (y < 0) return new Polar2d(Angle.Down, -y);
+                else return Polar2d.Zero;
+            }
+
+            double angle = Math.Atan2(y, x);
+            return new Polar2d(Angle.FromRadians(angle), Magnitude);
+        }
+
         public IEnumerator<double> GetEnumerator()
         {
             yield return x;
@@ -247,24 +265,6 @@ namespace Nerd_STF.Mathematics
         public override int GetHashCode() => x.GetHashCode() ^ y.GetHashCode();
         public override string ToString() => $"({x}, {y})";
         public string ToString(string format) => $"({x.ToString(format)}, {y.ToString(format)})";
-
-        public Polar2d ToPolar()
-        {
-            // If either one of the values are zero,
-            // we fit into an edge case (atan won't work).
-            if (x == 0)
-            {
-                // Honestly this could (and maybe should)
-                // be made branchless, and it would probably
-                // be better.
-                if (y > 0) return new Polar2d(Angle.Up, y);
-                else if (y < 0) return new Polar2d(Angle.Down, -y);
-                else return Polar2d.Zero;
-            }
-
-            double angle = Math.Atan2(y, x);
-            return new Polar2d(Angle.FromRadians(angle), Magnitude);
-        }
 
         public double[] ToArray() => new double[] { x, y };
         public Fill<double> ToFill()
