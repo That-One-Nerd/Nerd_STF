@@ -109,7 +109,7 @@ public sealed class ListTupleTests
         ListTuple<int> tuple = new(expected);
 
         int[] compare = tuple.ToArray();
-        AssertArrayEquals(expected, compare);
+        Assert.ArrayEquals(expected, compare);
     }
     [TestMethod] public void TestToList()
     {
@@ -117,7 +117,7 @@ public sealed class ListTupleTests
         ListTuple<int> tuple = new(expected);
 
         List<int> compare = tuple.ToList();
-        AssertArrayEquals(expected, compare);
+        Assert.ArrayEquals(expected, compare);
     }
     [TestMethod] public void TestToFill()
     {
@@ -149,8 +149,8 @@ public sealed class ListTupleTests
         Assert.AreEqual<ListTuple<int>>(new ListTuple<int>(1, 2, 3, 4, 5, 6, 7), (1, 2, 3, 4, 5, 6, 7));
 
         // ListTuple <-> T[]
-        AssertArrayEquals([1, 2, 3, 4, 5, 6, 7, 8], (int[])new ListTuple<int>(1, 2, 3, 4, 5, 6, 7, 8));
-        AssertArrayEquals(new ListTuple<int>(1, 2, 3, 4, 5, 6, 7, 8), (ListTuple<int>)new int[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+        Assert.ArrayEquals([1, 2, 3, 4, 5, 6, 7, 8], (int[])new ListTuple<int>(1, 2, 3, 4, 5, 6, 7, 8));
+        Assert.ArrayEquals(new ListTuple<int>(1, 2, 3, 4, 5, 6, 7, 8), (ListTuple<int>)new int[] { 1, 2, 3, 4, 5, 6, 7, 8 });
     }
 
     [TestMethod] public void TestEnumerator()
@@ -196,6 +196,6 @@ public sealed class ListTupleTests
         Assert.IsFalse(values.MoveNext());
 
         // One more enumerator test.
-        AssertEnumeratorEquals(tuple.GetEnumerator(), ((IEnumerable)tuple).GetEnumerator());
+        Assert.EnumeratorEquals(tuple.GetEnumerator(), ((IEnumerable)tuple).GetEnumerator());
     }
 }

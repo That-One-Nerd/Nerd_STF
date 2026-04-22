@@ -70,14 +70,14 @@ public sealed class MathETests
     [TestMethod] public void TestGeneratePrimes()
     {
         // Manually check a few inputs.
-        AssertArrayEquals([2, 3], MathE.GeneratePrimes(4));
-        AssertArrayEquals([2, 3, 5, 7], MathE.GeneratePrimes(10));
-        AssertArrayEquals([2, 3, 5, 7, 11], MathE.GeneratePrimes(11));
-        AssertArrayEquals([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31], MathE.GeneratePrimes(31));
+        Assert.ArrayEquals([2, 3], MathE.GeneratePrimes(4));
+        Assert.ArrayEquals([2, 3, 5, 7], MathE.GeneratePrimes(10));
+        Assert.ArrayEquals([2, 3, 5, 7, 11], MathE.GeneratePrimes(11));
+        Assert.ArrayEquals([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31], MathE.GeneratePrimes(31));
 
         // Use a more basic prime detection system to determine the rest.
         // Should always be in parity.
-        AssertArrayEquals(GetPrimesBasic(10000), MathE.GeneratePrimes(10000));
+        Assert.ArrayEquals(GetPrimesBasic(10000), MathE.GeneratePrimes(10000));
 
         static IEnumerable<int> GetPrimesBasic(int maximum)
         {

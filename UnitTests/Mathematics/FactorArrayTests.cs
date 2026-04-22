@@ -17,8 +17,8 @@ public sealed class FactorArrayTests
         for (int i = 0; i < 1000; i++)
         {
             int num = RandomInput(out int[] expected);
-            AssertArrayEquals(expected, MathE.PrimeFactorsE(num));
-            AssertArrayEquals(expected, FactorArray.GetPrimeFactors(num));
+            Assert.ArrayEquals(expected, MathE.PrimeFactorsE(num));
+            Assert.ArrayEquals(expected, FactorArray.GetPrimeFactors(num));
         }
     }
 
@@ -40,8 +40,8 @@ public sealed class FactorArrayTests
         for (int i = 0; i < 1000; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
-            AssertArrayEquals(expected, factors);
-            AssertEnumeratorEquals(factors.GetEnumerator(), ((IEnumerable)factors).GetEnumerator());
+            Assert.ArrayEquals(expected, factors);
+            Assert.EnumeratorEquals(factors.GetEnumerator(), ((IEnumerable)factors).GetEnumerator());
         }
     }
 
@@ -66,7 +66,7 @@ public sealed class FactorArrayTests
             Assert.AreEqual(expected.Length, index);
 
             // Assert distinct factors.
-            AssertArrayEquals(expected.Distinct(), factors.GetDistinctFactors());
+            Assert.ArrayEquals(expected.Distinct(), factors.GetDistinctFactors());
 
             // Test multiplicity and IsFactor.
             index = 0;
@@ -103,8 +103,8 @@ public sealed class FactorArrayTests
         for (int i = 0; i < 1000; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
-            AssertArrayEquals(expected, factors.ToArray());
-            AssertArrayEquals(expected, factors.ToList());
+            Assert.ArrayEquals(expected, factors.ToArray());
+            Assert.ArrayEquals(expected, factors.ToList());
 
             // Technically, ToFill() tests all of these methods at once.
             // But it's still good to test individually.
@@ -156,9 +156,9 @@ public sealed class FactorArrayTests
         for (int i = 0; i < 1000; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
-            AssertArrayEquals(expected, (int[])factors);
-            AssertArrayEquals(expected, (List<int>)factors);
-            AssertArrayEquals(expected, (ListTuple<int>)factors);
+            Assert.ArrayEquals(expected, (int[])factors);
+            Assert.ArrayEquals(expected, (List<int>)factors);
+            Assert.ArrayEquals(expected, (ListTuple<int>)factors);
         }
     }
 

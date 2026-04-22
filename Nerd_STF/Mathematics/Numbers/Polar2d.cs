@@ -1,4 +1,5 @@
-﻿using Nerd_STF.Mathematics.Algebra;
+﻿using Nerd_STF.Helpers;
+using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -129,11 +130,27 @@ namespace Nerd_STF.Mathematics.Numbers
 
         public Float2 ToXyz() => new Float2(m * MathE.Cos(a), m * MathE.Sin(a));
 
-        public bool Equals(Polar2d other)
+        public bool Equals(Polar2d other) => Equals(other, 1e-3);
+        public bool Equals(Polar2d other, double delta)
         {
-            if (Magnitude == 0) return other.Magnitude == 0;
-            else if (!a.Normalized.Equals(other.a.Normalized)) return false; // Different angles.
-            else if (!m.Equals(other.m)) return false;                       // Different magnitude.
+            Angle  a1 = a, a2 = other.a;
+            double m1 = m, m2 = other.m;
+
+            // Correct for negative magnitudes.
+            if (m1 < 0)
+            {
+                a1 += Angle.Half;
+                m1 *= -1;
+            }
+            if (m2 < 0)
+            {
+                a2 += Angle.Half;
+                m2 *= -1;
+            }
+
+            if (Math.Abs(m1) <= delta && Math.Abs(m2) <= delta) return true; // Edge case, close to zero.
+            if (Math.Abs(m1 - m2) > delta) return false;                     // Different magnitude.
+            else if (!a1.Normalized.Equals(a2.Normalized)) return false;     // Different angles.
             else return true;                                                // LGTM! 👍
         }
 #if CS8_OR_GREATER
