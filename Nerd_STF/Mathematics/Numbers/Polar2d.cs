@@ -7,7 +7,7 @@ using System.Numerics;
 
 namespace Nerd_STF.Mathematics.Numbers
 {
-    public struct Polar2d : IVector<Polar2d>, ICombinationIndexer<double>, IEquatable<Polar2d>
+    public struct Polar2d : IVector<Polar2d>, IEquatable<Polar2d>
 #if CS11_OR_GREATER
                            ,IFromTuple<Polar2d, (Angle, double)>,
                             IPresets2d<Polar2d>
@@ -64,61 +64,6 @@ namespace Nerd_STF.Mathematics.Numbers
         {
             a = Angle.FromRadians(fill(0));
             m = fill(1);
-        }
-
-        public double this[int index]
-        {
-            get
-            {
-                switch (index)
-                {
-                    case 0: return a.Radians;
-                    case 1: return m;
-                    default: throw new ArgumentOutOfRangeException(nameof(index));
-                }
-            }
-            set
-            {
-                switch (index)
-                {
-                    case 0: a = Angle.FromRadians(value); break;
-                    case 1: m = value; break;
-                    default: throw new ArgumentOutOfRangeException(nameof(index));
-                }
-            }
-        }
-        public ListTuple<double> this[string key]
-        {
-            get
-            {
-                double[] items = new double[key.Length];
-                for (int i = 0; i < key.Length; i++)
-                {
-                    char c = char.ToLower(key[i]);
-                    switch (c)
-                    {
-                        case 'a': items[i] = a.Radians; break;
-                        case 'm': items[i] = m; break;
-                        default: throw new ArgumentException("Invalid key.", nameof(key));
-                    }
-                }
-                return new ListTuple<double>(items);
-            }
-            set
-            {
-                IEnumerator<double> stepper = value.GetEnumerator();
-                for (int i = 0; i < key.Length; i++)
-                {
-                    char c = char.ToLower(key[i]);
-                    stepper.MoveNext();
-                    switch (c)
-                    {
-                        case 'a': a = Angle.FromRadians(stepper.Current); break;
-                        case 'm': m = stepper.Current; break;
-                        default: throw new ArgumentException("Invalid key.", nameof(key));
-                    }
-                }
-            }
         }
 
         public static Polar2d Average(IEnumerable<Polar2d> values)
