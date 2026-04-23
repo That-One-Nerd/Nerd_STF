@@ -10,6 +10,15 @@ namespace Nerd_STF.UnitTests.Mathematics.Numbers;
 [TestClass]
 public sealed class Polar2dTests
 {
+    public static Polar2d RandomData
+    {
+        get
+        {
+            Random rand = Random.Shared;
+            return new(Angle.FromRevolutions(rand.NextDouble()), 10 * rand.NextDouble());
+        }
+    }
+
     [TestMethod] public void TestConstants()
     {
         // Constants should have parity with themselves.
@@ -18,7 +27,6 @@ public sealed class Polar2dTests
         Assert.AreEqual(Polar2d.Zero, Polar2d.Down + Polar2d.Up);
         Assert.AreEqual(Polar2d.Zero, Polar2d.Left + Polar2d.Right);
     }
-
 
     [TestMethod] public void TestConstructors()
     {
@@ -82,8 +90,7 @@ public sealed class Polar2dTests
         Random rand = Random.Shared;
         for (int i = 0; i < BulkTestCount; i++)
         {
-            Polar2d a = new(Angle.FromRevolutions(rand.NextDouble()), 10 * rand.NextDouble()),
-                    b = new(Angle.FromRevolutions(rand.NextDouble()), 10 * rand.NextDouble());
+            Polar2d a = RandomData, b = RandomData;
             double c = rand.NextDouble();
 
             // Compare parity with Float2.

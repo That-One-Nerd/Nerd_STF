@@ -69,18 +69,17 @@ namespace Nerd_STF.Mathematics.Numbers
 
         public static Polar2d Average(IEnumerable<Polar2d> values)
         {
-            Angle totalAng = Angle.Zero;
-            double totalMag = 0;
+            Polar2d total = Zero;
             int count = 0;
 
             foreach (Polar2d val in values)
             {
-                totalAng += val.a;
-                totalMag += val.m;
+                total += val;
+                count++;
             }
 
             if (count == 0) return Zero;
-            else return new Polar2d(totalAng / count, totalMag / count);
+            else return total / count;
         }
         public static Polar2d Clamp(Polar2d value, Polar2d min, Polar2d max) =>
             new Polar2d(Angle.Clamp(value.a, min.a, max.a),
