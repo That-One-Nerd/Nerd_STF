@@ -1,11 +1,14 @@
 ﻿using Nerd_STF.Mathematics;
+using Nerd_STF.Mathematics.Algebra;
 using Nerd_STF.Mathematics.Numbers;
+using Nerd_STF.UnitTests.Helpers;
 using System;
+using static Nerd_STF.UnitTests.Helpers.TestHelperMethods;
 
 namespace Nerd_STF.UnitTests.Mathematics.Numbers;
 
 [TestClass]
-public class Polar2dTests
+public sealed class Polar2dTests
 {
     [TestMethod] public void TestConstants()
     {
@@ -16,20 +19,80 @@ public class Polar2dTests
         Assert.AreEqual(Polar2d.Zero, Polar2d.Left + Polar2d.Right);
     }
 
-    [TestMethod] public void TestSimpleProperties()
+
+    [TestMethod] public void TestConstructors()
     {
         Random rand = Random.Shared;
-        for (int i = 0; i < 10_000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
+        {
+            // 6.29 is intentional here. It's better to overshoot our
+            // input than to slightly undershoot it.
+            double aV = 6.29 * rand.NextDouble(), m = 10 * rand.NextDouble();
+            Angle a = Angle.FromRadians(aV);
+
+            Assert.AreEqual(a, new Polar2d(a, m).a);
+            Assert.AreEqual(m, new Polar2d(a, m).m);
+            Assert.AreEqual(a, new Polar2d(aV, m).a);
+            Assert.AreEqual(m, new Polar2d(aV, m).m);
+
+            double fill(int i) => i switch
+            {
+                0 => aV,
+                1 => m,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            Assert.AreEqual(a, new Polar2d(fill).a);
+            Assert.AreEqual(m, new Polar2d(fill).m);
+        }
+    }
+
+    [TestMethod] public void TestProperties()
+    {
+        Random rand = Random.Shared;
+        for (int i = 0; i < BulkTestCount; i++)
         {
             Angle a = Angle.FromRevolutions(rand.NextDouble());
             double m = 10 * rand.NextDouble();
 
             Polar2d val = new(a, m);
 
+            // Test getting properties.
             Assert.AreEqual(a, val.a);
             Assert.AreEqual(m, val.m);
             Assert.AreEqual(a, val.Theta);
             Assert.AreEqual(m, val.Magnitude);
+
+            // Test setting properties.
+            val.Theta += Angle.Quarter;
+            val.Magnitude += 1;
+            Assert.AreEqual(a + Angle.Quarter, val.a);
+            Assert.AreEqual(m + 1, val.m);
+
+            // Test that Magnitude^2 == MagnitudeSqr.
+            Assert.AreEqual(((IMagnitudeOperators<Polar2d>)val).MagnitudeSqr, val.Magnitude * val.Magnitude);
+
+            // Test normalizing makes Magnitude == 1.
+            Assert.AreEqual(1, val.Normalized.Magnitude);
+        }
+    }
+
+    [TestMethod] public void TestOperators()
+    {
+        Random rand = Random.Shared;
+        for (int i = 0; i < BulkTestCount; i++)
+        {
+            Polar2d a = new(Angle.FromRevolutions(rand.NextDouble()), 10 * rand.NextDouble()),
+                    b = new(Angle.FromRevolutions(rand.NextDouble()), 10 * rand.NextDouble());
+            double c = rand.NextDouble();
+
+            // Compare parity with Float2.
+            Assert.AreEqual(a.ToXyz() + b.ToXyz(), (a + b).ToXyz(), Compare.Float2());
+            Assert.AreEqual(-(a.ToXyz()), (-a).ToXyz(), Compare.Float2());
+            Assert.AreEqual(a.ToXyz() - b.ToXyz(), (a - b).ToXyz(), Compare.Float2());
+            Assert.AreEqual(a.ToXyz() * c, (a * c).ToXyz(), Compare.Float2());
+            Assert.AreEqual(c * a.ToXyz(), (c * a).ToXyz(), Compare.Float2());
+            Assert.AreEqual(a.ToXyz() / c, (a / c).ToXyz(), Compare.Float2());
         }
     }
 }

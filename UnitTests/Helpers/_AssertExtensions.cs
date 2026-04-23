@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Nerd_STF.UnitTests;
+namespace Nerd_STF.UnitTests.Helpers;
 
-internal static partial class _AssertExtensions
+internal static partial class AssertExtensions
 {
     extension(Assert)
     {

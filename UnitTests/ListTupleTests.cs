@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Nerd_STF.UnitTests.Helpers;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using static Nerd_STF.UnitTests.TestHelperMethods;
+using static Nerd_STF.UnitTests.Helpers.TestHelperMethods;
 
 namespace Nerd_STF.UnitTests;
 

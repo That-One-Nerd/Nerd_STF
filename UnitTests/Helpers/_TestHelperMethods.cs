@@ -4,16 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Nerd_STF.UnitTests;
+namespace Nerd_STF.UnitTests.Helpers;
 
 internal static class TestHelperMethods
 {
+    public const int BulkTestCount = 1000;
+
     public static void TestGetHashCode<T>(Func<T> construct)
         where T : IEquatable<T>
     {
         // I dunno what a better GetHashCode test would be,
         // I don't use this function very often.
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             // Technically this is not a correct test.
             // Two non-equal values are allowed to have the same hash code,

@@ -172,7 +172,6 @@ namespace Nerd_STF.Mathematics.Numbers
         public static Polar2d operator *(Polar2d a, double b) => new Polar2d(a.a, a.m * b);
         public static Polar2d operator *(double a, Polar2d b) => new Polar2d(b.a, b.m * a);
         public static Polar2d operator /(Polar2d a, double b) => new Polar2d(a.a, a.m / b);
-        public static Polar2d operator /(double a, Polar2d b) => new Polar2d(b.a, b.m / a);
         public static bool operator ==(Polar2d a, Polar2d b) => a.Equals(b);
         public static bool operator !=(Polar2d a, Polar2d b) => !a.Equals(b);
 

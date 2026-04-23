@@ -1,9 +1,10 @@
 ﻿using Nerd_STF.Mathematics;
+using Nerd_STF.UnitTests.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using static Nerd_STF.UnitTests.TestHelperMethods;
+using static Nerd_STF.UnitTests.Helpers.TestHelperMethods;
 
 namespace Nerd_STF.UnitTests.Mathematics;
 
@@ -14,7 +15,7 @@ public sealed class FactorArrayTests
     {
         // MathE.PrimeFactorsE and FactorArray.GetPrimeFactors
         // should always be equivalent.
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             int num = RandomInput(out int[] expected);
             Assert.ArrayEquals(expected, MathE.PrimeFactorsE(num));
@@ -25,7 +26,7 @@ public sealed class FactorArrayTests
     [TestMethod] public void TestFactorCount()
     {
         FactorArray factors;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
 
@@ -37,7 +38,7 @@ public sealed class FactorArrayTests
     [TestMethod] public void TestEnumerator()
     {
         FactorArray factors;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
             Assert.ArrayEquals(expected, factors);
@@ -48,7 +49,7 @@ public sealed class FactorArrayTests
     [TestMethod] public void TestFactors()
     {
         FactorArray factors;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
 
@@ -100,7 +101,7 @@ public sealed class FactorArrayTests
     [TestMethod] public void TestConversions()
     {
         FactorArray factors;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
             Assert.ArrayEquals(expected, factors.ToArray());
@@ -120,7 +121,7 @@ public sealed class FactorArrayTests
     [TestMethod] public void TestEquals()
     {
         FactorArray factors;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             int num1 = RandomInput(out _), num2;
             do { num2 = RandomInput(out _); } while (num1 == num2);
@@ -153,7 +154,7 @@ public sealed class FactorArrayTests
     [TestMethod] public void TestCasts()
     {
         FactorArray factors;
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             factors = FactorArray.GetPrimeFactors(RandomInput(out int[] expected));
             Assert.ArrayEquals(expected, (int[])factors);

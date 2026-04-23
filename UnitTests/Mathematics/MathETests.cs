@@ -1,8 +1,9 @@
 ﻿using Nerd_STF.Mathematics;
+using Nerd_STF.UnitTests.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using static Nerd_STF.UnitTests.TestHelperMethods;
+using static Nerd_STF.UnitTests.Helpers.TestHelperMethods;
 
 namespace Nerd_STF.UnitTests.Mathematics;
 
@@ -14,7 +15,7 @@ public sealed class MathETests
         // Test 10,000 randomly sampled integers.
         // There should always be parity with Math.Abs
         Random rand = new();
-        for (int i = 0; i < 10_000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             int number = rand.Next();
             int expected = number < 0 ? -number : number;
@@ -28,7 +29,7 @@ public sealed class MathETests
         // Test 10,000 randomly sampled doubles with range [-1e5,1e5).
         // There should always be parity with Math.Abs
         Random rand = new();
-        for (int i = 0; i < 10_000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             double number = rand.NextDouble() * 2e5 - 1e5;
             double expected = number < 0 ? -number : number;
@@ -56,7 +57,7 @@ public sealed class MathETests
         // Test 10,000 randomly sampled doubles with range [-1e5,1e5).
         // Convert to the desired type, trucating if necessary.
         Random rand = new();
-        for (int i = 0; i < 10_000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             double rawNumber = rand.NextDouble() * 2e5 - 1e5;
 

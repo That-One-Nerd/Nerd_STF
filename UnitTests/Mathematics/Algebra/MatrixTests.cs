@@ -3,6 +3,7 @@ using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Nerd_STF.UnitTests.Helpers.TestHelperMethods;
 
 namespace Nerd_STF.UnitTests.Mathematics.Algebra;
 
@@ -378,7 +379,7 @@ public sealed class MatrixTests
         Matrix2x2 mat;
         Random rand = new();
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < BulkTestCount; i++)
         {
             rad = rand.NextDouble() * Math.PI * 2;
             rot = Angle.FromRadians(rad);
