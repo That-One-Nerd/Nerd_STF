@@ -120,10 +120,10 @@ namespace Nerd_STF.Mathematics.Numbers
             m = 1;
         }
 
-        public void Deconstruct(out Angle angle, out double magnitude)
+        public void Deconstruct(out double magnitude, out Angle theta)
         {
-            angle = a;
             magnitude = m;
+            theta = a;
         }
 
         public Float2 ToXyz() => new Float2(m * MathE.Cos(a), m * MathE.Sin(a));

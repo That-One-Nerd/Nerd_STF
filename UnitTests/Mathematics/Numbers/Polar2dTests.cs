@@ -15,7 +15,7 @@ public sealed class Polar2dTests
         get
         {
             Random rand = Random.Shared;
-            return new(10 * rand.NextDouble(), Angle.FromRevolutions(rand.NextDouble()));
+            return new(20 * (rand.NextDouble() - 0.5), Angle.FromRevolutions(rand.NextDouble()));
         }
     }
 
@@ -82,6 +82,72 @@ public sealed class Polar2dTests
 
             // Test normalizing makes Magnitude == 1.
             Assert.AreEqual(1, val.Normalized.Magnitude);
+        }
+    }
+
+    [TestMethod] public void TestDeconstruct()
+    {
+        for (int i = 0; i < BulkTestCount; i++)
+        {
+            Polar2d polar = RandomData;
+
+            (double mag, Angle theta) = polar;
+            Assert.AreEqual(polar.m, mag);
+            Assert.AreEqual(polar.a, theta);
+
+            // Also test tuple conversions while we're at it.
+            // I find it a little silly that the two are different,
+            // but that's okay.
+            (double, Angle) tuple = polar;
+            Assert.AreEqual(polar.m, tuple.Item1);
+            Assert.AreEqual(polar.a, tuple.Item2);
+
+            Polar2d other = tuple;
+            Assert.AreEqual(polar, other);
+     
+        }
+    }
+
+    [TestMethod] public void TestNormalize()
+    {
+        for (int i = 0; i < BulkTestCount; i++)
+        {
+            Polar2d original = RandomData, normalized = original;
+            normalized.Normalize();
+
+            Assert.AreEqual(1, normalized.Magnitude);
+            Assert.AreEqual(original.ToXyz().Normalized, normalized.ToXyz(), Compare.Float2());
+            Assert.AreEqual(normalized, original.Normalized);
+        }
+    }
+
+    [TestMethod] public void TestXyzConversions()
+    {
+        // Test a bunch of standard cases and then a few dynamic ones.
+        Assert.AreEqual(Float2.Down, Polar2d.Down.ToXyz(), Compare.Float2());
+        Assert.AreEqual(Float2.Left, Polar2d.Left.ToXyz(), Compare.Float2());
+        Assert.AreEqual(Float2.Right, Polar2d.Right.ToXyz(), Compare.Float2());
+        Assert.AreEqual(Float2.Up, Polar2d.Up.ToXyz(), Compare.Float2());
+
+        for (int i = 0; i < BulkTestCount; i++)
+        {
+            Polar2d a = RandomData;
+
+            Float2 expected = (a.m * Math.Cos(a.a.Radians), a.m * Math.Sin(a.a.Radians));
+            Assert.AreEqual(expected, a.ToXyz(), Compare.Float2());
+            Assert.AreEqual(a.ToXyz(), (Float2)a, Compare.Float2());
+
+            // TODO: Also convert Float2 -> Polar2d, I like never use that.
+        }
+    }
+
+    [TestMethod] public void TestMatrixConversions()
+    {
+        // By matrix rules, Polar2d.ToMatrix() * (1, 0) should always = Polar2d.ToXyz()
+        for (int i = 0; i < BulkTestCount; i++)
+        {
+            Polar2d polar = RandomData;
+            Assert.AreEqual(polar.ToXyz(), polar.ToMatrix() * (1, 0), Compare.Float2());
         }
     }
 
