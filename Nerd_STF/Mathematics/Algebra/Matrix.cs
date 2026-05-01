@@ -1,4 +1,5 @@
 ﻿using Nerd_STF.Helpers;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -615,5 +616,6 @@ namespace Nerd_STF.Mathematics.Algebra
         public static implicit operator Matrix(Float2 vec) => new Matrix((2, 1), new double[] { vec.x, vec.y });
         public static implicit operator Matrix(Float3 vec) => new Matrix((3, 1), new double[] { vec.x, vec.y, vec.z });
         public static implicit operator Matrix(Float4 vec) => new Matrix((4, 1), new double[] { vec.x, vec.y, vec.z, vec.w });
+        public static implicit operator Matrix(Polar2d polar) => polar.ToMatrix();
     }
 }

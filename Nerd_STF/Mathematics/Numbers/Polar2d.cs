@@ -1,5 +1,4 @@
-﻿using Nerd_STF.Helpers;
-using Nerd_STF.Mathematics.Algebra;
+﻿using Nerd_STF.Mathematics.Algebra;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -10,20 +9,20 @@ namespace Nerd_STF.Mathematics.Numbers
 {
     public struct Polar2d : IVector<Polar2d>, IEquatable<Polar2d>
 #if CS11_OR_GREATER
-                           ,IFromTuple<Polar2d, (Angle, double)>,
+                           ,IFromTuple<Polar2d, (double, Angle)>,
                             IPresets2d<Polar2d>
 #endif
     {
-        public static Polar2d Down => new Polar2d(Angle.Down, 1);
-        public static Polar2d Left => new Polar2d(Angle.Left, 1);
-        public static Polar2d Right => new Polar2d(Angle.Right, 1);
-        public static Polar2d Up => new Polar2d(Angle.Up, 1);
+        public static Polar2d Down => new Polar2d(1, Angle.Down);
+        public static Polar2d Left => new Polar2d(1, Angle.Left);
+        public static Polar2d Right => new Polar2d(1, Angle.Right);
+        public static Polar2d Up => new Polar2d(1, Angle.Up);
 
 #if CS11_OR_GREATER
         // Bit of an odd definition, that's why it's hidden.
-        static Polar2d IPresets1d<Polar2d>.One => new Polar2d(Angle.FromRevolutions(1), 1);
+        static Polar2d IPresets1d<Polar2d>.One => new Polar2d(1, Angle.FromRevolutions(1));
 #endif
-        public static Polar2d Zero => new Polar2d(Angle.Zero, 0);
+        public static Polar2d Zero => new Polar2d(0, Angle.Zero);
 
         public Angle Theta
         {
@@ -51,20 +50,20 @@ namespace Nerd_STF.Mathematics.Numbers
         public Angle a;
         public double m;
 
-        public Polar2d(Angle angle, double magnitude)
+        public Polar2d(double magnitude, Angle theta)
         {
-            a = angle;
             m = magnitude;
+            a = theta;
         }
-        public Polar2d(double angle, double magnitude)
+        public Polar2d(double magnitude, double theta)
         {
-            a = Angle.FromRadians(angle);
             m = magnitude;
+            a = Angle.FromRadians(theta);
         }
         public Polar2d(Fill<double> fill)
         {
-            a = Angle.FromRadians(fill(0));
-            m = fill(1);
+            m = fill(0);
+            a = Angle.FromRadians(fill(1));
         }
 
         public static Polar2d Average(IEnumerable<Polar2d> values)
@@ -82,8 +81,8 @@ namespace Nerd_STF.Mathematics.Numbers
             else return total / count;
         }
         public static Polar2d Clamp(Polar2d value, Polar2d min, Polar2d max) =>
-            new Polar2d(Angle.Clamp(value.a, min.a, max.a),
-                        MathE.Clamp(value.m, min.m, max.m));
+            new Polar2d(MathE.Clamp(value.m, min.m, max.m),
+                        Angle.Clamp(value.a, min.a, max.a));
         public static void Clamp(ref Polar2d value, Polar2d min, Polar2d max)
         {
             // Can't clamp angle in-place, because it's a readonly struct.
@@ -91,7 +90,7 @@ namespace Nerd_STF.Mathematics.Numbers
             MathE.Clamp(ref value.m, min.m, max.m);
         }
         public static Polar2d ClampMagnitude(Polar2d value, double minMag, double maxMag) =>
-            new Polar2d(value.a, MathE.Clamp(value.m, minMag, maxMag));
+            new Polar2d(MathE.Clamp(value.m, minMag, maxMag), value.a);
         public static void ClampMagnitude(ref Polar2d value, double minMag, double maxMag) =>
             MathE.Clamp(ref value.m, minMag, maxMag);
 #if CS11_OR_GREATER
@@ -99,8 +98,8 @@ namespace Nerd_STF.Mathematics.Numbers
         static double IDotOperation<Polar2d, double>.Dot(IEnumerable<Polar2d> vals) => Float2.Dot(vals.Cast<Float2>());
 #endif
         public static Polar2d Lerp(Polar2d a, Polar2d b, double t, bool clamp = true) =>
-            new Polar2d(Angle.Lerp(a.a, b.a, t, clamp),
-                        MathE.Lerp(a.m, b.m, t, clamp));
+            new Polar2d(MathE.Lerp(a.m, b.m, t, clamp),
+                        Angle.Lerp(a.a, b.a, t, clamp));
         public static Polar2d Sum(IEnumerable<Polar2d> vals)
         {
             Polar2d result = Zero;
@@ -128,6 +127,8 @@ namespace Nerd_STF.Mathematics.Numbers
         }
 
         public Float2 ToXyz() => new Float2(m * MathE.Cos(a), m * MathE.Sin(a));
+
+        public Matrix2x2 ToMatrix() => Matrix2x2.Rotation(a) * m;
 
         public bool Equals(Polar2d other) => Equals(other, 1e-3);
         public bool Equals(Polar2d other, double delta)
@@ -166,11 +167,11 @@ namespace Nerd_STF.Mathematics.Numbers
         public string ToString(string format) => $"({m.ToString(format)}, {a.ToString(format)})";
 
         public static Polar2d operator +(Polar2d a, Polar2d b) => (a.ToXyz() + b.ToXyz()).ToPolar();
-        public static Polar2d operator -(Polar2d a) => new Polar2d(a.a, -a.m);
+        public static Polar2d operator -(Polar2d a) => new Polar2d(-a.m, a.a);
         public static Polar2d operator -(Polar2d a, Polar2d b) => (a.ToXyz() - b.ToXyz()).ToPolar();
-        public static Polar2d operator *(Polar2d a, double b) => new Polar2d(a.a, a.m * b);
-        public static Polar2d operator *(double a, Polar2d b) => new Polar2d(b.a, b.m * a);
-        public static Polar2d operator /(Polar2d a, double b) => new Polar2d(a.a, a.m / b);
+        public static Polar2d operator *(Polar2d a, double b) => new Polar2d(a.m * b, a.a);
+        public static Polar2d operator *(double a, Polar2d b) => new Polar2d(b.m * a, b.a);
+        public static Polar2d operator /(Polar2d a, double b) => new Polar2d(a.m / b, a.a);
         public static bool operator ==(Polar2d a, Polar2d b) => a.Equals(b);
         public static bool operator !=(Polar2d a, Polar2d b) => !a.Equals(b);
 
@@ -185,13 +186,13 @@ namespace Nerd_STF.Mathematics.Numbers
         public static implicit operator Polar2d(Vector2 vec) => ((Float2)vec).ToPolar();
         public static implicit operator Polar2d(Vector3 vec) => ((Float2)vec).ToPolar();
         public static implicit operator Polar2d(Vector4 vec) => ((Float2)vec).ToPolar();
-        public static implicit operator Polar2d((Angle, double) tuple) => new Polar2d(tuple.Item1, tuple.Item2);
+        public static implicit operator Polar2d((double, Angle) tuple) => new Polar2d(tuple.Item1, tuple.Item2);
 
         public static explicit operator Point(Polar2d polar) => (Point)polar.ToXyz();
         public static explicit operator PointF(Polar2d polar) => polar.ToXyz();
         public static implicit operator Vector2(Polar2d polar) => polar.ToXyz();
         public static implicit operator Vector3(Polar2d polar) => polar.ToXyz();
         public static implicit operator Vector4(Polar2d polar) => polar.ToXyz();
-        public static implicit operator ValueTuple<Angle, double>(Polar2d polar) => (polar.a, polar.m);
+        public static implicit operator ValueTuple<double, Angle>(Polar2d polar) => (polar.m, polar.a);
     }
 }

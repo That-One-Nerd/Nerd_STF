@@ -1,4 +1,5 @@
 ﻿using Nerd_STF.Helpers;
+using Nerd_STF.Mathematics.Numbers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -399,8 +400,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => a.Equals(b);
         public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !a.Equals(b);
 
-
-        public static implicit operator Matrix(Matrix2x2 mat) => new Matrix(mat);
+        public static implicit operator Matrix2x2(Polar2d polar) => polar.ToMatrix();
         public static explicit operator Matrix2x2(Matrix mat) =>
             new Matrix2x2(mat.TryGet(0, 0), mat.TryGet(0, 1),
                           mat.TryGet(1, 0), mat.TryGet(1, 1));
@@ -410,5 +410,7 @@ namespace Nerd_STF.Mathematics.Algebra
         public static explicit operator Matrix2x2(Matrix4x4 mat) =>
             new Matrix2x2(mat.r0c0, mat.r0c1,
                           mat.r1c0, mat.r1c1);
+
+        public static implicit operator Matrix(Matrix2x2 mat) => new Matrix(mat);
     }
 }

@@ -15,7 +15,7 @@ public sealed class Polar2dTests
         get
         {
             Random rand = Random.Shared;
-            return new(Angle.FromRevolutions(rand.NextDouble()), 10 * rand.NextDouble());
+            return new(10 * rand.NextDouble(), Angle.FromRevolutions(rand.NextDouble()));
         }
     }
 
@@ -38,15 +38,15 @@ public sealed class Polar2dTests
             double aV = 6.29 * rand.NextDouble(), m = 10 * rand.NextDouble();
             Angle a = Angle.FromRadians(aV);
 
-            Assert.AreEqual(a, new Polar2d(a, m).a);
-            Assert.AreEqual(m, new Polar2d(a, m).m);
-            Assert.AreEqual(a, new Polar2d(aV, m).a);
-            Assert.AreEqual(m, new Polar2d(aV, m).m);
+            Assert.AreEqual(a, new Polar2d(m, a).a);
+            Assert.AreEqual(m, new Polar2d(m, a).m);
+            Assert.AreEqual(a, new Polar2d(m, aV).a);
+            Assert.AreEqual(m, new Polar2d(m, aV).m);
 
             double fill(int i) => i switch
             {
-                0 => aV,
-                1 => m,
+                0 => m,
+                1 => aV,
                 _ => throw new ArgumentOutOfRangeException()
             };
 
@@ -60,10 +60,10 @@ public sealed class Polar2dTests
         Random rand = Random.Shared;
         for (int i = 0; i < BulkTestCount; i++)
         {
-            Angle a = Angle.FromRevolutions(rand.NextDouble());
             double m = 10 * rand.NextDouble();
+            Angle a = Angle.FromRevolutions(rand.NextDouble());
 
-            Polar2d val = new(a, m);
+            Polar2d val = new(m, a);
 
             // Test getting properties.
             Assert.AreEqual(a, val.a);

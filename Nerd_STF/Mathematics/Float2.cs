@@ -228,13 +228,13 @@ namespace Nerd_STF.Mathematics
                 // Honestly this could (and maybe should)
                 // be made branchless, and it would probably
                 // be better.
-                if (y > 0) return new Polar2d(Angle.Up, y);
-                else if (y < 0) return new Polar2d(Angle.Down, -y);
+                if (y > 0) return new Polar2d(y, Angle.Up);
+                else if (y < 0) return new Polar2d(-y, Angle.Down);
                 else return Polar2d.Zero;
             }
 
             double angle = Math.Atan2(y, x);
-            return new Polar2d(Angle.FromRadians(angle), Magnitude);
+            return new Polar2d(Magnitude, Angle.FromRadians(angle));
         }
 
         public IEnumerator<double> GetEnumerator()
